@@ -1,0 +1,40 @@
+package com.pzdd.note.ui
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import com.pzdd.note.data.AppSettings
+import com.pzdd.note.data.SettingsRepository
+import com.pzdd.note.data.ThemeMode
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+class SettingsViewModel(app: Application) : AndroidViewModel(app) {
+
+    private val repo = SettingsRepository(app)
+
+    private val _settings = MutableStateFlow(repo.load())
+    val settings: StateFlow<AppSettings> = _settings.asStateFlow()
+
+    private fun persist() = repo.save(_settings.value)
+
+    fun setThemeMode(mode: ThemeMode) {
+        _settings.value = _settings.value.copy(themeMode = mode)
+        persist()
+    }
+
+    fun setThemeColorKey(key: String) {
+        _settings.value = _settings.value.copy(themeColorKey = key)
+        persist()
+    }
+
+    fun setFloatingBottomBar(enabled: Boolean) {
+        _settings.value = _settings.value.copy(floatingBottomBar = enabled)
+        persist()
+    }
+
+    fun setLiquidGlassBottomBar(enabled: Boolean) {
+        _settings.value = _settings.value.copy(liquidGlassBottomBar = enabled)
+        persist()
+    }
+}

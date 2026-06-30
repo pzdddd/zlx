@@ -1,0 +1,68 @@
+package com.pzdd.note.ui
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.pzdd.note.data.Note
+import com.pzdd.note.data.NoteRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class NoteViewModel(app: Application) : AndroidViewModel(app) {
+
+    private val repo = NoteRepository(app)
+
+    private val _notes = MutableStateFlow<List<Note>>(emptyList())
+    val notes: StateFlow<List<Note>> = _notes.asStateFlow()
+
+    init {
+        _notes.value = repo.loadAll()
+    }
+
+    private fun persist() {
+        repo.saveAll(_notes.value)
+    }
+
+    fun addNote(title: String, content: String) {
+        if (title.isBlank() && content.isBlank()) return
+        val now = System.currentTimeMillis()
+        val note = Note(
+            id = now,
+            title = title.trim(),
+            content = content.trim(),
+            createdAt = now,
+            updatedAt = now
+        )
+        _notes.value = listOf(note) + _notes.value
+        persist()
+    }
+
+    fun updateNote(note: Note, title: String, content: String) {
+        _notes.value = _notes.value.map {
+            if (it.id == note.id) it.copy(
+                title = title.trim(),
+                content = content.trim(),
+                updatedAt = System.currentTimeMillis()
+            ) else it
+        }
+        persist()
+    }
+
+    fun deleteNote(note: Note) {
+        _notes.value = _notes.value.filterNot { it.id == note.id }
+        persist()
+    }
+
+    fun toggleFavorite(note: Note) {
+        _notes.value = _notes.value.map {
+            if (it.id == note.id) it.copy(
+                isFavorite = !it.isFavorite,
+                updatedAt = System.currentTimeMillis()
+            ) else it
+        }
+        persist()
+    }
+}

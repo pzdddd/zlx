@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -22,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,8 +34,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pzdd.note.ui.page.FavoritesPage
 import com.pzdd.note.ui.page.HomePage
 import com.pzdd.note.ui.page.SettingsPage
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.shape.RoundedCornerShape
+import com.kyant.backdrop.backdrops.LayerBackdrop
+import com.kyant.backdrop.backdrops.layerBackdrop
 
 @Composable
 fun AppRoot() {
@@ -47,34 +48,43 @@ fun AppRoot() {
     val floatingBottomBar = settings.floatingBottomBar
     val liquidGlass = settings.liquidGlassBottomBar
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        bottomBar = {
-            if (floatingBottomBar) {
-                FloatingBottomBar(
-                    selected = selected,
-                    onSelect = { selected = it },
-                    liquidGlass = liquidGlass,
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .padding(horizontal = 24.dp)
-                        .padding(bottom = 12.dp)
-                )
-            } else {
-                StandardBottomBar(
-                    selected = selected,
-                    onSelect = { selected = it },
-                    modifier = Modifier
-                )
+    // 液态玻璃 backdrop：采样底栏下方的页面内容用于折射/模糊
+    val backdrop = rememberLiquidGlassBackdrop()
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            bottomBar = {
+                if (floatingBottomBar) {
+                    FloatingBottomBar(
+                        selected = selected,
+                        onSelect = { selected = it },
+                        liquidGlass = liquidGlass,
+                        backdrop = backdrop,
+                        modifier = Modifier
+                            .navigationBarsPadding()
+                            .padding(horizontal = 24.dp)
+                            .padding(bottom = 12.dp)
+                    )
+                } else {
+                    StandardBottomBar(
+                        selected = selected,
+                        onSelect = { selected = it },
+                        modifier = Modifier
+                    )
+                }
             }
+        ) { paddingValues: PaddingValues ->
+            AppContent(
+                selected = selected,
+                noteVm = noteVm,
+                settingsVm = settingsVm,
+                paddingValues = paddingValues,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .layerBackdrop(backdrop)
+            )
         }
-    ) { paddingValues: PaddingValues ->
-        AppContent(
-            selected = selected,
-            noteVm = noteVm,
-            settingsVm = settingsVm,
-            paddingValues = paddingValues
-        )
     }
 }
 
@@ -83,9 +93,10 @@ private fun AppContent(
     selected: Int,
     noteVm: NoteViewModel,
     settingsVm: SettingsViewModel,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier) {
         when (selected) {
             0 -> HomePage(vm = noteVm, paddingValues = paddingValues)
             1 -> FavoritesPage(vm = noteVm, paddingValues = paddingValues)
@@ -110,13 +121,15 @@ private fun FloatingBottomBar(
     selected: Int,
     onSelect: (Int) -> Unit,
     liquidGlass: Boolean,
+    backdrop: LayerBackdrop,
     modifier: Modifier = Modifier
 ) {
     if (liquidGlass) {
-        // 液态玻璃 + 果冻弹性底栏
+        // 液态玻璃 + 果冻弹性底栏（基于 Kyant Backdrop 库）
         LiquidGlassBottomBar(
             selected = selected,
             onSelect = onSelect,
+            backdrop = backdrop,
             modifier = modifier,
         )
     } else {

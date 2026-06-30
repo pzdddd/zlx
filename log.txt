@@ -32,10 +32,10 @@
 // 如果背景就是纯色（没有图片/滚动内容），液态玻璃的"折射"效果会
 // 不明显——折射的前提是背景里有可被扭曲的内容（图案、文字、图片等）。
 
-package com.example.liquidglass
+package com.fuck.zlx.liquidglass
 
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateColorAsState
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -145,9 +145,7 @@ fun LiquidGlassSwitch(
             .toggleable(
                 value = checked,
                 onValueChange = { onCheckedChange?.invoke(it) },
-                enabled = enabled,
-                interactionSource = interactionSource,
-                indication = null,
+                enabled = enabled
             ),
         contentAlignment = Alignment.CenterStart,
     ) {
@@ -398,3 +396,242 @@ fun FeatureCenterScreenExample(backdrop: Backdrop) {
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
+    // ======================= Kyant Backdrop 核心配置 =======================
+    val backdrop = rememberLayerBackdrop()
+
+    val bottomBarPadding = if (isFloating || isLiquidGlass) {
+        Modifier.padding(horizontal = 16.dp, vertical = 16.dp) 
+    } else {
+        Modifier
+    }
+    
+    val cornerRadius = if (isSmoothCorners) 28.dp else if (isFloating) 16.dp else 0.dp
+    val bottomBarShape = RoundedCornerShape(cornerRadius)
+
+    val bottomBarOffset by animateDpAsState(
+        targetValue = if (actualVisibility) 0.dp else 130.dp,
+        animationSpec = spring(dampingRatio = 0.85f, stiffness = Spring.StiffnessMediumLow),
+        label = "bottomBarOffset"
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
+        bottomBar = {
+            // 底栏容器
+            Box(
+                modifier = bottomBarPadding
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .offset(y = bottomBarOffset),
+                contentAlignment = Alignment.Center
+            ) {
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    val tabCount = NavRoute.values().size
+                    val density = LocalDensity.current
+                    val tabWidthPx = with(density) { maxWidth.toPx() } / tabCount
+                    val tabWidth = maxWidth / tabCount
+                    val scope = rememberCoroutineScope()
+
+                    // ================= 核心参数配置 =================
+                    val selectedIndex = NavRoute.values().indexOf(currentRoute)
+                    val position = remember { Animatable(selectedIndex.toFloat()) }
+                    
+                    var isPressed by remember { mutableStateOf(false) }
+                    var dragVelocity by remember { mutableStateOf(0f) }
+
+                    // 同步外部路由变化
+                    LaunchedEffect(selectedIndex) {
+                        if (!isPressed) {
+                            position.animateTo(
+                                selectedIndex.toFloat(),
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            )
+                        }
+                    }
+
+                    // 🍎 物理形变动画：加大 jellyScale 让按下时果冻膨胀更明显 🍎
+                    val jellyScale by animateFloatAsState(
+                        targetValue = if (isPressed) 1.22f else 1f, // 从 1.15 提升到 1.22，充气感更强！
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+                        label = "jellyScale"
+                    )
+                    // 拖拽时的形变拉伸
+                    val stretchAmount by animateFloatAsState(
+                        targetValue = if (isPressed) (abs(dragVelocity) * 0.0015f).coerceIn(0f, 0.25f) else 0f,
+                        animationSpec = spring(stiffness = Spring.StiffnessHigh),
+                        label = "stretchAmount"
+                    )
+                    val stretchDirection = if (dragVelocity >= 0f) 1f else -1f
+                    
+                    // 恢复全宽，不需要再减去圆形大小
+                    val sliderOffsetPx = position.value * tabWidthPx
+
+                    // ================= 开始三明治分层绘制 =================
+
+                    // [图层 1]：最底部的整个底栏背景
+                    if (isLiquidGlass) {
+                        val containerColor = if (isDarkTheme) Color(0xFF121212).copy(alpha = 0.4f) else Color(0xFFFAFAFA).copy(alpha = 0.4f)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .drawBackdrop(
+                                    backdrop = backdrop,
+                                    shape = { Capsule() },
+                                    effects = {
+                                        vibrancy()
+                                        blur(12.dp.toPx())
+                                        lens(24.dp.toPx(), 24.dp.toPx())
+                                    },
+                                    highlight = { Highlight.Default },
+                                    shadow = { Shadow() },
+                                    onDrawSurface = { drawRect(containerColor) }
+                                )
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(bottomBarShape)
+                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+                                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), bottomBarShape)
+                                .shadow(if (isFloating) 0.dp else 8.dp)
+                        )
+                    }
+
+                    // [图层 2]：液态玻璃滑块的视觉层（藏在图标和文字后面，不会遮挡文字）
+                    if (isLiquidGlass) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .offset { IntOffset(sliderOffsetPx.roundToInt(), 0) }
+                                .width(tabWidth)       // 🍎 恢复占据整个 Tab 宽度
+                                .fillMaxHeight()
+                                .padding(horizontal = 14.dp, vertical = 8.dp) // 🍎 内部留白，形成优雅的胶囊体
+                                .graphicsLayer {
+                                    scaleX = jellyScale * (1f + stretchAmount * stretchDirection * 0.3f)
+                                    scaleY = jellyScale * (1f - stretchAmount * 0.15f)
+                                }
+                                .drawBackdrop(
+                                    backdrop = backdrop,
+                                    shape = { Capsule() }, // 胶囊形状
+                                    effects = {
+                                        val pressProgress = if (isPressed) 1f else 0f
+                                        lens(
+                                            10.dp.toPx() + 6.dp.toPx() * pressProgress,
+                                            14.dp.toPx() + 8.dp.toPx() * pressProgress,
+                                            chromaticAberration = true
+                                        )
+                                    },
+                                    highlight = { Highlight.Default },
+                                    shadow = { Shadow() },
+                                    innerShadow = { InnerShadow(radius = 8.dp) },
+                                    onDrawSurface = {
+                                        drawRect(
+                                            if (isDarkTheme) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
+                                        )
+                                    }
+                                )
+                        )
+                    } else {
+                        // 经典样式的胶囊背景
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .offset { IntOffset(sliderOffsetPx.roundToInt(), 0) }
+                                .width(tabWidth)
+                                .fillMaxHeight()
+                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape) // Compose中长方形用CircleShape就是完美胶囊
+                        )
+                    }
+
+                    // [图层 3]：图标与文字展示（渲染在滑块上方，保证百分百清晰不被模糊）
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        NavRoute.values().forEach { route ->
+                            val isSelected = currentRoute == route
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    // 给图标加上直接点击检测，提升响应速度
+                                    .pointerInput(route) {
+                                        detectTapGestures { currentRoute = route }
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally, 
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = if (isSelected) route.selectedIcon else route.unselectedIcon,
+                                        contentDescription = route.title,
+                                        tint = contentColor,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = route.title,
+                                        fontSize = 12.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = contentColor
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // [图层 4]：纯隐形的拖拽事件拦截层（精准盖在当前滑块的上方接收左右拖拽手势）
+                    if (isLiquidGlass) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .offset { IntOffset(sliderOffsetPx.roundToInt(), 0) }
+                                .width(tabWidth)       // 🍎 拦截层同样占满整个 Tab 宽
+                                .fillMaxHeight()
+                                .pointerInput(tabCount, tabWidthPx) {
+                                    detectDragGestures(
+                                        onDragStart = { isPressed = true },
+                                        onDragEnd = {
+                                            isPressed = false
+                                            dragVelocity = 0f
+                                            val target = position.value.roundToInt().coerceIn(0, tabCount - 1)
+                                            scope.launch {
+                                                position.animateTo(
+                                                    target.toFloat(),
+                                                    animationSpec = spring(
+                                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                        stiffness = Spring.StiffnessLow
+                                                    )
+                                                )
+                                            }
+                                            currentRoute = NavRoute.values()[target]
+                                        },
+                                        onDragCancel = {
+                                            isPressed = false
+                                            dragVelocity = 0f
+                                        },
+                                        onDrag = { change, dragAmount ->
+                                            change.consume()
+                                            dragVelocity = dragAmount.x
+                                            val delta = dragAmount.x / tabWidthPx
+                                            scope.launch {
+                                                position.snapTo(
+                                                    (position.value + delta).coerceIn(0f, (tabCount - 1).toFloat())
+                                                )
+                                            }
+                                        }
+                                    )
+                                }
+                        )
+                    }
+                }
+            }
+        }
+    ) { paddingValues ->

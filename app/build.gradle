@@ -52,4 +52,8 @@ dependencies {
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.test.manifest
     coreLibraryDesugaring libs.desugar.jdk.libs
+
+    // 液态玻璃效果库
+    implementation 'io.github.kyant0:backdrop:1.0.6'
+    implementation 'io.github.kyant0:shapes:1.2.0'
 }

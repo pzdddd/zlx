@@ -1,25 +1,25 @@
 package com.pzdd.note.ui
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -28,21 +28,38 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.effects.blur
+import com.kyant.backdrop.effects.lens
+import com.kyant.backdrop.effects.vibrancy
+import com.kyant.backdrop.backdrops.LayerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
+import com.kyant.backdrop.highlight.Highlight
+import com.kyant.backdrop.shadow.InnerShadow
+import com.kyant.backdrop.shadow.Shadow
+import com.kyant.shapes.Capsule
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 data class BottomBarItem(
     val icon: ImageVector,
@@ -56,218 +73,215 @@ fun defaultBottomItems() = listOf(
 )
 
 /**
- * 液态玻璃 + 果冻弹性的浮动底栏。
+ * 基于 Kyant Backdrop 库的液态玻璃底栏。
  *
- * 设计参考 log.txt 中的 com.kyant.backdrop 思路：
- * - blur()       → 真实背景模糊（API31+ RenderEffect，低版本降级半透明）
- * - Highlight    → 顶部高光渐变 + 边缘亮线
- * - Shadow       → 底部柔和投影
- * - lens/vibrancy→ 用渐变色调叠加模拟折射饱和感
- * - 果冻动画     → spring(DampingRatioMediumBouncy) 缩放 + 按压挤压
+ * 参考 log.txt 中的实现思路：
+ * - [图层1] 整个底栏背景：drawBackdrop + vibrancy + blur + lens + Highlight + Shadow
+ * - [图层2] 液态玻璃滑块：跟随选中位置滑动，按压时果冻形变 + 色散折射
+ * - [图层3] 图标与文字：渲染在最上层，保证清晰不被模糊
+ * - [图层4] 隐形拖拽层：支持左右拖拽切换 Tab
  *
- * 不依赖外部库，兼容 minSdk 28。
+ * 需要调用方提供 backdrop（通过 rememberLayerBackdrop() 创建）。
  */
 @Composable
 fun LiquidGlassBottomBar(
     selected: Int,
     onSelect: (Int) -> Unit,
+    backdrop: LayerBackdrop,
     modifier: Modifier = Modifier,
     items: List<BottomBarItem> = defaultBottomItems(),
-    cornerRadius: Dp = 28.dp,
 ) {
     val isLight = MaterialTheme.colorScheme.background.luminance() > 0.5f
+    val tabCount = items.size
 
-    val glassColor = if (isLight) {
-        Color.White.copy(alpha = 0.55f)
-    } else {
-        Color(0xFF1C1C1E).copy(alpha = 0.45f)
-    }
-    val borderColor = if (isLight) {
-        Color.White.copy(alpha = 0.6f)
-    } else {
-        Color.White.copy(alpha = 0.12f)
-    }
+    BoxWithConstraints(modifier = modifier.fillMaxWidth().height(72.dp)) {
+        val density = LocalDensity.current
+        val tabWidthPx = with(density) { maxWidth.toPx() } / tabCount
+        val tabWidth = maxWidth / tabCount
+        val scope = rememberCoroutineScope()
 
-    // 投影层和玻璃主体必须是平级兄弟，不能父子嵌套，
-    // 否则父级的 blur() 会把子级内容（按钮）也一起模糊掉。
-    Box(
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        // 投影层（模拟 Shadow）— 纯色块 + blur，放在底层
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .padding(top = 4.dp)
-                .clip(RoundedCornerShape(cornerRadius))
-                .background(Color.Black.copy(alpha = if (isLight) 0.10f else 0.35f))
-                .blur(16.dp),
-        )
-        // 玻璃主体 — 不加 blur，按钮内容清晰可见
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(cornerRadius))
-                .background(glassColor)
-                .border(1.dp, borderColor, RoundedCornerShape(cornerRadius))
-                .drawBehind {
-                    // 顶部高光渐变（模拟 Highlight.Default）
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.White.copy(alpha = if (isLight) 0.45f else 0.18f),
-                                Color.Transparent,
-                            ),
-                            startY = 0f,
-                            endY = size.height * 0.5f,
-                        ),
-                    )
-                    // 底部微暗渐变，增加厚度感
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Black.copy(alpha = if (isLight) 0.04f else 0.15f),
-                            ),
-                            startY = size.height * 0.5f,
-                            endY = size.height,
-                        ),
-                    )
-                },
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                items.forEachIndexed { index, item ->
-                    JellyNavItem(
-                        item = item,
-                        selected = selected == index,
-                        onClick = { onSelect(index) },
-                        isLight = isLight,
-                    )
-                }
+        // 滑块位置动画
+        val position = remember { Animatable(selected.toFloat()) }
+
+        var isPressed by remember { mutableStateOf(false) }
+        var dragVelocity by remember { mutableFloatStateOf(0f) }
+
+        // 同步外部选中变化
+        LaunchedEffect(selected) {
+            if (!isPressed) {
+                position.animateTo(
+                    selected.toFloat(),
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    ),
+                )
             }
         }
-    }
-}
-/**
- * 单个果冻导航项。
- *
- * 果冻效果：
- * - 选中时图标 + 文字用弹性 spring 放大
- * - 按压时 graphicsLayer scaleX/Y 挤压（像捏果冻）
- * - 选中指示器为胶囊高亮，带弹性位移
- */
-@Composable
-private fun RowScope.JellyNavItem(
-    item: BottomBarItem,
-    selected: Boolean,
-    onClick: () -> Unit,
-    isLight: Boolean,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
 
-    val contentColor = if (selected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-    }
+        // 果冻按压膨胀
+        val jellyScale by animateFloatAsState(
+            targetValue = if (isPressed) 1.22f else 1f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium,
+            ),
+            label = "jellyScale",
+        )
+        // 拖拽拉伸
+        val stretchAmount by animateFloatAsState(
+            targetValue = if (isPressed) (abs(dragVelocity) * 0.0015f).coerceIn(0f, 0.25f) else 0f,
+            animationSpec = spring(stiffness = Spring.StiffnessHigh),
+            label = "stretchAmount",
+        )
+        val stretchDirection = if (dragVelocity >= 0f) 1f else -1f
 
-    // 选中时整体放大
-    val selectedScale by animateFloatAsState(
-        targetValue = if (selected) 1.12f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow,
-        ),
-        label = "selectedScale",
-    )
-    // 按压时挤压：横向拉伸、纵向压缩
-    val pressScaleX by animateFloatAsState(
-        targetValue = if (isPressed) 1.15f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessHigh,
-        ),
-        label = "pressScaleX",
-    )
-    val pressScaleY by animateFloatAsState(
-        targetValue = if (isPressed) 0.85f else 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessHigh,
-        ),
-        label = "pressScaleY",
-    )
-    // 选中指示器（胶囊）宽度弹性变化
-    val indicatorWidth by animateDpAsState(
-        targetValue = if (selected) 40.dp else 0.dp,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium,
-        ),
-        label = "indicatorWidth",
-    )
+        val sliderOffsetPx = position.value * tabWidthPx
 
-    val indicatorColor = if (isLight) {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-    } else {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-    }
+        // ==================== [图层1] 底栏整体液态玻璃背景 ====================
+        val containerColor = if (isLight) {
+            Color(0xFFFAFAFA).copy(alpha = 0.4f)
+        } else {
+            Color(0xFF121212).copy(alpha = 0.4f)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { Capsule() },
+                    effects = {
+                        vibrancy()
+                        blur(12.dp.toPx())
+                        lens(24.dp.toPx(), 24.dp.toPx())
+                    },
+                    highlight = { Highlight.Default },
+                    shadow = { Shadow() },
+                    onDrawSurface = { drawRect(containerColor) },
+                ),
+        )
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .weight(1f)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick,
-            )
-            .padding(vertical = 6.dp),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            // 选中胶囊指示器
-            if (indicatorWidth > 0.dp) {
+        // ==================== [图层2] 液态玻璃滑块 ====================
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset { IntOffset(sliderOffsetPx.roundToInt(), 0) }
+                .width(tabWidth)
+                .fillMaxHeight()
+                .padding(horizontal = 14.dp, vertical = 8.dp)
+                .graphicsLayer {
+                    scaleX = jellyScale * (1f + stretchAmount * stretchDirection * 0.3f)
+                    scaleY = jellyScale * (1f - stretchAmount * 0.15f)
+                }
+                .drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { Capsule() },
+                    effects = {
+                        val pressProgress = if (isPressed) 1f else 0f
+                        lens(
+                            10.dp.toPx() + 6.dp.toPx() * pressProgress,
+                            14.dp.toPx() + 8.dp.toPx() * pressProgress,
+                            chromaticAberration = true,
+                        )
+                    },
+                    highlight = { Highlight.Default },
+                    shadow = { Shadow() },
+                    innerShadow = { InnerShadow(radius = 8.dp) },
+                    onDrawSurface = {
+                        drawRect(
+                            if (isLight) Color.Black.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.10f),
+                        )
+                    },
+                ),
+        )
+        // ==================== [图层3] 图标与文字 ====================
+        Row(modifier = Modifier.fillMaxSize()) {
+            items.forEachIndexed { index, item ->
+                val isSelected = selected == index
                 Box(
                     modifier = Modifier
-                        .width(indicatorWidth)
-                        .height(32.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(indicatorColor),
-                )
-            }
-            // 图标 + 文字，套 graphicsLayer 做果冻形变
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.graphicsLayer {
-                    scaleX = selectedScale * pressScaleX
-                    scaleY = selectedScale * pressScaleY
-                },
-            ) {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = item.label,
-                    tint = contentColor,
-                    modifier = Modifier.size(22.dp),
-                )
-                if (selected) {
-                    Text(
-                        text = item.label,
-                        color = contentColor,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.SemiBold,
-                        ),
-                        modifier = Modifier.padding(top = 2.dp),
-                        maxLines = 1,
-                    )
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .pointerInput(index) {
+                            detectTapGestures { onSelect(index) }
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    val contentColor = if (isSelected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = item.label,
+                            tint = contentColor,
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = item.label,
+                            fontSize = 12.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = contentColor,
+                        )
+                    }
                 }
             }
         }
+
+        // ==================== [图层4] 隐形拖拽层 ====================
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset { IntOffset(sliderOffsetPx.roundToInt(), 0) }
+                .width(tabWidth)
+                .fillMaxHeight()
+                .pointerInput(tabCount, tabWidthPx) {
+                    detectDragGestures(
+                        onDragStart = { isPressed = true },
+                        onDragEnd = {
+                            isPressed = false
+                            dragVelocity = 0f
+                            val target = position.value.roundToInt().coerceIn(0, tabCount - 1)
+                            scope.launch {
+                                position.animateTo(
+                                    target.toFloat(),
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessLow,
+                                    ),
+                                )
+                            }
+                            onSelect(target)
+                        },
+                        onDragCancel = {
+                            isPressed = false
+                            dragVelocity = 0f
+                        },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            dragVelocity = dragAmount.x
+                            val delta = dragAmount.x / tabWidthPx
+                            scope.launch {
+                                position.snapTo(
+                                    (position.value + delta).coerceIn(0f, (tabCount - 1).toFloat()),
+                                )
+                            }
+                        },
+                    )
+                },
+        )
     }
 }
+
+/**
+ * 创建液态玻璃底栏所需的 backdrop。
+ * 在页面根布局中使用，并将背景内容用 Modifier.layerBackdrop(backdrop) 标记。
+ */
+@Composable
+fun rememberLiquidGlassBackdrop(): LayerBackdrop = rememberLayerBackdrop()

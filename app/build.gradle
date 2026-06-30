@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace 'com.pzdd.note'
-    compileSdk 37
+    compileSdk 36
 
     defaultConfig {
         applicationId 'com.pzdd.note'

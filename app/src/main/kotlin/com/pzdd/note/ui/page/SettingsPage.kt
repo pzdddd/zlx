@@ -1,7 +1,9 @@
 package com.pzdd.note.ui.page
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,6 +33,9 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,87 +50,40 @@ import com.pzdd.note.ui.theme.ThemeColorOptions
 
 @Composable
 fun SettingsPage(
-    paddingValues: PaddingValues,
-    settingsVm: SettingsViewModel
+    vm: SettingsViewModel,
+    paddingValues: PaddingValues
 ) {
-    val settings by settingsVm.settings.collectAsStateSafe()
+    val settings by vm.settings.collectAsStateSafe()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(paddingValues)
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // 应用信息卡片
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(text = "PZ 记事本", style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = "版本 1.0",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
         // ===== 主题模式 =====
         SettingsSectionCard(title = "主题模式") {
-            ThemeMode.entries.forEach { mode ->
-                SelectableRow(
-                    title = mode.label,
-                    selected = settings.themeMode == mode,
-                    onClick = { settingsVm.setThemeMode(mode) }
-                )
-            }
+            ThemeModePickerRow(
+                currentMode = settings.themeMode,
+                onSelect = { vm.setThemeMode(it) }
+            )
         }
 
-        // ===== 主题色 =====
-        SettingsSectionCard(title = "主题色") {
+        // ===== 主题颜色 =====
+        SettingsSectionCard(title = "主题颜色") {
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(vertical = 4.dp)
+                contentPadding = PaddingValues(horizontal = 4.dp)
             ) {
                 items(ThemeColorOptions) { option ->
-                    val isSelected = settings.themeColorKey == option.key
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape)
-                                .background(option.lightPrimary)
-                                .then(
-                                    if (isSelected) Modifier.border(
-                                        width = 3.dp,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        shape = CircleShape
-                                    ) else Modifier
-                                )
-                                .clickable { settingsVm.setThemeColorKey(option.key) },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (isSelected) {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        }
-                        Text(
-                            text = option.name,
-                            style = MaterialTheme.typography.labelSmall,
-                            textAlign = TextAlign.Center
-                        )
-                    }
+                    SelectableRow(
+                        title = option.name,
+                        color = option.lightPrimary,
+                        selected = settings.themeColorKey == option.key,
+                        onClick = { vm.setThemeColorKey(option.key) }
+                    )
                 }
             }
         }
@@ -133,14 +94,14 @@ fun SettingsPage(
                 title = "悬浮分页底栏",
                 subtitle = "底栏悬浮于内容上方，圆角胶囊样式",
                 checked = settings.floatingBottomBar,
-                onCheckedChange = { settingsVm.setFloatingBottomBar(it) }
+                onCheckedChange = { vm.setFloatingBottomBar(it) }
             )
             SwitchRow(
                 title = "液态玻璃效果",
                 subtitle = "半透明毛玻璃质感的底栏背景",
                 checked = settings.liquidGlassBottomBar,
                 enabled = settings.floatingBottomBar,
-                onCheckedChange = { settingsVm.setLiquidGlassBottomBar(it) }
+                onCheckedChange = { vm.setLiquidGlassBottomBar(it) }
             )
         }
 
@@ -185,10 +146,10 @@ private fun SettingsSectionCard(
         }
     }
 }
-
 @Composable
 private fun SelectableRow(
     title: String,
+    color: Color,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -205,7 +166,18 @@ private fun SelectableRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = title, style = MaterialTheme.typography.bodyLarge)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(color)
+            )
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+        }
         if (selected) {
             Icon(
                 imageVector = Icons.Filled.Check,
@@ -253,5 +225,96 @@ private fun SwitchRow(
             enabled = enabled,
             onCheckedChange = onCheckedChange
         )
+    }
+}
+
+@Composable
+private fun ThemeModePickerRow(
+    currentMode: ThemeMode,
+    onSelect: (ThemeMode) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 12.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = "主题模式", style = MaterialTheme.typography.bodyLarge)
+            Row(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = currentMode.label,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Filled.KeyboardArrowUp
+                    else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
+        // 点击后在卡片内直接展开列表，选中后自动收回
+        AnimatedVisibility(visible = expanded) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+            ) {
+                ThemeMode.entries.forEachIndexed { index, mode ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                onSelect(mode)
+                                expanded = false
+                            }
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = mode.label,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (mode == currentMode)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.onSurface
+                        )
+                        if (mode == currentMode) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                    // 分隔线（最后一项不显示）
+                    if (index < ThemeMode.entries.size - 1) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .height(0.5.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                                )
+                        )
+                    }
+                }
+            }
+        }
     }
 }

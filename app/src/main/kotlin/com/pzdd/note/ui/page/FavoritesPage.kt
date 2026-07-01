@@ -170,7 +170,7 @@ private fun FavCard(
                 Icon(
                     Icons.Filled.Star,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.tertiary,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.dp)
                 )
             }

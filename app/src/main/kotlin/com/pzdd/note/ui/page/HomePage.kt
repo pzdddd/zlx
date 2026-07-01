@@ -299,7 +299,7 @@ private fun NoteCard(
                     Icon(
                         Icons.Filled.Star,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.tertiary,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -356,14 +356,14 @@ private fun NoteCard(
                     Icon(
                         if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
                         contentDescription = "收藏",
-                        tint = if (note.isFavorite) MaterialTheme.colorScheme.tertiary
+                        tint = if (note.isFavorite) MaterialTheme.colorScheme.primary
                                else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = "收藏",
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (note.isFavorite) MaterialTheme.colorScheme.tertiary
+                        color = if (note.isFavorite) MaterialTheme.colorScheme.primary
                                 else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

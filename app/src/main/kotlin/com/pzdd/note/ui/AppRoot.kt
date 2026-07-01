@@ -1,13 +1,15 @@
 package com.pzdd.note.ui
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -50,23 +52,15 @@ fun AppRoot() {
 
     // 液态玻璃 backdrop：采样底栏下方的页面内容用于折射/模糊
     val backdrop = rememberLiquidGlassBackdrop()
+    val liquidGlassEnabled = floatingBottomBar && liquidGlass
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
-                if (floatingBottomBar) {
-                    FloatingBottomBar(
-                        selected = selected,
-                        onSelect = { selected = it },
-                        liquidGlass = liquidGlass,
-                        backdrop = backdrop,
-                        modifier = Modifier
-                            .navigationBarsPadding()
-                            .padding(horizontal = 24.dp)
-                            .padding(bottom = 12.dp)
-                    )
-                } else {
+                // 仅标准底栏放入 Scaffold 槽以预留底部空间；
+                // 悬浮底栏不占 Scaffold 布局，改为 Box 叠加在内容上方
+                if (!floatingBottomBar) {
                     StandardBottomBar(
                         selected = selected,
                         onSelect = { selected = it },
@@ -80,9 +74,24 @@ fun AppRoot() {
                 noteVm = noteVm,
                 settingsVm = settingsVm,
                 paddingValues = paddingValues,
+                backdrop = backdrop,
+                liquidGlassEnabled = liquidGlassEnabled,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        // 悬浮底栏叠加在 Scaffold 内容之上
+        if (floatingBottomBar) {
+            FloatingBottomBar(
+                selected = selected,
+                onSelect = { selected = it },
+                liquidGlass = liquidGlass,
+                backdrop = backdrop,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .layerBackdrop(backdrop)
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 12.dp)
             )
         }
     }
@@ -94,10 +103,25 @@ private fun AppContent(
     noteVm: NoteViewModel,
     settingsVm: SettingsViewModel,
     paddingValues: PaddingValues,
+    backdrop: LayerBackdrop,
+    liquidGlassEnabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        when (selected) {
+    val baseModifier = if (liquidGlassEnabled) {
+        modifier.statusBarsPadding().layerBackdrop(backdrop)
+    } else {
+        modifier.statusBarsPadding()
+    }
+
+    // 使用 Crossfade 替代 AnimatedContent：
+    // 纯 alpha 淡入淡出，不做位移，避免新旧页面同时布局+绘制造成的掉帧
+    Crossfade(
+        targetState = selected,
+        animationSpec = tween(durationMillis = 200),
+        modifier = baseModifier,
+        label = "pageTransition",
+    ) { page ->
+        when (page) {
             0 -> HomePage(vm = noteVm, paddingValues = paddingValues)
             1 -> FavoritesPage(vm = noteVm, paddingValues = paddingValues)
             2 -> SettingsPage(vm = settingsVm, paddingValues = paddingValues)

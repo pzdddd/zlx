@@ -1,0 +1,6 @@
+@Composable
+private fun StandardBottomBar(
+    selected: Int,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {

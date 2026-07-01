@@ -21,10 +21,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,20 +90,39 @@ fun HomePage(
                     NoteCard(
                         note = note,
                         onClick = { editingNote = note },
-                        onLongClick = { actionNote = note }
+                        onLongClick = { actionNote = note },
+                        onCopyContent = {
+                            copyToClipboard(context, "内容", note.content)
+                            Toast.makeText(context, "已复制内容", Toast.LENGTH_SHORT).show()
+                        },
+                        onCopyTitle = {
+                            copyToClipboard(context, "标题", note.title)
+                            Toast.makeText(context, "已复制标题", Toast.LENGTH_SHORT).show()
+                        },
+                        onToggleFavorite = {
+                            vm.toggleFavorite(note)
+                        },
+                        onDelete = {
+                            vm.deleteNote(note)
+                            Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
+                        }
                     )
                 }
             }
         }
 
-        ExtendedFloatingActionButton(
+        FloatingActionButton(
             onClick = { showAdd = true },
-            icon = { Icon(Icons.Filled.Add, contentDescription = "添加") },
-            text = { Text("添加") },
+            shape = androidx.compose.foundation.shape.CircleShape,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(20.dp)
-        )
+                .size(56.dp)
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = "添加")
+        }
     }
 
     if (showAdd) {
@@ -160,7 +184,11 @@ fun HomePage(
 private fun NoteCard(
     note: Note,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
+    onCopyContent: () -> Unit,
+    onCopyTitle: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -209,6 +237,77 @@ private fun NoteCard(
                     maxLines = 4,
                     overflow = TextOverflow.Ellipsis
                 )
+            }
+
+            // 分隔线
+            Spacer(Modifier.size(8.dp))
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+            Spacer(Modifier.size(6.dp))
+
+            // 操作按钮行：复制（左）、收藏（中）、删除（右）
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(48.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 复制按钮：单击复制内容，长按复制标题
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.combinedClickable(
+                        onClick = onCopyContent,
+                        onLongClick = onCopyTitle
+                    )
+                ) {
+                    Icon(
+                        Icons.Filled.ContentCopy,
+                        contentDescription = "复制",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "复制",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                // 收藏按钮
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.combinedClickable(onClick = onToggleFavorite)
+                ) {
+                    Icon(
+                        if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                        contentDescription = "收藏",
+                        tint = if (note.isFavorite) MaterialTheme.colorScheme.tertiary
+                               else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "收藏",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (note.isFavorite) MaterialTheme.colorScheme.tertiary
+                                else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                // 删除按钮
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.combinedClickable(onClick = onDelete)
+                ) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = "删除",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "删除",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }

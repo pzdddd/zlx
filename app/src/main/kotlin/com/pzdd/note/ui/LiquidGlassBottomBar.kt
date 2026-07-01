@@ -1,5 +1,6 @@
 package com.pzdd.note.ui
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -207,11 +208,39 @@ fun LiquidGlassBottomBar(
                         },
                     contentAlignment = Alignment.Center,
                 ) {
-                    val contentColor = if (isSelected) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    val contentColor by animateColorAsState(
+                        targetValue = if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium,
+                        ),
+                        label = "tabContentColor",
+                    )
+                    val iconScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.15f else 1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium,
+                        ),
+                        label = "tabIconScale",
+                    )
+                    val labelAlpha by animateFloatAsState(
+                        targetValue = if (isSelected) 1f else 0.7f,
+                        animationSpec = spring(stiffness = Spring.StiffnessMedium),
+                        label = "tabLabelAlpha",
+                    )
+                    val labelScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.05f else 1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium,
+                        ),
+                        label = "tabLabelScale",
+                    )
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
@@ -220,14 +249,23 @@ fun LiquidGlassBottomBar(
                             imageVector = item.icon,
                             contentDescription = item.label,
                             tint = contentColor,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier
+                                .size(24.dp)
+                                .graphicsLayer {
+                                    scaleX = iconScale
+                                    scaleY = iconScale
+                                },
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = item.label,
                             fontSize = 12.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                            color = contentColor,
+                            color = contentColor.copy(alpha = labelAlpha),
+                            modifier = Modifier.graphicsLayer {
+                                scaleX = labelScale
+                                scaleY = labelScale
+                            },
                         )
                     }
                 }

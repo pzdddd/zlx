@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,7 @@ fun FavoritesPage(
     paddingValues: PaddingValues
 ) {
     val allNotes by vm.notes.collectAsState()
-    val favorites = allNotes.filter { it.isFavorite }
+    val favorites by remember(allNotes) { derivedStateOf { allNotes.filter { it.isFavorite } } }
     val context = LocalContext.current
 
     var editingNote by remember { mutableStateOf<Note?>(null) }

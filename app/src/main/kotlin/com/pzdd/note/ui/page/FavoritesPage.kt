@@ -19,11 +19,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
@@ -31,7 +33,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,11 +73,19 @@ fun FavoritesPage(
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("普通模式", "深度模式")
 
-    // 按模式过滤收藏笔记
-    val favorites by remember(allNotes, selectedTab) {
+    // 搜索关键词
+    var searchQuery by remember { mutableStateOf("") }
+
+    // 按模式过滤收藏笔记，并应用搜索
+    val favorites by remember(allNotes, selectedTab, searchQuery) {
         derivedStateOf {
             val modeValue = if (selectedTab == 0) NoteMode.NORMAL.value else NoteMode.DEEP.value
-            allNotes.filter { it.isFavorite && it.mode == modeValue }
+            val modeFav = allNotes.filter { it.isFavorite && it.mode == modeValue }
+            if (searchQuery.isBlank()) modeFav
+            else modeFav.filter {
+                it.title.contains(searchQuery, ignoreCase = true) ||
+                it.content.contains(searchQuery, ignoreCase = true)
+            }
         }
     }
 
@@ -113,6 +125,42 @@ fun FavoritesPage(
             onTabSelected = { selectedTab = it }
         )
 
+        // 搜索框
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            placeholder = {
+                Text(
+                    if (selectedTab == 0) "搜索收藏笔记..." else "搜索收藏父笔记...",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(20.dp)) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "清除",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+        )
         Box(modifier = Modifier.fillMaxSize()) {
             if (favorites.isEmpty()) {
                 Column(

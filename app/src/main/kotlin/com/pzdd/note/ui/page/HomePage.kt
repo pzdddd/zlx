@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
@@ -91,6 +92,9 @@ fun HomePage(
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("普通模式", "深度模式")
 
+    // 搜索关键词（普通模式和深度模式共用）
+    var searchQuery by remember { mutableStateOf("") }
+
     // 按模式过滤：普通模式和深度模式相互独立，互不同步
     val modeNotes by remember(allNotes) {
         derivedStateOf {
@@ -98,9 +102,22 @@ fun HomePage(
             else allNotes.filter { it.mode == NoteMode.DEEP.value }
         }
     }
-    // 普通模式直接使用全部；深度模式只显示父笔记（parentId == -1）
-    val notes = if (selectedTab == 0) modeNotes
-                else modeNotes.filter { it.parentId == -1L }
+    // 普通模式：应用搜索过滤
+    // 深度模式：只显示父笔记（parentId == -1），并应用搜索过滤
+    val notes = if (selectedTab == 0) {
+        if (searchQuery.isBlank()) modeNotes
+        else modeNotes.filter {
+            it.title.contains(searchQuery, ignoreCase = true) ||
+            it.content.contains(searchQuery, ignoreCase = true)
+        }
+    } else {
+        val parents = modeNotes.filter { it.parentId == -1L }
+        if (searchQuery.isBlank()) parents
+        else parents.filter {
+            it.title.contains(searchQuery, ignoreCase = true) ||
+            it.content.contains(searchQuery, ignoreCase = true)
+        }
+    }
     var showAdd by remember { mutableStateOf(false) }
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
@@ -135,11 +152,57 @@ fun HomePage(
             .fillMaxSize()
             .padding(paddingValues)
     ) {
+        // 软件名称
+        Text(
+            text = "PZ-NOTE",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(start = 20.dp, top = 12.dp, bottom = 4.dp)
+        )
+
         // 顶部双文字 Tab
         ModeTabRow(
             tabs = tabs,
             selectedIndex = selectedTab,
             onTabSelected = { selectedTab = it }
+        )
+
+        // 搜索框（普通模式和深度模式共用）
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            placeholder = {
+                Text(
+                    if (selectedTab == 0) "搜索笔记..." else "搜索父笔记...",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    Icons.Filled.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(20.dp)) {
+                        Icon(
+                            Icons.Filled.Close,
+                            contentDescription = "清除",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp)
         )
 
         Box(modifier = Modifier.fillMaxSize()) {

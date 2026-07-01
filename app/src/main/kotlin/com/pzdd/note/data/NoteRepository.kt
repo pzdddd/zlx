@@ -24,6 +24,7 @@ class NoteRepository(context: Context) {
                             content = o.optString("content"),
                             isFavorite = o.optBoolean("isFavorite"),
                             mode = o.optInt("mode", 0),
+                            parentId = o.optLong("parentId", -1L),
                             createdAt = o.optLong("createdAt"),
                             updatedAt = o.optLong("updatedAt")
                         )
@@ -43,6 +44,7 @@ class NoteRepository(context: Context) {
                     put("content", n.content)
                     put("isFavorite", n.isFavorite)
                     put("mode", n.mode)
+                    put("parentId", n.parentId)
                     put("createdAt", n.createdAt)
                     put("updatedAt", n.updatedAt)
                 }

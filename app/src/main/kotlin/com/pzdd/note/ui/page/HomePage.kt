@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
@@ -45,6 +46,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -90,12 +92,15 @@ fun HomePage(
     val tabs = listOf("普通模式", "深度模式")
 
     // 按模式过滤：普通模式和深度模式相互独立，互不同步
-    val notes by remember(allNotes) {
+    val modeNotes by remember(allNotes) {
         derivedStateOf {
             if (selectedTab == 0) allNotes.filter { it.mode == NoteMode.NORMAL.value }
             else allNotes.filter { it.mode == NoteMode.DEEP.value }
         }
     }
+    // 普通模式直接使用全部；深度模式只显示父笔记（parentId == -1）
+    val notes = if (selectedTab == 0) modeNotes
+                else modeNotes.filter { it.parentId == -1L }
     var showAdd by remember { mutableStateOf(false) }
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
@@ -189,7 +194,7 @@ fun HomePage(
                 }
             }
         } else {
-            // 深度模式：命令笔记列表
+            // 深度模式：可折叠父笔记列表
             if (notes.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -197,7 +202,7 @@ fun HomePage(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "还没有命令笔记",
+                        text = "还没有笔记",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -211,24 +216,28 @@ fun HomePage(
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(notes, key = { it.id }) { note ->
-                        DeepNoteCard(
-                            note = note,
-                            onToggleFavorite = { vm.toggleFavorite(note) },
+                    items(notes, key = { it.id }) { parentNote ->
+                        DeepParentCard(
+                            parentNote = parentNote,
+                            children = modeNotes.filter { it.parentId == parentNote.id },
+                            onToggleFavorite = { vm.toggleFavorite(parentNote) },
                             onDelete = {
-                                vm.deleteNote(note)
+                                vm.deleteNote(parentNote)
                                 Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
                             },
-                            onRename = { newTitle -> vm.updateNoteTitle(note, newTitle) },
-                            onAddCommand = { cmd -> vm.addCommand(note, cmd) },
-                            onUpdateCommand = { idx, cmd -> vm.updateCommand(note, idx, cmd) },
-                            onDeleteCommand = { idx -> vm.deleteCommand(note, idx) },
-                            onMoveCommand = { idx, up -> vm.moveCommand(note, idx, up) },
-                            onCopyCommand = { text ->
-                                copyToClipboard(context, "命令", text)
-                                Toast.makeText(context, "已复制命令", Toast.LENGTH_SHORT).show()
+                            onRename = { newTitle -> vm.updateNoteTitle(parentNote, newTitle) },
+                            onAddChild = { title, content ->
+                                vm.addNote(title, content, NoteMode.DEEP, parentId = parentNote.id)
+                            },
+                            onUpdateChild = { child, title, content ->
+                                vm.updateNote(child, title, content)
+                            },
+                            onDeleteChild = { child -> vm.deleteNote(child) },
+                            onCopyChild = { text ->
+                                copyToClipboard(context, "内容", text)
+                                Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
                             }
                         )
                     }
@@ -455,27 +464,24 @@ private fun NoteCard(
     }
 }
 
-// ===== 深度模式：命令笔记卡片 =====
+// ===== 深度模式：可折叠父笔记卡片 =====
 
 @Composable
-private fun DeepNoteCard(
-    note: Note,
+private fun DeepParentCard(
+    parentNote: Note,
+    children: List<Note>,
     onToggleFavorite: () -> Unit,
     onDelete: () -> Unit,
     onRename: (String) -> Unit,
-    onAddCommand: (String) -> Unit,
-    onUpdateCommand: (Int, String) -> Unit,
-    onDeleteCommand: (Int) -> Unit,
-    onMoveCommand: (Int, Boolean) -> Unit,
-    onCopyCommand: (String) -> Unit
+    onAddChild: (String, String) -> Unit,
+    onUpdateChild: (Note, String, String) -> Unit,
+    onDeleteChild: (Note) -> Unit,
+    onCopyChild: (String) -> Unit
 ) {
-    val commands = remember(note.content) {
-        if (note.content.isBlank()) emptyList() else note.content.split("\n")
-    }
+    var expanded by rememberSaveable(parentNote.id) { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
-    var newCommandText by remember { mutableStateOf("") }
-    var editingIndex by remember { mutableStateOf(-1) }
-    var editingText by remember { mutableStateOf("") }
+    var showAddChild by remember { mutableStateOf(false) }
+    var editingChild by remember { mutableStateOf<Note?>(null) }
 
     val dateFormatter = remember {
         java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
@@ -483,24 +489,50 @@ private fun DeepNoteCard(
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(14.dp)) {
-            // 标题行 + 操作按钮
+            // 标题行：点击展开/折叠 + 操作按钮
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickable(onClick = { expanded = !expanded })
             ) {
+                // 展开/折叠箭头
+                Icon(
+                    imageVector = if (expanded) Icons.Filled.KeyboardArrowDown
+                                  else Icons.Filled.KeyboardArrowRight,
+                    contentDescription = if (expanded) "折叠" else "展开",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(4.dp))
                 Text(
-                    text = note.title.ifBlank { "(无标题)" },
+                    text = parentNote.title.ifBlank { "(无标题)" },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
+                // 子笔记数量徽标
+                if (children.isNotEmpty()) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.padding(end = 4.dp)
+                    ) {
+                        Text(
+                            text = "${children.size}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                    }
+                }
                 IconButton(onClick = onToggleFavorite, modifier = Modifier.size(32.dp)) {
                     Icon(
-                        if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                        if (parentNote.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
                         contentDescription = "收藏",
-                        tint = if (note.isFavorite) MaterialTheme.colorScheme.primary
+                        tint = if (parentNote.isFavorite) MaterialTheme.colorScheme.primary
                                else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
@@ -524,53 +556,34 @@ private fun DeepNoteCard(
             }
 
             Text(
-                text = "更新: ${dateFormatter.format(java.util.Date(note.updatedAt))}",
+                text = "更新: ${dateFormatter.format(java.util.Date(parentNote.updatedAt))}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(Modifier.size(8.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-            Spacer(Modifier.size(8.dp))
+            // 展开内容：子笔记列表 + 添加子笔记按钮
+            if (expanded) {
+                Spacer(Modifier.size(8.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                Spacer(Modifier.size(8.dp))
 
-            // 命令行列表（可滚动）
-            if (commands.isEmpty()) {
-                Text(
-                    text = "暂无命令，在下方添加",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 300.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    commands.forEachIndexed { index, cmd ->
-                        CommandRow(
+                if (children.isEmpty()) {
+                    Text(
+                        text = "暂无子笔记，点击下方添加",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                } else {
+                    children.forEachIndexed { index, child ->
+                        DeepChildRow(
                             index = index,
-                            text = cmd,
-                            total = commands.size,
-                            isEditing = editingIndex == index,
-                            editingText = editingText,
-                            onStartEdit = {
-                                editingIndex = index
-                                editingText = cmd
-                            },
-                            onTextChange = { editingText = it },
-                            onDoneEdit = {
-                                onUpdateCommand(index, editingText)
-                                editingIndex = -1
-                            },
-                            onCancelEdit = { editingIndex = -1 },
-                            onCopy = { onCopyCommand(cmd) },
-                            onDelete = { onDeleteCommand(index) },
-                            onMoveUp = { onMoveCommand(index, true) },
-                            onMoveDown = { onMoveCommand(index, false) }
+                            child = child,
+                            onEdit = { editingChild = child },
+                            onCopy = { onCopyChild(child.content) },
+                            onDelete = { onDeleteChild(child) }
                         )
-                        if (index < commands.lastIndex) {
+                        if (index < children.lastIndex) {
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
                                 modifier = Modifier.padding(vertical = 2.dp)
@@ -578,46 +591,26 @@ private fun DeepNoteCard(
                         }
                     }
                 }
-            }
 
-            Spacer(Modifier.size(8.dp))
+                Spacer(Modifier.size(8.dp))
 
-            // 添加新命令行
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = newCommandText,
-                    onValueChange = { newCommandText = it },
-                    placeholder = { Text("输入命令...", style = MaterialTheme.typography.bodySmall) },
-                    modifier = Modifier.weight(1f),
-                    singleLine = false,
-                    maxLines = 3,
-                    textStyle = MaterialTheme.typography.bodySmall
-                )
-                Spacer(Modifier.width(8.dp))
-                IconButton(
-                    onClick = {
-                        if (newCommandText.isNotBlank()) {
-                            onAddCommand(newCommandText.trim())
-                            newCommandText = ""
-                        }
-                    }
+                // 添加子笔记按钮
+                OutlinedButton(
+                    onClick = { showAddChild = true },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Icon(
-                        Icons.Filled.Add,
-                        contentDescription = "添加命令",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("添加子笔记", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
     }
 
+    // 重命名对话框
     if (showRenameDialog) {
         RenameDialog(
-            initialTitle = note.title,
+            initialTitle = parentNote.title,
             onDismiss = { showRenameDialog = false },
             onConfirm = {
                 onRename(it)
@@ -625,23 +618,43 @@ private fun DeepNoteCard(
             }
         )
     }
+
+    // 添加子笔记对话框
+    if (showAddChild) {
+        NoteEditDialog(
+            title = "新建子笔记",
+            initialTitle = "",
+            initialContent = "",
+            onDismiss = { showAddChild = false },
+            onConfirm = { t, c ->
+                onAddChild(t, c)
+                showAddChild = false
+            }
+        )
+    }
+
+    // 编辑子笔记对话框
+    editingChild?.let { child ->
+        NoteEditDialog(
+            title = "编辑子笔记",
+            initialTitle = child.title,
+            initialContent = child.content,
+            onDismiss = { editingChild = null },
+            onConfirm = { t, c ->
+                onUpdateChild(child, t, c)
+                editingChild = null
+            }
+        )
+    }
 }
 
 @Composable
-private fun CommandRow(
+private fun DeepChildRow(
     index: Int,
-    text: String,
-    total: Int,
-    isEditing: Boolean,
-    editingText: String,
-    onStartEdit: () -> Unit,
-    onTextChange: (String) -> Unit,
-    onDoneEdit: () -> Unit,
-    onCancelEdit: () -> Unit,
+    child: Note,
+    onEdit: () -> Unit,
     onCopy: () -> Unit,
-    onDelete: () -> Unit,
-    onMoveUp: () -> Unit,
-    onMoveDown: () -> Unit
+    onDelete: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.Top,
@@ -655,72 +668,61 @@ private fun CommandRow(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 6.dp, end = 4.dp)
         )
-        if (isEditing) {
-            OutlinedTextField(
-                value = editingText,
-                onValueChange = onTextChange,
-                modifier = Modifier.weight(1f),
-                singleLine = false,
-                maxLines = 5,
-                textStyle = MaterialTheme.typography.bodySmall
-            )
-        } else {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.bodySmall,
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                modifier = Modifier
-                    .weight(1f)
-                    .combinedClickable(onClick = onStartEdit, onLongClick = onStartEdit)
-                    .padding(top = 4.dp, end = 4.dp)
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .combinedClickable(onClick = onEdit, onLongClick = onEdit)
+                .padding(top = 2.dp, end = 4.dp)
+        ) {
+            if (child.title.isNotBlank()) {
+                Text(
+                    text = child.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            if (child.content.isNotBlank()) {
+                Text(
+                    text = child.content,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+        }
+        IconButton(onClick = onEdit, modifier = Modifier.size(28.dp)) {
+            Icon(
+                Icons.Filled.Edit,
+                contentDescription = "编辑",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp)
             )
         }
-        if (isEditing) {
-            IconButton(onClick = onDoneEdit, modifier = Modifier.size(28.dp)) {
-                Icon(Icons.Filled.Check, contentDescription = "完成", modifier = Modifier.size(16.dp))
-            }
-            IconButton(onClick = onCancelEdit, modifier = Modifier.size(28.dp)) {
-                Icon(Icons.Filled.Close, contentDescription = "取消", modifier = Modifier.size(16.dp))
-            }
-        } else {
-            Column {
-                IconButton(
-                    onClick = onMoveUp,
-                    enabled = index > 0,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "上移", modifier = Modifier.size(16.dp))
-                }
-                IconButton(
-                    onClick = onMoveDown,
-                    enabled = index < total - 1,
-                    modifier = Modifier.size(24.dp)
-                ) {
-                    Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "下移", modifier = Modifier.size(16.dp))
-                }
-            }
-            IconButton(onClick = onCopy, modifier = Modifier.size(28.dp)) {
-                Icon(
-                    Icons.Filled.ContentCopy,
-                    contentDescription = "复制",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
-                Icon(
-                    Icons.Filled.Delete,
-                    contentDescription = "删除",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+        IconButton(onClick = onCopy, modifier = Modifier.size(28.dp)) {
+            Icon(
+                Icons.Filled.ContentCopy,
+                contentDescription = "复制",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(16.dp)
+            )
+        }
+        IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = "删除",
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
 
 @Composable
-private fun RenameDialog(
+internal fun RenameDialog(
     initialTitle: String,
     onDismiss: () -> Unit,
     onConfirm: (String) -> Unit

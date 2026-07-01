@@ -27,7 +27,7 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         repo.saveAll(_notes.value)
     }
 
-    fun addNote(title: String, content: String, mode: NoteMode = NoteMode.NORMAL) {
+    fun addNote(title: String, content: String, mode: NoteMode = NoteMode.NORMAL, parentId: Long = -1L) {
         if (title.isBlank() && content.isBlank()) return
         val now = System.currentTimeMillis()
         val note = Note(
@@ -35,10 +35,17 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
             title = title.trim(),
             content = content.trim(),
             mode = mode.value,
+            parentId = parentId,
             createdAt = now,
             updatedAt = now
         )
         _notes.value = listOf(note) + _notes.value
+        persist()
+    }
+
+    /** 删除父笔记及其所有子笔记 */
+    fun deleteNote(note: Note) {
+        _notes.value = _notes.value.filterNot { it.id == note.id || it.parentId == note.id }
         persist()
     }
 
@@ -92,11 +99,6 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         if (index !in lines.indices) return
         lines.removeAt(index)
         updateNoteContent(note, lines.joinToString("\n"))
-    }
-
-    fun deleteNote(note: Note) {
-        _notes.value = _notes.value.filterNot { it.id == note.id }
-        persist()
     }
 
     fun toggleFavorite(note: Note) {

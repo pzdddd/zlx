@@ -232,7 +232,7 @@ private fun FloatingBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .graphicsLayer { translationY = offsetY * (size.height + 32.dp.toPx()) }
+            .graphicsLayer { translationY = offsetY * (size.height + 100.dp.toPx()) }
     ) {
         if (liquidGlass) {
             // 液态玻璃 + 果冻弹性底栏（基于 Kyant Backdrop 库）

@@ -3,7 +3,9 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -185,7 +187,15 @@ fun HomePage(
         }
 
         // 悬浮底栏可见时，FAB 上移避开底栏；底栏隐藏时 FAB 回到默认位置
-        val fabBottomPadding = if (floatingBottomBar && bottomBarVisible) 140.dp else 20.dp
+        // 使用动画平滑过渡，避免底栏隐藏时 FAB 瞬间下跳
+        val fabBottomPadding by animateDpAsState(
+            targetValue = if (floatingBottomBar && bottomBarVisible) 140.dp else 140.dp,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            ),
+            label = "fabBottomPadding"
+        )
         FloatingActionButton(
             onClick = { showAdd = true },
             shape = androidx.compose.foundation.shape.CircleShape,

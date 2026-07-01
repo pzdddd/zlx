@@ -25,20 +25,30 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -53,6 +63,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -74,6 +85,9 @@ fun HomePage(
     var showAdd by remember { mutableStateOf(false) }
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
+    // 深度模式专用状态
+    var deepAddNote by remember { mutableStateOf(false) }
+    var deepEditingNote by remember { mutableStateOf<Note?>(null) }
 
     // 顶部 Tab：0 = 普通模式，1 = 深度模式
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -165,45 +179,62 @@ fun HomePage(
                 }
             }
         } else {
-            // 深度模式：占位界面
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "深度模式",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(Modifier.size(8.dp))
-                Text(
-                    text = "敬请期待",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            // 深度模式：命令笔记列表
+            if (notes.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "还没有命令笔记",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "点击右下角按钮添加",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(notes, key = { it.id }) { note ->
+                        DeepNoteCard(
+                            note = note,
+                            onToggleFavorite = { vm.toggleFavorite(note) },
+                            onDelete = {
+                                vm.deleteNote(note)
+                                Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
+                            },
+                            onRename = { newTitle -> vm.updateNoteTitle(note, newTitle) },
+                            onAddCommand = { cmd -> vm.addCommand(note, cmd) },
+                            onUpdateCommand = { idx, cmd -> vm.updateCommand(note, idx, cmd) },
+                            onDeleteCommand = { idx -> vm.deleteCommand(note, idx) },
+                            onMoveCommand = { idx, up -> vm.moveCommand(note, idx, up) },
+                            onCopyCommand = { text ->
+                                copyToClipboard(context, "命令", text)
+                                Toast.makeText(context, "已复制命令", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                }
             }
         }
 
-        // 悬浮底栏可见时，FAB 上移避开底栏；底栏隐藏时 FAB 回到默认位置
-        // 使用动画平滑过渡，避免底栏隐藏时 FAB 瞬间下跳
-        val fabBottomPadding by animateDpAsState(
-            targetValue = if (floatingBottomBar && bottomBarVisible) 140.dp else 140.dp,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
-            ),
-            label = "fabBottomPadding"
-        )
+        // FAB 固定位置，不随底栏显示/隐藏而移动
         FloatingActionButton(
-            onClick = { showAdd = true },
+            onClick = { if (selectedTab == 0) showAdd = true else deepAddNote = true },
             shape = androidx.compose.foundation.shape.CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 20.dp, bottom = fabBottomPadding)
+                .padding(end = 20.dp, bottom = 20.dp)
                 .size(56.dp)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "添加")
@@ -235,6 +266,21 @@ fun HomePage(
                 vm.updateNote(note, t, c)
                 editingNote = null
                 Toast.makeText(context, "已保存", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+    // 深度模式：新建命令笔记
+    if (deepAddNote) {
+        NoteEditDialog(
+            title = "新建命令笔记",
+            initialTitle = "",
+            initialContent = "",
+            onDismiss = { deepAddNote = false },
+            onConfirm = { t, c ->
+                vm.addNote(t, c)
+                deepAddNote = false
+                Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -397,6 +443,322 @@ private fun NoteCard(
             }
         }
     }
+}
+
+// ===== 深度模式：命令笔记卡片 =====
+
+@Composable
+private fun DeepNoteCard(
+    note: Note,
+    onToggleFavorite: () -> Unit,
+    onDelete: () -> Unit,
+    onRename: (String) -> Unit,
+    onAddCommand: (String) -> Unit,
+    onUpdateCommand: (Int, String) -> Unit,
+    onDeleteCommand: (Int) -> Unit,
+    onMoveCommand: (Int, Boolean) -> Unit,
+    onCopyCommand: (String) -> Unit
+) {
+    val commands = remember(note.content) {
+        if (note.content.isBlank()) emptyList() else note.content.split("\n")
+    }
+    var showRenameDialog by remember { mutableStateOf(false) }
+    var newCommandText by remember { mutableStateOf("") }
+    var editingIndex by remember { mutableStateOf(-1) }
+    var editingText by remember { mutableStateOf("") }
+
+    val dateFormatter = remember {
+        java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
+    }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            // 标题行 + 操作按钮
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = note.title.ifBlank { "(无标题)" },
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = onToggleFavorite, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                        contentDescription = "收藏",
+                        tint = if (note.isFavorite) MaterialTheme.colorScheme.primary
+                               else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                IconButton(onClick = { showRenameDialog = true }, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        Icons.Filled.Edit,
+                        contentDescription = "重命名",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = "删除",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            Text(
+                text = "更新: ${dateFormatter.format(java.util.Date(note.updatedAt))}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(Modifier.size(8.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            Spacer(Modifier.size(8.dp))
+
+            // 命令行列表（可滚动）
+            if (commands.isEmpty()) {
+                Text(
+                    text = "暂无命令，在下方添加",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    commands.forEachIndexed { index, cmd ->
+                        CommandRow(
+                            index = index,
+                            text = cmd,
+                            total = commands.size,
+                            isEditing = editingIndex == index,
+                            editingText = editingText,
+                            onStartEdit = {
+                                editingIndex = index
+                                editingText = cmd
+                            },
+                            onTextChange = { editingText = it },
+                            onDoneEdit = {
+                                onUpdateCommand(index, editingText)
+                                editingIndex = -1
+                            },
+                            onCancelEdit = { editingIndex = -1 },
+                            onCopy = { onCopyCommand(cmd) },
+                            onDelete = { onDeleteCommand(index) },
+                            onMoveUp = { onMoveCommand(index, true) },
+                            onMoveDown = { onMoveCommand(index, false) }
+                        )
+                        if (index < commands.lastIndex) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.size(8.dp))
+
+            // 添加新命令行
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = newCommandText,
+                    onValueChange = { newCommandText = it },
+                    placeholder = { Text("输入命令...", style = MaterialTheme.typography.bodySmall) },
+                    modifier = Modifier.weight(1f),
+                    singleLine = false,
+                    maxLines = 3,
+                    textStyle = MaterialTheme.typography.bodySmall
+                )
+                Spacer(Modifier.width(8.dp))
+                IconButton(
+                    onClick = {
+                        if (newCommandText.isNotBlank()) {
+                            onAddCommand(newCommandText.trim())
+                            newCommandText = ""
+                        }
+                    }
+                ) {
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = "添加命令",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+    }
+
+    if (showRenameDialog) {
+        RenameDialog(
+            initialTitle = note.title,
+            onDismiss = { showRenameDialog = false },
+            onConfirm = {
+                onRename(it)
+                showRenameDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun CommandRow(
+    index: Int,
+    text: String,
+    total: Int,
+    isEditing: Boolean,
+    editingText: String,
+    onStartEdit: () -> Unit,
+    onTextChange: (String) -> Unit,
+    onDoneEdit: () -> Unit,
+    onCancelEdit: () -> Unit,
+    onCopy: () -> Unit,
+    onDelete: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        // 第一行：序号 + 命令文本（或编辑框）
+        Row(verticalAlignment = Alignment.Top) {
+            Text(
+                text = "${index + 1}.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 6.dp, end = 4.dp)
+            )
+            if (isEditing) {
+                OutlinedTextField(
+                    value = editingText,
+                    onValueChange = onTextChange,
+                    modifier = Modifier.weight(1f),
+                    singleLine = false,
+                    maxLines = 5,
+                    textStyle = MaterialTheme.typography.bodySmall
+                )
+            } else {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontFamily = FontFamily.Monospace,
+                    modifier = Modifier
+                        .weight(1f)
+                        .combinedClickable(onClick = onStartEdit, onLongClick = onStartEdit)
+                        .padding(top = 4.dp, end = 4.dp)
+                )
+            }
+        }
+
+        // 第二行：右侧固定三个功能按钮（编辑模式下显示完成/取消）
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (isEditing) {
+                IconButton(onClick = onDoneEdit, modifier = Modifier.size(28.dp)) {
+                    Icon(Icons.Filled.Check, contentDescription = "完成", modifier = Modifier.size(16.dp))
+                }
+                IconButton(onClick = onCancelEdit, modifier = Modifier.size(28.dp)) {
+                    Icon(Icons.Filled.Close, contentDescription = "取消", modifier = Modifier.size(16.dp))
+                }
+            } else {
+                // 上移
+                IconButton(
+                    onClick = onMoveUp,
+                    enabled = index > 0,
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "上移",
+                        tint = if (index > 0) MaterialTheme.colorScheme.onSurfaceVariant
+                               else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                // 下移
+                IconButton(
+                    onClick = onMoveDown,
+                    enabled = index < total - 1,
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "下移",
+                        tint = if (index < total - 1) MaterialTheme.colorScheme.onSurfaceVariant
+                               else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                // 复制
+                IconButton(onClick = onCopy, modifier = Modifier.size(28.dp)) {
+                    Icon(
+                        Icons.Filled.ContentCopy,
+                        contentDescription = "复制",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+                // 删除
+                IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = "删除",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RenameDialog(
+    initialTitle: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var text by remember { mutableStateOf(initialTitle) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("重命名", style = MaterialTheme.typography.titleMedium) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text("标题") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(text.trim()) }) { Text("确定") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("取消") }
+        }
+    )
 }
 
 /**

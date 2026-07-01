@@ -51,6 +51,47 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         persist()
     }
 
+    fun updateNoteTitle(note: Note, title: String) {
+        _notes.value = _notes.value.map {
+            if (it.id == note.id) it.copy(
+                title = title,
+                updatedAt = System.currentTimeMillis()
+            ) else it
+        }
+        persist()
+    }
+
+    fun updateNoteContent(note: Note, content: String) {
+        _notes.value = _notes.value.map {
+            if (it.id == note.id) it.copy(
+                content = content,
+                updatedAt = System.currentTimeMillis()
+            ) else it
+        }
+        persist()
+    }
+
+    fun addCommand(note: Note, command: String) {
+        if (command.isBlank()) return
+        val lines = if (note.content.isEmpty()) listOf(command)
+                     else note.content.split("\n") + command
+        updateNoteContent(note, lines.joinToString("\n"))
+    }
+
+    fun updateCommand(note: Note, index: Int, command: String) {
+        val lines = note.content.split("\n").toMutableList()
+        if (index !in lines.indices) return
+        lines[index] = command
+        updateNoteContent(note, lines.joinToString("\n"))
+    }
+
+    fun deleteCommand(note: Note, index: Int) {
+        val lines = note.content.split("\n").toMutableList()
+        if (index !in lines.indices) return
+        lines.removeAt(index)
+        updateNoteContent(note, lines.joinToString("\n"))
+    }
+
     fun deleteNote(note: Note) {
         _notes.value = _notes.value.filterNot { it.id == note.id }
         persist()
@@ -64,5 +105,15 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
             ) else it
         }
         persist()
+    }
+
+    fun moveCommand(note: Note, index: Int, up: Boolean) {
+        val lines = note.content.split("\n").toMutableList()
+        val target = if (up) index - 1 else index + 1
+        if (target !in lines.indices) return
+        val tmp = lines[index]
+        lines[index] = lines[target]
+        lines[target] = tmp
+        updateNoteContent(note, lines.joinToString("\n"))
     }
 }

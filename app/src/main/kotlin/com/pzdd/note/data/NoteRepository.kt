@@ -23,6 +23,7 @@ class NoteRepository(context: Context) {
                             title = o.optString("title"),
                             content = o.optString("content"),
                             isFavorite = o.optBoolean("isFavorite"),
+                            isPinned = o.optBoolean("isPinned", false),
                             mode = o.optInt("mode", 0),
                             parentId = o.optLong("parentId", -1L),
                             createdAt = o.optLong("createdAt"),
@@ -37,18 +38,17 @@ class NoteRepository(context: Context) {
     fun saveAll(notes: List<Note>) {
         val arr = JSONArray()
         notes.forEach { n ->
-            arr.put(
-                JSONObject().apply {
-                    put("id", n.id)
-                    put("title", n.title)
-                    put("content", n.content)
-                    put("isFavorite", n.isFavorite)
-                    put("mode", n.mode)
-                    put("parentId", n.parentId)
-                    put("createdAt", n.createdAt)
-                    put("updatedAt", n.updatedAt)
-                }
-            )
+            arr.put(JSONObject().apply {
+                put("id", n.id)
+                put("title", n.title)
+                put("content", n.content)
+                put("isFavorite", n.isFavorite)
+                put("isPinned", n.isPinned)
+                put("mode", n.mode)
+                put("parentId", n.parentId)
+                put("createdAt", n.createdAt)
+                put("updatedAt", n.updatedAt)
+            })
         }
         prefs.edit().putString(KEY_NOTES, arr.toString()).apply()
     }

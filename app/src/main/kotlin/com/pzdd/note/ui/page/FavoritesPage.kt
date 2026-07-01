@@ -250,6 +250,10 @@ fun FavoritesPage(
                 vm.toggleFavorite(note)
                 actionNote = null
             },
+            onTogglePin = {
+                vm.togglePin(note)
+                actionNote = null
+            },
             onDelete = {
                 vm.deleteNote(note)
                 actionNote = null

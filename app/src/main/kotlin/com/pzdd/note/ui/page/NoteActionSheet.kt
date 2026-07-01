@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.filled.Title
@@ -32,6 +34,7 @@ fun NoteActionSheet(
     onCopyTitle: () -> Unit,
     onCopyContent: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onTogglePin: () -> Unit,
     onDelete: () -> Unit
 ) {
     AlertDialog(
@@ -47,6 +50,11 @@ fun NoteActionSheet(
                     if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
                     if (note.isFavorite) "取消收藏" else "收藏",
                     onToggleFavorite
+                )
+                ActionRow(
+                    if (note.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                    if (note.isPinned) "取消置顶" else "置顶",
+                    onTogglePin
                 )
                 ActionRow(Icons.Filled.Delete, "删除", onDelete, destructive = true)
             }

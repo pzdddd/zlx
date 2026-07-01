@@ -8,6 +8,7 @@ data class Note(
     val title: String = "",
     val content: String = "",
     val isFavorite: Boolean = false,
+    val isPinned: Boolean = false,
     val mode: Int = NoteMode.NORMAL.value,
     val parentId: Long = -1L,  // -1 = 顶层笔记（父笔记）；否则为子笔记，指向父笔记 id
     val createdAt: Long = System.currentTimeMillis(),

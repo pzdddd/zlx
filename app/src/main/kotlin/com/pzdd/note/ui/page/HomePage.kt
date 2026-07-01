@@ -7,6 +7,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,9 +24,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -37,8 +39,10 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -52,7 +56,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -66,11 +69,15 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.compose.runtime.collectAsState
 import com.pzdd.note.data.Note
 import com.pzdd.note.data.NoteMode
@@ -105,11 +112,13 @@ fun HomePage(
     // 普通模式：应用搜索过滤
     // 深度模式：只显示父笔记（parentId == -1），并应用搜索过滤
     val notes = if (selectedTab == 0) {
-        if (searchQuery.isBlank()) modeNotes
+        val filtered = if (searchQuery.isBlank()) modeNotes
         else modeNotes.filter {
             it.title.contains(searchQuery, ignoreCase = true) ||
             it.content.contains(searchQuery, ignoreCase = true)
         }
+        // 置顶笔记排在前面
+        filtered.sortedByDescending { it.isPinned }
     } else {
         val parents = modeNotes.filter { it.parentId == -1L }
         if (searchQuery.isBlank()) parents
@@ -127,13 +136,18 @@ fun HomePage(
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = rememberLazyListState()
-    LaunchedEffect(listState) {
-        var prevIndex = listState.firstVisibleItemIndex
-        var prevOffset = listState.firstVisibleItemScrollOffset
+    // 深度模式列表也有独立的滚动状态
+    val deepListState = rememberLazyListState()
+
+    // 将滚动方向检测逻辑提取为可复用的函数
+    suspend fun trackScrollDirection(
+        state: androidx.compose.foundation.lazy.LazyListState
+    ) {
+        var prevIndex = state.firstVisibleItemIndex
+        var prevOffset = state.firstVisibleItemScrollOffset
         snapshotFlow {
-            listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
+            state.firstVisibleItemIndex to state.firstVisibleItemScrollOffset
         }.collect { (index, offset) ->
-            // 只在有笔记时才检测滚动方向
             if (notes.isNotEmpty()) {
                 val isScrollingUp = when {
                     index > prevIndex -> true
@@ -145,6 +159,15 @@ fun HomePage(
             prevIndex = index
             prevOffset = offset
         }
+    }
+
+    // 普通模式滚动检测
+    LaunchedEffect(listState) {
+        trackScrollDirection(listState)
+    }
+    // 深度模式滚动检测
+    LaunchedEffect(deepListState) {
+        trackScrollDirection(deepListState)
     }
 
     Column(
@@ -276,16 +299,48 @@ fun HomePage(
                     )
                 }
             } else {
+                // 深度模式：可拖动排序的父笔记列表
+                var deepDragIndex by remember { mutableIntStateOf(-1) }
+                var deepDragOffset by remember { mutableStateOf(0f) }
+                // 每个卡片大致高度（含间距），用于计算交换阈值
+                val cardHeightPx = with(LocalDensity.current) { (90.dp).toPx() }
+                val swapThreshold = cardHeightPx * 0.5f
+
                 LazyColumn(
-                    state = listState,
+                    state = deepListState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(notes, key = { it.id }) { parentNote ->
+                    itemsIndexed(notes, key = { _, n -> n.id }) { index, parentNote ->
+                        val isDragging = deepDragIndex == index
                         DeepParentCard(
                             parentNote = parentNote,
                             children = modeNotes.filter { it.parentId == parentNote.id },
+                            isDragging = isDragging,
+                            dragOffset = if (isDragging) deepDragOffset else 0f,
+                            onDragStart = {
+                                deepDragIndex = index
+                                deepDragOffset = 0f
+                            },
+                            onDragMove = { dragAmount ->
+                                deepDragOffset += dragAmount
+                                // 向下拖拽：累计偏移超过半张卡片高度时与下一项交换
+                                if (deepDragOffset > swapThreshold && index < notes.lastIndex) {
+                                    vm.reorderDeepParents(parentNote.id, notes[index + 1].id)
+                                    deepDragIndex = index + 1
+                                    // 交换后保留残余偏移，避免视觉跳跃
+                                    deepDragOffset -= swapThreshold
+                                } else if (deepDragOffset < -swapThreshold && index > 0) {
+                                    vm.reorderDeepParents(parentNote.id, notes[index - 1].id)
+                                    deepDragIndex = index - 1
+                                    deepDragOffset += swapThreshold
+                                }
+                            },
+                            onDragEnd = {
+                                deepDragIndex = -1
+                                deepDragOffset = 0f
+                            },
                             onToggleFavorite = { vm.toggleFavorite(parentNote) },
                             onDelete = {
                                 vm.deleteNote(parentNote)
@@ -302,6 +357,9 @@ fun HomePage(
                             onCopyChild = { text ->
                                 copyToClipboard(context, "内容", text)
                                 Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
+                            },
+                            onReorderChild = { fromId, toId ->
+                                vm.reorderChildren(parentNote.id, fromId, toId)
                             }
                         )
                     }
@@ -386,6 +444,11 @@ fun HomePage(
                 vm.toggleFavorite(note)
                 actionNote = null
             },
+            onTogglePin = {
+                vm.togglePin(note)
+                actionNote = null
+                Toast.makeText(context, if (!note.isPinned) "已置顶" else "已取消置顶", Toast.LENGTH_SHORT).show()
+            },
             onDelete = {
                 vm.deleteNote(note)
                 actionNote = null
@@ -431,6 +494,15 @@ private fun NoteCard(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f)
+                    )
+                }
+                if (note.isPinned) {
+                    Spacer(Modifier.width(6.dp))
+                    Icon(
+                        Icons.Filled.PushPin,
+                        contentDescription = "置顶",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
                 if (note.isFavorite) {
@@ -534,13 +606,19 @@ private fun NoteCard(
 private fun DeepParentCard(
     parentNote: Note,
     children: List<Note>,
+    isDragging: Boolean = false,
+    dragOffset: Float = 0f,
+    onDragStart: () -> Unit = {},
+    onDragMove: (Float) -> Unit = {},
+    onDragEnd: () -> Unit = {},
     onToggleFavorite: () -> Unit,
     onDelete: () -> Unit,
     onRename: (String) -> Unit,
     onAddChild: (String, String) -> Unit,
     onUpdateChild: (Note, String, String) -> Unit,
     onDeleteChild: (Note) -> Unit,
-    onCopyChild: (String) -> Unit
+    onCopyChild: (String) -> Unit,
+    onReorderChild: (Long, Long) -> Unit
 ) {
     var expanded by rememberSaveable(parentNote.id) { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
@@ -551,13 +629,32 @@ private fun DeepParentCard(
         java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
     }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .zIndex(if (isDragging) 1f else 0f)
+            .graphicsLayer {
+                translationY = dragOffset
+                shadowElevation = if (isDragging) 12f else 0f
+            }
+    ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            // 标题行：点击展开/折叠 + 操作按钮
+            // 标题行：长按拖动排序 + 点击展开/折叠 + 操作按钮
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .pointerInput(parentNote.id) {
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { onDragStart() },
+                            onDragEnd = { onDragEnd() },
+                            onDragCancel = { onDragEnd() },
+                            onDrag = { change, dragAmount ->
+                                change.consume()
+                                onDragMove(dragAmount.y)
+                            }
+                        )
+                    }
                     .combinedClickable(onClick = { expanded = !expanded })
             ) {
                 // 展开/折叠箭头
@@ -645,7 +742,17 @@ private fun DeepParentCard(
                             child = child,
                             onEdit = { editingChild = child },
                             onCopy = { onCopyChild(child.content) },
-                            onDelete = { onDeleteChild(child) }
+                            onDelete = { onDeleteChild(child) },
+                            onMoveUp = {
+                                if (index > 0) {
+                                    onReorderChild(child.id, children[index - 1].id)
+                                }
+                            },
+                            onMoveDown = {
+                                if (index < children.lastIndex) {
+                                    onReorderChild(child.id, children[index + 1].id)
+                                }
+                            }
                         )
                         if (index < children.lastIndex) {
                             HorizontalDivider(
@@ -655,6 +762,8 @@ private fun DeepParentCard(
                         }
                     }
                 }
+
+                Spacer(Modifier.size(8.dp))
 
                 Spacer(Modifier.size(8.dp))
 
@@ -718,7 +827,9 @@ private fun DeepChildRow(
     child: Note,
     onEdit: () -> Unit,
     onCopy: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.Top,
@@ -755,6 +866,28 @@ private fun DeepChildRow(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+        }
+        // 拖动排序按钮：上箭头 + 下箭头
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(top = 2.dp)
+        ) {
+            IconButton(onClick = onMoveUp, modifier = Modifier.size(20.dp)) {
+                Icon(
+                    Icons.Filled.KeyboardArrowUp,
+                    contentDescription = "上移",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            IconButton(onClick = onMoveDown, modifier = Modifier.size(20.dp)) {
+                Icon(
+                    Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "下移",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }

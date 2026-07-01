@@ -111,6 +111,40 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         persist()
     }
 
+    fun togglePin(note: Note) {
+        _notes.value = _notes.value.map {
+            if (it.id == note.id) it.copy(
+                isPinned = !it.isPinned,
+                updatedAt = System.currentTimeMillis()
+            ) else it
+        }
+        persist()
+    }
+
+    /** 重新排列深度模式父笔记顺序：将 fromId 移动到 toId 的位置 */
+    fun reorderDeepParents(fromId: Long, toId: Long) {
+        val list = _notes.value.toMutableList()
+        val fromIndex = list.indexOfFirst { it.id == fromId }
+        val toIndex = list.indexOfFirst { it.id == toId }
+        if (fromIndex == -1 || toIndex == -1 || fromIndex == toIndex) return
+        val item = list.removeAt(fromIndex)
+        list.add(toIndex, item)
+        _notes.value = list
+        persist()
+    }
+
+    /** 重新排列子笔记顺序：在 parentId 下将 fromId 移动到 toId 的位置 */
+    fun reorderChildren(parentId: Long, fromId: Long, toId: Long) {
+        val list = _notes.value.toMutableList()
+        val fromIndex = list.indexOfFirst { it.id == fromId }
+        val toIndex = list.indexOfFirst { it.id == toId }
+        if (fromIndex == -1 || toIndex == -1 || fromIndex == toIndex) return
+        val item = list.removeAt(fromIndex)
+        list.add(toIndex, item)
+        _notes.value = list
+        persist()
+    }
+
     fun moveCommand(note: Note, index: Int, up: Boolean) {
         val lines = note.content.split("\n").toMutableList()
         val target = if (up) index - 1 else index + 1

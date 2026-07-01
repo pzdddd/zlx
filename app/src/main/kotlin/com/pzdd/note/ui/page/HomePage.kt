@@ -1,9 +1,9 @@
 package com.pzdd.note.ui.page
-
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,13 +13,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentCopy
@@ -32,18 +35,23 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
@@ -64,6 +72,10 @@ fun HomePage(
     var showAdd by remember { mutableStateOf(false) }
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
+
+    // 顶部 Tab：0 = 普通模式，1 = 深度模式
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val tabs = listOf("普通模式", "深度模式")
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = rememberLazyListState()
@@ -87,57 +99,88 @@ fun HomePage(
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        if (notes.isEmpty()) {
+        // 顶部双文字 Tab
+        ModeTabRow(
+            tabs = tabs,
+            selectedIndex = selectedTab,
+            onTabSelected = { selectedTab = it }
+        )
+
+        Box(modifier = Modifier.fillMaxSize()) {
+        if (selectedTab == 0) {
+            // 普通模式：笔记列表
+            if (notes.isEmpty()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "还没有笔记",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "点击右下角按钮添加",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(notes, key = { it.id }) { note ->
+                        NoteCard(
+                            note = note,
+                            onClick = { editingNote = note },
+                            onLongClick = { actionNote = note },
+                            onCopyContent = {
+                                copyToClipboard(context, "内容", note.content)
+                                Toast.makeText(context, "已复制内容", Toast.LENGTH_SHORT).show()
+                            },
+                            onCopyTitle = {
+                                copyToClipboard(context, "标题", note.title)
+                                Toast.makeText(context, "已复制标题", Toast.LENGTH_SHORT).show()
+                            },
+                            onToggleFavorite = {
+                                vm.toggleFavorite(note)
+                            },
+                            onDelete = {
+                                vm.deleteNote(note)
+                                Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                }
+            }
+        } else {
+            // 深度模式：占位界面
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "还没有笔记",
+                    text = "深度模式",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    text = "敬请期待",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
-                    text = "点击右下角按钮添加",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else {
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(notes, key = { it.id }) { note ->
-                    NoteCard(
-                        note = note,
-                        onClick = { editingNote = note },
-                        onLongClick = { actionNote = note },
-                        onCopyContent = {
-                            copyToClipboard(context, "内容", note.content)
-                            Toast.makeText(context, "已复制内容", Toast.LENGTH_SHORT).show()
-                        },
-                        onCopyTitle = {
-                            copyToClipboard(context, "标题", note.title)
-                            Toast.makeText(context, "已复制标题", Toast.LENGTH_SHORT).show()
-                        },
-                        onToggleFavorite = {
-                            vm.toggleFavorite(note)
-                        },
-                        onDelete = {
-                            vm.deleteNote(note)
-                            Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
-                        }
-                    )
-                }
             }
         }
 
@@ -155,7 +198,8 @@ fun HomePage(
         ) {
             Icon(Icons.Filled.Add, contentDescription = "添加")
         }
-    }
+        } // Box
+    } // Column
 
     if (showAdd) {
         NoteEditDialog(
@@ -338,6 +382,64 @@ private fun NoteCard(
                         text = "删除",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * 顶部横向双文字 Tab：普通模式 / 深度模式
+ * 使用药丸形背景指示当前选中项，点击切换。
+ */
+@Composable
+private fun ModeTabRow(
+    tabs: List<String>,
+    selectedIndex: Int,
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(24.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(4.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            tabs.forEachIndexed { index, title ->
+                val isSelected = index == selectedIndex
+                // 选中项背景宽度动画
+                val indicatorOffset by animateDpAsState(
+                    targetValue = if (isSelected) 0.dp else 0.dp,
+                    label = "tabIndicator"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .combinedClickable(onClick = { onTabSelected(index) }),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isSelected) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {}
+                    }
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

@@ -11,7 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -44,7 +44,7 @@ fun NoteActionSheet(
                 ActionRow(Icons.Filled.Title, "复制标题", onCopyTitle)
                 ActionRow(Icons.Filled.ContentCopy, "复制内容", onCopyContent)
                 ActionRow(
-                    if (note.isFavorite) Icons.Outlined.StarBorder else Icons.Filled.Star,
+                    if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
                     if (note.isFavorite) "取消收藏" else "收藏",
                     onToggleFavorite
                 )

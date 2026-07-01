@@ -121,7 +121,10 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         persist()
     }
 
-    /** 重新排列深度模式父笔记顺序：将 fromId 移动到 toId 的位置 */
+    /**
+     * 重新排列深度模式父笔记顺序（拖拽过程中调用，不立即持久化，避免频繁写盘卡顿）。
+     * 将 fromId 移动到 toId 的位置。
+     */
     fun reorderDeepParents(fromId: Long, toId: Long) {
         val list = _notes.value.toMutableList()
         val fromIndex = list.indexOfFirst { it.id == fromId }
@@ -130,6 +133,11 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         val item = list.removeAt(fromIndex)
         list.add(toIndex, item)
         _notes.value = list
+        // 拖拽过程中不 persist()，松手时由 persistDeepOrder() 统一保存
+    }
+
+    /** 拖拽松手后调用：持久化当前排序到本地存储 */
+    fun persistDeepOrder() {
         persist()
     }
 

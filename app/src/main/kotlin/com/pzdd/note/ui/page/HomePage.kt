@@ -5,9 +5,11 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,9 +65,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,7 +82,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.lazy.LazyListState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.pzdd.note.data.Note
 import com.pzdd.note.data.NoteMode
 import com.pzdd.note.ui.NoteViewModel
@@ -299,12 +306,73 @@ fun HomePage(
                     )
                 }
             } else {
+                // ================================================================
                 // 深度模式：可拖动排序的父笔记列表
+                // ================================================================
+                // 拖拽状态：当前被拖拽条目在列表中的索引，-1 表示无拖拽
                 var deepDragIndex by remember { mutableIntStateOf(-1) }
+                // 被拖拽条目的累计 Y 轴偏移量（像素），仅纵向，横向已锁定
                 var deepDragOffset by remember { mutableStateOf(0f) }
                 // 每个卡片大致高度（含间距），用于计算交换阈值
                 val cardHeightPx = with(LocalDensity.current) { (90.dp).toPx() }
+                // 条目交换阈值：拖拽超过半张卡片高度时与相邻条目换位
                 val swapThreshold = cardHeightPx * 0.5f
+                // 边缘自动滚动触发区域宽度（像素）
+                val edgeScrollZone = with(LocalDensity.current) { (80.dp).toPx() }
+                val coroutineScope = rememberCoroutineScope()
+                // 边缘自动滚动的协程任务，null 表示未在滚动
+                var autoScrollJob by remember { mutableStateOf<Job?>(null) }
+
+                /**
+                 * 启动或更新边缘自动滚动。
+                 * 根据 draggedItemTop / draggedItemBottom 相对视口的位置，
+                 * 动态计算滚动速度：越靠近边缘速度越快，离开边缘则停止。
+                 */
+                fun updateAutoScroll(
+                    draggedItemTop: Float,
+                    draggedItemBottom: Float,
+                    viewportStart: Float,
+                    viewportEnd: Float,
+                    currentIndex: Int,
+                    lastIndex: Int
+                ) {
+                    when {
+                        // 拖拽条目顶部接近视口上边缘 → 向上滚动
+                        draggedItemTop < viewportStart + edgeScrollZone && currentIndex > 0 -> {
+                            // 距离边缘越近，速度越快（最大 cardHeightPx * 0.2f / 帧）
+                            val distance = (draggedItemTop - viewportStart).coerceAtLeast(0f)
+                            val speed = (edgeScrollZone - distance).coerceIn(0f, edgeScrollZone)
+                            val scrollPerFrame = (speed / edgeScrollZone) * cardHeightPx * 0.2f
+                            if (autoScrollJob == null) {
+                                autoScrollJob = coroutineScope.launch {
+                                    while (true) {
+                                        deepListState.scrollBy(-scrollPerFrame)
+                                        delay(16)
+                                    }
+                                }
+                            }
+                        }
+                        // 拖拽条目底部接近视口下边缘 → 向下滚动
+                        draggedItemBottom > viewportEnd - edgeScrollZone && currentIndex < lastIndex -> {
+                            val distance = (viewportEnd - draggedItemBottom).coerceAtLeast(0f)
+                            val speed = (edgeScrollZone - distance).coerceIn(0f, edgeScrollZone)
+                            val scrollPerFrame = (speed / edgeScrollZone) * cardHeightPx * 0.2f
+                            if (autoScrollJob == null) {
+                                autoScrollJob = coroutineScope.launch {
+                                    while (true) {
+                                        deepListState.scrollBy(scrollPerFrame)
+                                        delay(16)
+                                    }
+                                }
+                            }
+                        }
+                        // 不在边缘区域 → 停止自动滚动
+                        else -> {
+                            autoScrollJob?.cancel()
+                            autoScrollJob = null
+                        }
+                    }
+                }
 
                 LazyColumn(
                     state = deepListState,
@@ -319,27 +387,57 @@ fun HomePage(
                             children = modeNotes.filter { it.parentId == parentNote.id },
                             isDragging = isDragging,
                             dragOffset = if (isDragging) deepDragOffset else 0f,
+                            // 所有条目都加 animateItem()，实现 200ms 平滑换位过渡动画
+                            // 拖拽中的条目除外（它由 graphicsLayer.translationY 手动控制位置）
+                            modifier = if (!isDragging) Modifier.animateItem() else Modifier,
                             onDragStart = {
                                 deepDragIndex = index
                                 deepDragOffset = 0f
                             },
                             onDragMove = { dragAmount ->
+                                // 严格锁定横向：仅累加 Y 轴偏移，X 轴完全忽略
                                 deepDragOffset += dragAmount
-                                // 向下拖拽：累计偏移超过半张卡片高度时与下一项交换
+
+                                // —— 边缘自动滚动检测 ——
+                                val layoutInfo = deepListState.layoutInfo
+                                val vi = layoutInfo.visibleItemsInfo.find { it.index == index }
+                                if (vi != null) {
+                                    val itemTopOnScreen = vi.offset.toFloat() + deepDragOffset
+                                    val itemBottomOnScreen = (vi.offset + vi.size).toFloat() + deepDragOffset
+                                    updateAutoScroll(
+                                        draggedItemTop = itemTopOnScreen,
+                                        draggedItemBottom = itemBottomOnScreen,
+                                        viewportStart = layoutInfo.viewportStartOffset.toFloat(),
+                                        viewportEnd = layoutInfo.viewportEndOffset.toFloat(),
+                                        currentIndex = index,
+                                        lastIndex = notes.lastIndex
+                                    )
+                                }
+
+                                // —— 实时交换逻辑（穿插换位）——
+                                // 向下拖拽：累计偏移超过半张卡片高度 → 与下方条目交换
                                 if (deepDragOffset > swapThreshold && index < notes.lastIndex) {
                                     vm.reorderDeepParents(parentNote.id, notes[index + 1].id)
                                     deepDragIndex = index + 1
-                                    // 交换后保留残余偏移，避免视觉跳跃
+                                    // 交换后扣减阈值，保留残余偏移避免视觉跳跃
                                     deepDragOffset -= swapThreshold
-                                } else if (deepDragOffset < -swapThreshold && index > 0) {
+                                }
+                                // 向上拖拽：累计偏移超过半张卡片高度 → 与上方条目交换
+                                else if (deepDragOffset < -swapThreshold && index > 0) {
                                     vm.reorderDeepParents(parentNote.id, notes[index - 1].id)
                                     deepDragIndex = index - 1
                                     deepDragOffset += swapThreshold
                                 }
                             },
                             onDragEnd = {
+                                // 松手：停止边缘滚动
+                                autoScrollJob?.cancel()
+                                autoScrollJob = null
+                                // 松手：重置拖拽状态，取消阴影上浮效果
                                 deepDragIndex = -1
                                 deepDragOffset = 0f
+                                // 松手：统一持久化排序到本地存储（拖拽过程中不写盘，避免卡顿）
+                                vm.persistDeepOrder()
                             },
                             onToggleFavorite = { vm.toggleFavorite(parentNote) },
                             onDelete = {
@@ -608,6 +706,7 @@ private fun DeepParentCard(
     children: List<Note>,
     isDragging: Boolean = false,
     dragOffset: Float = 0f,
+    modifier: Modifier = Modifier,
     onDragStart: () -> Unit = {},
     onDragMove: (Float) -> Unit = {},
     onDragEnd: () -> Unit = {},
@@ -628,33 +727,65 @@ private fun DeepParentCard(
     val dateFormatter = remember {
         java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
     }
+    // 拖拽时的视觉反馈：缩放动画（弹簧效果，松手回弹自然）
+    val scale by animateFloatAsState(
+        targetValue = if (isDragging) 1.03f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "dragScale"
+    )
+    // 拖拽时的阴影高度动画
+    val shadowElevation by animateFloatAsState(
+        targetValue = if (isDragging) 16f else 0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "dragShadow"
+    )
+    // 拖拽时的透明度动画
+    val dragAlpha by animateFloatAsState(
+        targetValue = if (isDragging) 0.92f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy),
+        label = "dragAlpha"
+    )
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .zIndex(if (isDragging) 1f else 0f)
+            .zIndex(if (isDragging) 999f else 0f)
+            // 拖拽手势绑定在 Card 外层，与内层按钮点击完全隔离，杜绝手势冲突
+            .pointerInput(parentNote.id) {
+                detectDragGesturesAfterLongPress(
+                    // onDragStart 在长按检测通过后触发（系统默认约 500ms 长按）
+                    onDragStart = { onDragStart() },
+                    onDragEnd = {
+                        // 松手立刻终止拖拽浮动状态
+                        onDragEnd()
+                    },
+                    onDragCancel = {
+                        // 取消时也终止拖拽
+                        onDragEnd()
+                    },
+                    onDrag = { change, dragAmount ->
+                        change.consume()
+                        // 严格锁定横向：仅传递 Y 轴偏移，X 轴完全忽略
+                        onDragMove(dragAmount.y)
+                    }
+                )
+            }
             .graphicsLayer {
+                // 纵向位移（仅 Y 轴，横向已锁定）
                 translationY = dragOffset
-                shadowElevation = if (isDragging) 12f else 0f
+                this.shadowElevation = shadowElevation
+                scaleX = scale
+                scaleY = scale
+                alpha = dragAlpha
             }
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            // 标题行：长按拖动排序 + 点击展开/折叠 + 操作按钮
+            // 标题行：点击展开/折叠 + 操作按钮
+            // combinedClickable 单独在此层，不与拖拽手势冲突
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .pointerInput(parentNote.id) {
-                        detectDragGesturesAfterLongPress(
-                            onDragStart = { onDragStart() },
-                            onDragEnd = { onDragEnd() },
-                            onDragCancel = { onDragEnd() },
-                            onDrag = { change, dragAmount ->
-                                change.consume()
-                                onDragMove(dragAmount.y)
-                            }
-                        )
-                    }
                     .combinedClickable(onClick = { expanded = !expanded })
             ) {
                 // 展开/折叠箭头

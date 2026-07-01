@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentCopy
@@ -33,10 +34,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -50,13 +54,38 @@ import com.pzdd.note.ui.copyToClipboard
 @Composable
 fun HomePage(
     vm: NoteViewModel,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    floatingBottomBar: Boolean = false,
+    bottomBarVisible: Boolean = false,
+    onScrollDirectionChanged: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
     val notes by vm.notes.collectAsState()
     var showAdd by remember { mutableStateOf(false) }
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
+
+    // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
+    val listState = rememberLazyListState()
+    LaunchedEffect(listState) {
+        var prevIndex = listState.firstVisibleItemIndex
+        var prevOffset = listState.firstVisibleItemScrollOffset
+        snapshotFlow {
+            listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
+        }.collect { (index, offset) ->
+            // 只在有笔记时才检测滚动方向
+            if (notes.isNotEmpty()) {
+                val isScrollingUp = when {
+                    index > prevIndex -> true
+                    index < prevIndex -> false
+                    else -> offset > prevOffset  // 同一 item 内，offset 增大 = 向上滚动
+                }
+                onScrollDirectionChanged(isScrollingUp)
+            }
+            prevIndex = index
+            prevOffset = offset
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -82,6 +111,7 @@ fun HomePage(
             }
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -111,6 +141,8 @@ fun HomePage(
             }
         }
 
+        // 悬浮底栏可见时，FAB 上移避开底栏；底栏隐藏时 FAB 回到默认位置
+        val fabBottomPadding = if (floatingBottomBar && bottomBarVisible) 140.dp else 20.dp
         FloatingActionButton(
             onClick = { showAdd = true },
             shape = androidx.compose.foundation.shape.CircleShape,
@@ -118,7 +150,7 @@ fun HomePage(
             contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(20.dp)
+                .padding(end = 20.dp, bottom = fabBottomPadding)
                 .size(56.dp)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "添加")

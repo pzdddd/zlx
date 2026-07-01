@@ -1,6 +1,9 @@
 package com.pzdd.note.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,11 +29,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pzdd.note.ui.page.FavoritesPage
@@ -38,6 +44,13 @@ import com.pzdd.note.ui.page.HomePage
 import com.pzdd.note.ui.page.SettingsPage
 import com.kyant.backdrop.backdrops.LayerBackdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
+
+/**
+ * 悬浮底栏可见性状态：由页面滚动方向驱动。
+ * - 向上滚动（查看更多内容）时隐藏底栏
+ * - 向下滚动时重新显示底栏
+ */
+enum class BottomBarVisibility { VISIBLE, HIDDEN }
 
 @Composable
 fun AppRoot() {
@@ -53,6 +66,9 @@ fun AppRoot() {
     // 液态玻璃 backdrop：采样底栏下方的页面内容用于折射/模糊
     val backdrop = rememberLiquidGlassBackdrop()
     val liquidGlassEnabled = floatingBottomBar && liquidGlass
+
+    // 悬浮底栏的显示/隐藏状态，由页面滚动驱动
+    var bottomBarVisibility by remember { mutableStateOf(BottomBarVisibility.VISIBLE) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -76,6 +92,14 @@ fun AppRoot() {
                 paddingValues = paddingValues,
                 backdrop = backdrop,
                 liquidGlassEnabled = liquidGlassEnabled,
+                floatingBottomBar = floatingBottomBar,
+                bottomBarVisible = floatingBottomBar && bottomBarVisibility == BottomBarVisibility.VISIBLE,
+                onScrollDirectionChanged = { isScrollingUp ->
+                    if (floatingBottomBar) {
+                        bottomBarVisibility =
+                            if (isScrollingUp) BottomBarVisibility.HIDDEN else BottomBarVisibility.VISIBLE
+                    }
+                },
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -87,12 +111,58 @@ fun AppRoot() {
                 onSelect = { selected = it },
                 liquidGlass = liquidGlass,
                 backdrop = backdrop,
+                visible = bottomBarVisibility == BottomBarVisibility.VISIBLE,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 12.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun AppContent(
+    selected: Int,
+    noteVm: NoteViewModel,
+    settingsVm: SettingsViewModel,
+    paddingValues: PaddingValues,
+    backdrop: LayerBackdrop,
+    liquidGlassEnabled: Boolean,
+    floatingBottomBar: Boolean,
+    bottomBarVisible: Boolean,
+    onScrollDirectionChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val baseModifier = if (liquidGlassEnabled) {
+        modifier.statusBarsPadding().layerBackdrop(backdrop)
+    } else {
+        modifier.statusBarsPadding()
+    }
+
+    // 使用 Crossfade 替代 AnimatedContent：
+    // 纯 alpha 淡入淡出，不做位移，避免新旧页面同时布局+绘制造成的掉帧
+    Crossfade(
+        targetState = selected,
+        animationSpec = tween(durationMillis = 200),
+        modifier = baseModifier,
+        label = "pageTransition",
+    ) { page ->
+        when (page) {
+            0 -> HomePage(
+                vm = noteVm,
+                paddingValues = paddingValues,
+                floatingBottomBar = floatingBottomBar,
+                bottomBarVisible = bottomBarVisible,
+                onScrollDirectionChanged = onScrollDirectionChanged
+            )
+            1 -> FavoritesPage(
+                vm = noteVm,
+                paddingValues = paddingValues,
+                onScrollDirectionChanged = onScrollDirectionChanged
+            )
+            2 -> SettingsPage(vm = settingsVm, paddingValues = paddingValues)
         }
     }
 }
@@ -146,30 +216,47 @@ private fun FloatingBottomBar(
     onSelect: (Int) -> Unit,
     liquidGlass: Boolean,
     backdrop: LayerBackdrop,
+    visible: Boolean,
     modifier: Modifier = Modifier
 ) {
-    if (liquidGlass) {
-        // 液态玻璃 + 果冻弹性底栏（基于 Kyant Backdrop 库）
-        LiquidGlassBottomBar(
-            selected = selected,
-            onSelect = onSelect,
-            backdrop = backdrop,
-            modifier = modifier,
-        )
-    } else {
-        // 普通浮动底栏
-        Surface(
-            modifier = modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 4.dp,
-            tonalElevation = 3.dp
-        ) {
-            NavigationBar(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.onSurface
+    // 向上滚动时底栏向下滑出屏幕隐藏，向下滑动时滑回显示
+    val offsetY by animateFloatAsState(
+        targetValue = if (visible) 0f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "bottomBarOffset"
+    )
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer { translationY = offsetY * (size.height + 32.dp.toPx()) }
+    ) {
+        if (liquidGlass) {
+            // 液态玻璃 + 果冻弹性底栏（基于 Kyant Backdrop 库）
+            LiquidGlassBottomBar(
+                selected = selected,
+                onSelect = onSelect,
+                backdrop = backdrop,
+                modifier = Modifier,
+            )
+        } else {
+            // 普通浮动底栏
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = 4.dp,
+                tonalElevation = 3.dp
             ) {
-                BottomItems(selected, onSelect)
+                NavigationBar(
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                ) {
+                    BottomItems(selected, onSelect)
+                }
             }
         }
     }

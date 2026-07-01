@@ -40,7 +40,8 @@ import com.pzdd.note.ui.copyToClipboard
 @Composable
 fun FavoritesPage(
     vm: NoteViewModel,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onScrollDirectionChanged: (Boolean) -> Unit = {}
 ) {
     val allNotes by vm.notes.collectAsState()
     val favorites by remember(allNotes) { derivedStateOf { allNotes.filter { it.isFavorite } } }
@@ -48,6 +49,27 @@ fun FavoritesPage(
 
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
+
+    // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+    androidx.compose.runtime.LaunchedEffect(listState) {
+        var prevIndex = listState.firstVisibleItemIndex
+        var prevOffset = listState.firstVisibleItemScrollOffset
+        androidx.compose.runtime.snapshotFlow {
+            listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
+        }.collect { (index, offset) ->
+            if (favorites.isNotEmpty()) {
+                val isScrollingUp = when {
+                    index > prevIndex -> true
+                    index < prevIndex -> false
+                    else -> offset > prevOffset
+                }
+                onScrollDirectionChanged(isScrollingUp)
+            }
+            prevIndex = index
+            prevOffset = offset
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -68,6 +90,7 @@ fun FavoritesPage(
             }
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -82,7 +105,6 @@ fun FavoritesPage(
             }
         }
     }
-
     editingNote?.let { note ->
         NoteEditDialog(
             title = "编辑笔记",

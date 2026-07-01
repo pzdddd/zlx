@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pzdd.note.data.Note
+import com.pzdd.note.data.NoteMode
 import com.pzdd.note.data.NoteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,13 +27,14 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         repo.saveAll(_notes.value)
     }
 
-    fun addNote(title: String, content: String) {
+    fun addNote(title: String, content: String, mode: NoteMode = NoteMode.NORMAL) {
         if (title.isBlank() && content.isBlank()) return
         val now = System.currentTimeMillis()
         val note = Note(
             id = now,
             title = title.trim(),
             content = content.trim(),
+            mode = mode.value,
             createdAt = now,
             updatedAt = now
         )

@@ -49,6 +49,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -69,6 +70,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.collectAsState
 import com.pzdd.note.data.Note
+import com.pzdd.note.data.NoteMode
 import com.pzdd.note.ui.NoteViewModel
 import com.pzdd.note.ui.copyToClipboard
 
@@ -81,17 +83,25 @@ fun HomePage(
     onScrollDirectionChanged: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
-    val notes by vm.notes.collectAsState()
+    val allNotes by vm.notes.collectAsState()
+
+    // 顶部 Tab：0 = 普通模式，1 = 深度模式
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val tabs = listOf("普通模式", "深度模式")
+
+    // 按模式过滤：普通模式和深度模式相互独立，互不同步
+    val notes by remember(allNotes) {
+        derivedStateOf {
+            if (selectedTab == 0) allNotes.filter { it.mode == NoteMode.NORMAL.value }
+            else allNotes.filter { it.mode == NoteMode.DEEP.value }
+        }
+    }
     var showAdd by remember { mutableStateOf(false) }
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
     // 深度模式专用状态
     var deepAddNote by remember { mutableStateOf(false) }
     var deepEditingNote by remember { mutableStateOf<Note?>(null) }
-
-    // 顶部 Tab：0 = 普通模式，1 = 深度模式
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("普通模式", "深度模式")
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = rememberLazyListState()
@@ -234,7 +244,7 @@ fun HomePage(
             contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 20.dp, bottom = 20.dp)
+                .padding(end = 20.dp, bottom = 140.dp)
                 .size(56.dp)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "添加")
@@ -249,7 +259,7 @@ fun HomePage(
             initialContent = "",
             onDismiss = { showAdd = false },
             onConfirm = { t, c ->
-                vm.addNote(t, c)
+                vm.addNote(t, c, NoteMode.NORMAL)
                 showAdd = false
                 Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
             }
@@ -278,7 +288,7 @@ fun HomePage(
             initialContent = "",
             onDismiss = { deepAddNote = false },
             onConfirm = { t, c ->
-                vm.addNote(t, c)
+                vm.addNote(t, c, NoteMode.DEEP)
                 deepAddNote = false
                 Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
             }
@@ -633,101 +643,77 @@ private fun CommandRow(
     onMoveUp: () -> Unit,
     onMoveDown: () -> Unit
 ) {
-    Column(
+    Row(
+        verticalAlignment = Alignment.Top,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
-        // 第一行：序号 + 命令文本（或编辑框）
-        Row(verticalAlignment = Alignment.Top) {
-            Text(
-                text = "${index + 1}.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 6.dp, end = 4.dp)
+        Text(
+            text = "${index + 1}.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 6.dp, end = 4.dp)
+        )
+        if (isEditing) {
+            OutlinedTextField(
+                value = editingText,
+                onValueChange = onTextChange,
+                modifier = Modifier.weight(1f),
+                singleLine = false,
+                maxLines = 5,
+                textStyle = MaterialTheme.typography.bodySmall
             )
-            if (isEditing) {
-                OutlinedTextField(
-                    value = editingText,
-                    onValueChange = onTextChange,
-                    modifier = Modifier.weight(1f),
-                    singleLine = false,
-                    maxLines = 5,
-                    textStyle = MaterialTheme.typography.bodySmall
-                )
-            } else {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontFamily = FontFamily.Monospace,
-                    modifier = Modifier
-                        .weight(1f)
-                        .combinedClickable(onClick = onStartEdit, onLongClick = onStartEdit)
-                        .padding(top = 4.dp, end = 4.dp)
-                )
-            }
+        } else {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                modifier = Modifier
+                    .weight(1f)
+                    .combinedClickable(onClick = onStartEdit, onLongClick = onStartEdit)
+                    .padding(top = 4.dp, end = 4.dp)
+            )
         }
-
-        // 第二行：右侧固定三个功能按钮（编辑模式下显示完成/取消）
-        Row(
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            if (isEditing) {
-                IconButton(onClick = onDoneEdit, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Filled.Check, contentDescription = "完成", modifier = Modifier.size(16.dp))
-                }
-                IconButton(onClick = onCancelEdit, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Filled.Close, contentDescription = "取消", modifier = Modifier.size(16.dp))
-                }
-            } else {
-                // 上移
+        if (isEditing) {
+            IconButton(onClick = onDoneEdit, modifier = Modifier.size(28.dp)) {
+                Icon(Icons.Filled.Check, contentDescription = "完成", modifier = Modifier.size(16.dp))
+            }
+            IconButton(onClick = onCancelEdit, modifier = Modifier.size(28.dp)) {
+                Icon(Icons.Filled.Close, contentDescription = "取消", modifier = Modifier.size(16.dp))
+            }
+        } else {
+            Column {
                 IconButton(
                     onClick = onMoveUp,
                     enabled = index > 0,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(
-                        Icons.Filled.KeyboardArrowUp,
-                        contentDescription = "上移",
-                        tint = if (index > 0) MaterialTheme.colorScheme.onSurfaceVariant
-                               else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "上移", modifier = Modifier.size(16.dp))
                 }
-                // 下移
                 IconButton(
                     onClick = onMoveDown,
                     enabled = index < total - 1,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(24.dp)
                 ) {
-                    Icon(
-                        Icons.Filled.KeyboardArrowDown,
-                        contentDescription = "下移",
-                        tint = if (index < total - 1) MaterialTheme.colorScheme.onSurfaceVariant
-                               else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Icon(Icons.Filled.KeyboardArrowDown, contentDescription = "下移", modifier = Modifier.size(16.dp))
                 }
-                // 复制
-                IconButton(onClick = onCopy, modifier = Modifier.size(28.dp)) {
-                    Icon(
-                        Icons.Filled.ContentCopy,
-                        contentDescription = "复制",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-                // 删除
-                IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
-                    Icon(
-                        Icons.Filled.Delete,
-                        contentDescription = "删除",
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+            }
+            IconButton(onClick = onCopy, modifier = Modifier.size(28.dp)) {
+                Icon(
+                    Icons.Filled.ContentCopy,
+                    contentDescription = "复制",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+                Icon(
+                    Icons.Filled.Delete,
+                    contentDescription = "删除",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
     }

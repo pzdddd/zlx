@@ -8,6 +8,16 @@ data class Note(
     val title: String = "",
     val content: String = "",
     val isFavorite: Boolean = false,
+    val mode: Int = NoteMode.NORMAL.value,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )
+
+enum class NoteMode(val value: Int) {
+    NORMAL(0),   // 普通模式
+    DEEP(1);     // 深度模式
+
+    companion object {
+        fun fromValue(v: Int): NoteMode = entries.firstOrNull { it.value == v } ?: NORMAL
+    }
+}

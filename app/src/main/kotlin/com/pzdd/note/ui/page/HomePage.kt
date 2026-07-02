@@ -4,6 +4,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -11,9 +12,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -74,6 +75,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -84,6 +86,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
@@ -95,6 +98,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import com.pzdd.note.data.Note
 import com.pzdd.note.data.NoteMode
 import com.pzdd.note.ui.NoteViewModel
@@ -1099,8 +1103,28 @@ private fun ModeTabRow(
 ) {
     val density = LocalDensity.current
     val tabCount = tabs.size
-    var dragOffset by remember { mutableStateOf(0f) }
+    val scope = rememberCoroutineScope()
+
+    // 滑块位置（px），由 Animatable 统一管理，避免拖拽→动画切换时跳变
+    val indicatorPx = remember { Animatable(selectedIndex.toFloat()) }
     var isDragging by remember { mutableStateOf(false) }
+
+    // 用 rememberUpdatedState 确保 pointerInput lambda 内始终拿到最新值
+    val currentIndex by rememberUpdatedState(selectedIndex)
+    val currentOnTabSelected by rememberUpdatedState(onTabSelected)
+
+    // 非拖拽时，selectedIndex 变化则平滑动画到目标
+    LaunchedEffect(selectedIndex) {
+        if (!isDragging) {
+            indicatorPx.animateTo(
+                targetValue = selectedIndex.toFloat(),
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
+        }
+    }
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -1116,51 +1140,74 @@ private fun ModeTabRow(
                 .fillMaxWidth()
                 .height(44.dp)
                 .clip(RoundedCornerShape(24.dp))
-                .pointerInput(tabCount) {
+                .pointerInput(Unit) {
                     val tabWidthPx = size.width.toFloat() / tabCount
-                    detectHorizontalDragGestures(
-                        onDragStart = { isDragging = true },
-                        onDragEnd = {
-                            isDragging = false
-                            val threshold = tabWidthPx / 2f
-                            when {
-                                dragOffset > threshold && selectedIndex > 0 ->
-                                    onTabSelected(selectedIndex - 1)
-                                dragOffset < -threshold && selectedIndex < tabCount - 1 ->
-                                    onTabSelected(selectedIndex + 1)
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        val startX = down.position.x
+                        var totalDrag = 0f
+                        var dragStarted = false
+
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull() ?: break
+                            val dragAmount = change.positionChange().x
+                            if (dragAmount != 0f) {
+                                totalDrag += dragAmount
+                                if (!dragStarted && kotlin.math.abs(totalDrag) > viewConfiguration.touchSlop) {
+                                    dragStarted = true
+                                    isDragging = true
+                                    scope.launch { indicatorPx.stop() }
+                                }
+                                if (dragStarted) {
+                                    change.consume()
+                                    val base = currentIndex.toFloat()
+                                    val target = (base + totalDrag / tabWidthPx)
+                                        .coerceIn(0f, (tabCount - 1).toFloat())
+                                    scope.launch { indicatorPx.snapTo(target) }
+                                }
                             }
-                            dragOffset = 0f
-                        },
-                        onDragCancel = {
-                            isDragging = false
-                            dragOffset = 0f
+                            if (!change.pressed) break
                         }
-                    ) { _, dragAmount ->
-                        dragOffset += dragAmount
+
+                        if (dragStarted) {
+                            // 滑块滑到哪个 tab 的区域，就切换到哪个 tab
+                            val targetIndex = indicatorPx.value.roundToInt()
+                                .coerceIn(0, tabCount - 1)
+                            isDragging = false
+                            if (targetIndex != currentIndex) {
+                                currentOnTabSelected(targetIndex)
+                            } else {
+                                // 没切换，动画弹回原位
+                                scope.launch {
+                                    indicatorPx.animateTo(
+                                        targetValue = currentIndex.toFloat(),
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioNoBouncy,
+                                            stiffness = Spring.StiffnessMediumLow
+                                        )
+                                    )
+                                }
+                            }
+                        } else {
+                            // 点击：根据按下位置判断点击了哪个 tab
+                            val tappedIndex = (startX / tabWidthPx).toInt().coerceIn(0, tabCount - 1)
+                            currentOnTabSelected(tappedIndex)
+                        }
                     }
                 }
         ) {
             val tabWidth = maxWidth / tabCount
-            val indicatorOffset by animateDpAsState(
-                targetValue = tabWidth * selectedIndex +
-                        if (isDragging) with(density) { dragOffset.toDp() } else 0.dp,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                ),
-                label = "indicatorOffset"
-            )
-
             // 滑动指示器背景（纯色，无 elevation/阴影）
             Box(
                 modifier = Modifier
-                    .offset(x = indicatorOffset + 4.dp, y = 4.dp)
+                    .offset(x = tabWidth * indicatorPx.value + 4.dp, y = 4.dp)
                     .size(width = tabWidth - 8.dp, height = 36.dp)
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colorScheme.primary)
             ) {}
 
-            // 文字层
+            // 文字层（不拦截触摸事件，点击和拖拽统一由父级处理）
             Row(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -1183,12 +1230,7 @@ private fun ModeTabRow(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxSize()
-                            .combinedClickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() },
-                                onClick = { onTabSelected(index) }
-                            ),
+                            .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

@@ -8,10 +8,14 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -1090,6 +1094,12 @@ private fun ModeTabRow(
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current
+    val tabCount = tabs.size
+    // 拖拽偏移量（px），正值=向右拖，负值=向左拖
+    var dragOffset by remember { mutableStateOf(0f) }
+    var isDragging by remember { mutableStateOf(false) }
+
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier
@@ -1097,75 +1107,94 @@ private fun ModeTabRow(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(24.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(4.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            tabs.forEachIndexed { index, title ->
-                val isSelected = index == selectedIndex
-
-                // 指示器背景动画：alpha + 缩放
-                val indicatorAlpha by animateFloatAsState(
-                    targetValue = if (isSelected) 1f else 0f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    ),
-                    label = "tabIndicatorAlpha"
-                )
-                val indicatorScale by animateFloatAsState(
-                    targetValue = if (isSelected) 1f else 0.8f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    ),
-                    label = "tabIndicatorScale"
-                )
-
-                // 文字颜色动画
-                val textColor by animateColorAsState(
-                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onSurfaceVariant,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium),
-                    label = "tabTextColor"
-                )
-                // 文字字重动画（通过缩放模拟粗细变化）
-                val textScale by animateFloatAsState(
-                    targetValue = if (isSelected) 1f else 0.95f,
-                    animationSpec = spring(stiffness = Spring.StiffnessMedium),
-                    label = "tabTextScale"
-                )
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(36.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .combinedClickable(onClick = { onTabSelected(index) }),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // 指示器背景（始终存在，通过 alpha 控制显隐）
-                    Surface(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = indicatorScale
-                                scaleY = indicatorScale
-                                alpha = indicatorAlpha
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp)
+                .pointerInput(tabCount) {
+                    val tabWidthPx = size.width.toFloat() / tabCount
+                    detectHorizontalDragGestures(
+                        onDragStart = { isDragging = true },
+                        onDragEnd = {
+                            isDragging = false
+                            // 拖拽超过半个 tab 宽度则切换
+                            val threshold = tabWidthPx / 2f
+                            when {
+                                dragOffset > threshold && selectedIndex > 0 ->
+                                    onTabSelected(selectedIndex - 1)
+                                dragOffset < -threshold && selectedIndex < tabCount - 1 ->
+                                    onTabSelected(selectedIndex + 1)
                             }
-                    ) {}
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = textColor,
-                        modifier = Modifier.graphicsLayer {
-                            scaleX = textScale
-                            scaleY = textScale
+                            dragOffset = 0f
+                        },
+                        onDragCancel = {
+                            isDragging = false
+                            dragOffset = 0f
                         }
+                    ) { _, dragAmount ->
+                        dragOffset += dragAmount
+                    }
+                }
+        ) {
+            val tabWidth = maxWidth / tabCount
+            // 指示器目标偏移（拖拽时跟随手指，松手后弹簧回弹）
+            val indicatorOffset by animateDpAsState(
+                targetValue = tabWidth * selectedIndex +
+                        if (isDragging) with(density) { dragOffset.toDp() } else 0.dp,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                ),
+                label = "indicatorOffset"
+            )
+
+            // 滑动指示器背景
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .offset(x = indicatorOffset + 4.dp, y = 4.dp)
+                    .size(width = tabWidth - 8.dp, height = 36.dp)
+            ) {}
+
+            // 文字层
+            Row(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    val isSelected = index == selectedIndex
+                    val textColor by animateColorAsState(
+                        targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                        animationSpec = spring(stiffness = Spring.StiffnessMedium),
+                        label = "tabTextColor$index"
                     )
+                    val textScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1f else 0.92f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        ),
+                        label = "tabTextScale$index"
+                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .combinedClickable(onClick = { onTabSelected(index) }),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            color = textColor,
+                            modifier = Modifier.graphicsLayer {
+                                scaleX = textScale
+                                scaleY = textScale
+                            }
+                        )
+                    }
                 }
             }
         }

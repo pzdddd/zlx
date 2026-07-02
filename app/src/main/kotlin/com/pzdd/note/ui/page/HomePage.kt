@@ -3,9 +3,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -1101,10 +1103,37 @@ private fun ModeTabRow(
         ) {
             tabs.forEachIndexed { index, title ->
                 val isSelected = index == selectedIndex
-                // 选中项背景宽度动画
-                val indicatorOffset by animateDpAsState(
-                    targetValue = if (isSelected) 0.dp else 0.dp,
-                    label = "tabIndicator"
+
+                // 指示器背景动画：alpha + 缩放
+                val indicatorAlpha by animateFloatAsState(
+                    targetValue = if (isSelected) 1f else 0f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    ),
+                    label = "tabIndicatorAlpha"
+                )
+                val indicatorScale by animateFloatAsState(
+                    targetValue = if (isSelected) 1f else 0.8f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    ),
+                    label = "tabIndicatorScale"
+                )
+
+                // 文字颜色动画
+                val textColor by animateColorAsState(
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                    animationSpec = spring(stiffness = Spring.StiffnessMedium),
+                    label = "tabTextColor"
+                )
+                // 文字字重动画（通过缩放模拟粗细变化）
+                val textScale by animateFloatAsState(
+                    targetValue = if (isSelected) 1f else 0.95f,
+                    animationSpec = spring(stiffness = Spring.StiffnessMedium),
+                    label = "tabTextScale"
                 )
 
                 Box(
@@ -1115,19 +1144,27 @@ private fun ModeTabRow(
                         .combinedClickable(onClick = { onTabSelected(index) }),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isSelected) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier.fillMaxSize()
-                        ) {}
-                    }
+                    // 指示器背景（始终存在，通过 alpha 控制显隐）
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                scaleX = indicatorScale
+                                scaleY = indicatorScale
+                                alpha = indicatorAlpha
+                            }
+                    ) {}
                     Text(
                         text = title,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = textColor,
+                        modifier = Modifier.graphicsLayer {
+                            scaleX = textScale
+                            scaleY = textScale
+                        }
                     )
                 }
             }

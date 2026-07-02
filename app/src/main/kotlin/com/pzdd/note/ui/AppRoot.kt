@@ -1,6 +1,7 @@
 package com.pzdd.note.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -69,8 +70,11 @@ fun AppRoot() {
 
     // 悬浮底栏的显示/隐藏状态，由页面滚动驱动
     var bottomBarVisibility by remember { mutableStateOf(BottomBarVisibility.VISIBLE) }
-
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {

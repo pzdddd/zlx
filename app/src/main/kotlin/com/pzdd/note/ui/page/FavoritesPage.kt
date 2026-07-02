@@ -584,19 +584,16 @@ private fun FavModeTabRow(
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val density = LocalDensity.current
     val tabCount = tabs.size
     val scope = rememberCoroutineScope()
 
-    // 滑块位置（以 tab 索引为单位），由 Animatable 统一管理，避免拖拽→动画切换时跳变
     val indicatorPos = remember { Animatable(selectedIndex.toFloat()) }
     var isDragging by remember { mutableStateOf(false) }
+    var isPressed by remember { mutableStateOf(false) }
 
-    // 用 rememberUpdatedState 确保 pointerInput lambda 内始终拿到最新值
     val currentIndex by rememberUpdatedState(selectedIndex)
     val currentOnTabSelected by rememberUpdatedState(onTabSelected)
 
-    // 非拖拽时，selectedIndex 变化则平滑动画到目标
     LaunchedEffect(selectedIndex) {
         if (!isDragging) {
             indicatorPos.animateTo(
@@ -608,6 +605,16 @@ private fun FavModeTabRow(
             )
         }
     }
+
+    // 按压/拖拽时滑块缩小（凹进去的反馈），松手弹回
+    val indicatorScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.90f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "favIndicatorScale"
+    )
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -630,6 +637,11 @@ private fun FavModeTabRow(
                         val startX = down.position.x
                         var totalDrag = 0f
                         var dragStarted = false
+                        // 只有按下点在蓝色滑块区域内才触发按压动画
+                        val indicatorLeft = currentIndex * tabWidthPx
+                        val indicatorRight = indicatorLeft + tabWidthPx
+                        val onIndicator = startX in indicatorLeft..indicatorRight
+                        if (onIndicator) isPressed = true
 
                         while (true) {
                             val event = awaitPointerEvent()
@@ -653,15 +665,15 @@ private fun FavModeTabRow(
                             if (!change.pressed) break
                         }
 
+                        isPressed = false
+
                         if (dragStarted) {
-                            // 滑块滑到哪个 tab 的区域，就切换到哪个 tab
                             val targetIndex = indicatorPos.value.roundToInt()
                                 .coerceIn(0, tabCount - 1)
                             isDragging = false
                             if (targetIndex != currentIndex) {
                                 currentOnTabSelected(targetIndex)
                             } else {
-                                // 没切换，动画弹回原位
                                 scope.launch {
                                     indicatorPos.animateTo(
                                         targetValue = currentIndex.toFloat(),
@@ -680,10 +692,16 @@ private fun FavModeTabRow(
                 }
         ) {
             val tabWidth = maxWidth / tabCount
+
+            // 滑动指示器：按压时缩小产生"凹进去"效果
             Box(
                 modifier = Modifier
                     .offset(x = tabWidth * indicatorPos.value + 4.dp, y = 4.dp)
                     .size(width = tabWidth - 8.dp, height = 36.dp)
+                    .graphicsLayer {
+                        scaleX = indicatorScale
+                        scaleY = indicatorScale
+                    }
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colorScheme.primary)
             ) {}

@@ -12,10 +12,20 @@
 #   public *;
 #}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# 保留行号信息，方便崩溃日志定位
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# 保留泛型签名（Compose/Kotlin 反射需要）
+-keepattributes Signature,InnerClasses,EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations
+
+# Kotlin 元数据
+-keep class kotlin.Metadata { *; }
+
+# Compose 需要保留的规则
+-dontwarn androidx.compose.**
+
+# 液态玻璃效果库
+-keep class io.github.kyant0.** { *; }
+-dontwarn io.github.kyant0.**

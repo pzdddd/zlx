@@ -6,7 +6,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -582,6 +584,8 @@ private fun FavModeTabRow(
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -591,6 +595,7 @@ private fun FavModeTabRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(44.dp)
+                .clip(RoundedCornerShape(24.dp))
                 .pointerInput(tabCount) {
                     val tabWidthPx = size.width.toFloat() / tabCount
                     detectHorizontalDragGestures(
@@ -620,18 +625,18 @@ private fun FavModeTabRow(
                 targetValue = tabWidth * selectedIndex +
                         if (isDragging) with(density) { dragOffset.toDp() } else 0.dp,
                 animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    dampingRatio = Spring.DampingRatioNoBouncy,
                     stiffness = Spring.StiffnessMediumLow
                 ),
                 label = "favIndicatorOffset"
             )
 
-            Surface(
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(20.dp),
+            Box(
                 modifier = Modifier
                     .offset(x = indicatorOffset + 4.dp, y = 4.dp)
                     .size(width = tabWidth - 8.dp, height = 36.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.primary)
             ) {}
 
             Row(
@@ -648,7 +653,7 @@ private fun FavModeTabRow(
                     val textScale by animateFloatAsState(
                         targetValue = if (isSelected) 1f else 0.92f,
                         animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            dampingRatio = Spring.DampingRatioNoBouncy,
                             stiffness = Spring.StiffnessMedium
                         ),
                         label = "favTabTextScale$index"
@@ -657,7 +662,11 @@ private fun FavModeTabRow(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
-                            .combinedClickable(onClick = { onTabSelected(index) }),
+                            .combinedClickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() },
+                                onClick = { onTabSelected(index) }
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

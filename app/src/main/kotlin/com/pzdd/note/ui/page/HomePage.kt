@@ -9,6 +9,9 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.scrollBy
@@ -1096,12 +1099,13 @@ private fun ModeTabRow(
 ) {
     val density = LocalDensity.current
     val tabCount = tabs.size
-    // 拖拽偏移量（px），正值=向右拖，负值=向左拖
     var dragOffset by remember { mutableStateOf(0f) }
     var isDragging by remember { mutableStateOf(false) }
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
+        tonalElevation = 0.dp,
+        shadowElevation = 0.dp,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -1111,13 +1115,13 @@ private fun ModeTabRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(44.dp)
+                .clip(RoundedCornerShape(24.dp))
                 .pointerInput(tabCount) {
                     val tabWidthPx = size.width.toFloat() / tabCount
                     detectHorizontalDragGestures(
                         onDragStart = { isDragging = true },
                         onDragEnd = {
                             isDragging = false
-                            // 拖拽超过半个 tab 宽度则切换
                             val threshold = tabWidthPx / 2f
                             when {
                                 dragOffset > threshold && selectedIndex > 0 ->
@@ -1137,24 +1141,23 @@ private fun ModeTabRow(
                 }
         ) {
             val tabWidth = maxWidth / tabCount
-            // 指示器目标偏移（拖拽时跟随手指，松手后弹簧回弹）
             val indicatorOffset by animateDpAsState(
                 targetValue = tabWidth * selectedIndex +
                         if (isDragging) with(density) { dragOffset.toDp() } else 0.dp,
                 animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    dampingRatio = Spring.DampingRatioNoBouncy,
                     stiffness = Spring.StiffnessMediumLow
                 ),
                 label = "indicatorOffset"
             )
 
-            // 滑动指示器背景
-            Surface(
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(20.dp),
+            // 滑动指示器背景（纯色，无 elevation/阴影）
+            Box(
                 modifier = Modifier
                     .offset(x = indicatorOffset + 4.dp, y = 4.dp)
                     .size(width = tabWidth - 8.dp, height = 36.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.primary)
             ) {}
 
             // 文字层
@@ -1172,7 +1175,7 @@ private fun ModeTabRow(
                     val textScale by animateFloatAsState(
                         targetValue = if (isSelected) 1f else 0.92f,
                         animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            dampingRatio = Spring.DampingRatioNoBouncy,
                             stiffness = Spring.StiffnessMedium
                         ),
                         label = "tabTextScale$index"
@@ -1181,7 +1184,11 @@ private fun ModeTabRow(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxSize()
-                            .combinedClickable(onClick = { onTabSelected(index) }),
+                            .combinedClickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() },
+                                onClick = { onTabSelected(index) }
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

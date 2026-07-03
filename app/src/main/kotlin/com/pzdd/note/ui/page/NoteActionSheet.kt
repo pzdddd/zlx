@@ -84,7 +84,6 @@ fun NoteActionSheet(
 ) {
     val isLight = MaterialTheme.colorScheme.background.luminance() > 0.5f
     val haptic = LocalHapticFeedback.current
-
     // 弹出动画进度（0→1），手动驱动 graphicsLayer
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
@@ -105,6 +104,9 @@ fun NoteActionSheet(
         visible = false
         onDismiss()
     }
+
+    // 拦截系统返回键，关闭弹窗而不是退出 App
+    androidx.activity.compose.BackHandler { dismissWithAnim() }
 
     Box(
         modifier = Modifier

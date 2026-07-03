@@ -62,6 +62,7 @@ fun NoteEditDialog(
     var t by remember { mutableStateOf(initialTitle) }
     var c by remember { mutableStateOf(initialContent) }
     var fullscreen by remember { mutableStateOf(false) }
+    var saved by remember { mutableStateOf(false) }
     LaunchedEffect(fullscreen) { onHideBottomBar(fullscreen) }
 
     val isLight = MaterialTheme.colorScheme.background.luminance() > 0.5f
@@ -69,13 +70,29 @@ fun NoteEditDialog(
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
-    val dismissWithAnim: () -> Unit = {
+    // 关闭时自动保存（返回键、点遮罩、取消按钮都会触发）
+    val dismissWithSave: () -> Unit = {
+        if (!saved) {
+            saved = true
+            onHideBottomBar(false)
+            onConfirm(t, c)
+        }
         visible = false
-        onDismiss()
     }
 
-    // 拦截系统返回键，关闭弹窗而不是退出 App
-    androidx.activity.compose.BackHandler { dismissWithAnim() }
+    // 全屏↔非全屏切换（不保存不关闭）
+    val toggleFullscreen: () -> Unit = {
+        fullscreen = !fullscreen
+    }
+
+    // 拦截系统返回键：全屏时退出全屏，非全屏时自动保存并关闭
+    androidx.activity.compose.BackHandler {
+        if (fullscreen) {
+            fullscreen = false
+        } else {
+            dismissWithSave()
+        }
+    }
 
     val animProgress by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
@@ -101,7 +118,7 @@ fun NoteEditDialog(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = dismissWithAnim
+                onClick = dismissWithSave
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -201,11 +218,11 @@ fun NoteEditDialog(
                         }
                     }
 
-                    // 右侧：取消 + 保存
+                    // 右侧：取消 + 保存（都会自动保存）
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 取消按钮
+                        // 取消按钮（自动保存并关闭）
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -216,7 +233,7 @@ fun NoteEditDialog(
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
-                                    onClick = dismissWithAnim
+                                    onClick = dismissWithSave
                                 )
                                 .padding(horizontal = 20.dp, vertical = 10.dp)
                         ) {
@@ -230,7 +247,7 @@ fun NoteEditDialog(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        // 保存按钮
+                        // 保存按钮（自动保存并关闭）
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -238,7 +255,7 @@ fun NoteEditDialog(
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
-                                    onClick = { onConfirm(t, c) }
+                                    onClick = dismissWithSave
                                 )
                                 .padding(horizontal = 20.dp, vertical = 10.dp)
                         ) {
@@ -368,7 +385,7 @@ fun NoteEditDialog(
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // 取消按钮
+                            // 取消按钮（自动保存并关闭）
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(50))
@@ -379,7 +396,7 @@ fun NoteEditDialog(
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = null,
-                                        onClick = { fullscreen = false }
+                                        onClick = dismissWithSave
                                     )
                                     .padding(horizontal = 24.dp, vertical = 10.dp)
                             ) {
@@ -393,7 +410,7 @@ fun NoteEditDialog(
 
                             Spacer(modifier = Modifier.width(12.dp))
 
-                            // 保存按钮
+                            // 保存按钮（自动保存并关闭）
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(50))
@@ -401,10 +418,7 @@ fun NoteEditDialog(
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = null,
-                                        onClick = {
-                                            fullscreen = false
-                                            onConfirm(t, c)
-                                        }
+                                        onClick = dismissWithSave
                                     )
                                     .padding(horizontal = 24.dp, vertical = 10.dp)
                             ) {

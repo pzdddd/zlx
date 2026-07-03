@@ -113,11 +113,11 @@ fun HomePage(
     floatingBottomBar: Boolean = false,
     bottomBarVisible: Boolean = false,
     onScrollDirectionChanged: (Boolean) -> Unit = {},
-    backdrop: com.kyant.backdrop.backdrops.LayerBackdrop? = null
+    backdrop: com.kyant.backdrop.backdrops.LayerBackdrop? = null,
+    onHideBottomBar: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
     val allNotes by vm.notes.collectAsState()
-
     // 顶部 Tab：0 = 普通模式，1 = 深度模式
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("普通模式", "深度模式")
@@ -522,7 +522,8 @@ fun HomePage(
                 vm.addNote(t, c, NoteMode.NORMAL)
                 showAdd = false
                 Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
-            }
+            },
+            onHideBottomBar = onHideBottomBar
         )
     }
 
@@ -536,7 +537,8 @@ fun HomePage(
                 vm.updateNote(note, t, c)
                 editingNote = null
                 Toast.makeText(context, "已保存", Toast.LENGTH_SHORT).show()
-            }
+            },
+            onHideBottomBar = onHideBottomBar
         )
     }
 
@@ -551,7 +553,8 @@ fun HomePage(
                 vm.addNote(t, c, NoteMode.DEEP)
                 deepAddNote = false
                 Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
-            }
+            },
+            onHideBottomBar = onHideBottomBar
         )
     }
 

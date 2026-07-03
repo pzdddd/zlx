@@ -67,6 +67,8 @@ fun AppRoot() {
     // 液态玻璃 backdrop：采样底栏下方的页面内容用于折射/模糊
     val backdrop = rememberLiquidGlassBackdrop()
     val liquidGlassEnabled = floatingBottomBar && liquidGlass
+    // 全屏编辑时隐藏底栏的全局状态
+    var hideBottomBar by remember { mutableStateOf(false) }
 
     // 悬浮底栏的显示/隐藏状态，由页面滚动驱动
     var bottomBarVisibility by remember { mutableStateOf(BottomBarVisibility.VISIBLE) }
@@ -80,7 +82,8 @@ fun AppRoot() {
             bottomBar = {
                 // 仅标准底栏放入 Scaffold 槽以预留底部空间；
                 // 悬浮底栏不占 Scaffold 布局，改为 Box 叠加在内容上方
-                if (!floatingBottomBar) {
+                // 全屏编辑时隐藏标准底栏
+                if (!floatingBottomBar && !hideBottomBar) {
                     StandardBottomBar(
                         selected = selected,
                         onSelect = { selected = it },
@@ -104,12 +107,12 @@ fun AppRoot() {
                             if (isScrollingUp) BottomBarVisibility.HIDDEN else BottomBarVisibility.VISIBLE
                     }
                 },
+                onHideBottomBar = { hideBottomBar = it },
                 modifier = Modifier.fillMaxSize()
             )
         }
-
-        // 悬浮底栏叠加在 Scaffold 内容之上
-        if (floatingBottomBar) {
+        // 悬浮底栏叠加在 Scaffold 内容之上（全屏编辑时隐藏）
+        if (floatingBottomBar && !hideBottomBar) {
             FloatingBottomBar(
                 selected = selected,
                 onSelect = { selected = it },
@@ -137,6 +140,7 @@ private fun AppContent(
     floatingBottomBar: Boolean,
     bottomBarVisible: Boolean,
     onScrollDirectionChanged: (Boolean) -> Unit,
+    onHideBottomBar: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // 始终附加 layerBackdrop，让 NoteActionSheet 等覆盖层也能使用真实液态玻璃
@@ -158,12 +162,14 @@ private fun AppContent(
                 bottomBarVisible = bottomBarVisible,
                 onScrollDirectionChanged = onScrollDirectionChanged,
                 backdrop = backdrop,
+                onHideBottomBar = onHideBottomBar,
             )
             1 -> FavoritesPage(
                 vm = noteVm,
                 paddingValues = paddingValues,
                 onScrollDirectionChanged = onScrollDirectionChanged,
                 backdrop = backdrop,
+                onHideBottomBar = onHideBottomBar,
             )
             2 -> SettingsPage(vm = settingsVm, paddingValues = paddingValues)
         }

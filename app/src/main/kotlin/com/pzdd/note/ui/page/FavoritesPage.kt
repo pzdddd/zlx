@@ -81,13 +81,13 @@ import com.pzdd.note.ui.NoteViewModel
 import com.pzdd.note.ui.copyToClipboard
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-
 @Composable
 fun FavoritesPage(
     vm: NoteViewModel,
     paddingValues: PaddingValues,
     onScrollDirectionChanged: (Boolean) -> Unit = {},
-    backdrop: com.kyant.backdrop.backdrops.LayerBackdrop? = null
+    backdrop: com.kyant.backdrop.backdrops.LayerBackdrop? = null,
+    onHideBottomBar: (Boolean) -> Unit = {}
 ) {
     val allNotes by vm.notes.collectAsState()
     val context = LocalContext.current
@@ -266,7 +266,8 @@ fun FavoritesPage(
                 vm.updateNote(note, t, c)
                 editingNote = null
                 Toast.makeText(context, "已保存", Toast.LENGTH_SHORT).show()
-            }
+            },
+            onHideBottomBar = onHideBottomBar
         )
     }
 

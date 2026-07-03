@@ -17,8 +17,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,6 +39,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -50,6 +59,7 @@ fun NoteEditDialog(
 ) {
     var t by remember { mutableStateOf(initialTitle) }
     var c by remember { mutableStateOf(initialContent) }
+    var fullscreen by remember { mutableStateOf(false) }
 
     val isLight = MaterialTheme.colorScheme.background.luminance() > 0.5f
 
@@ -146,7 +156,44 @@ fun NoteEditDialog(
                     shape = RoundedCornerShape(16.dp)
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                // 放大全屏按钮（放在内容下方）
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(
+                                if (isLight) Color.Black.copy(alpha = 0.05f)
+                                else Color.White.copy(alpha = 0.08f)
+                            )
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { fullscreen = true }
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.Fullscreen,
+                                contentDescription = "全屏查看",
+                                tint = if (isLight) Color.Black.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.6f),
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                text = "全屏编辑",
+                                fontSize = 13.sp,
+                                color = if (isLight) Color.Black.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+                }
 
                 // 按钮行
                 Row(
@@ -196,6 +243,115 @@ fun NoteEditDialog(
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White
+                        )
+                    }
+                }
+            }
+        }
+
+        // ==================== 全屏查看内容面板 ====================
+        if (fullscreen) {
+            val fsAnim by animateFloatAsState(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                ),
+                label = "fsAnim"
+            )
+            val fsBaseColor = if (isLight) Color(0xFFF0F0F3) else Color(0xFF1C1C1E)
+            val fsBorderColor = Color.White.copy(alpha = 0.6f)
+
+            val fsFocusRequester = remember { FocusRequester() }
+            LaunchedEffect(Unit) {
+                kotlinx.coroutines.delay(300)
+                runCatching { fsFocusRequester.requestFocus() }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f * fsAnim))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { fullscreen = false }
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .graphicsLayer {
+                            scaleX = 0.9f + 0.1f * fsAnim
+                            scaleY = 0.9f + 0.1f * fsAnim
+                            alpha = fsAnim
+                        }
+                        .shadow(24.dp, RoundedCornerShape(28.dp))
+                        .clip(RoundedCornerShape(28.dp))
+                        .background(fsBaseColor.copy(alpha = 0.92f))
+                        .background(Brush.verticalGradient(listOf(
+                            if (isLight) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.05f),
+                            Color.Transparent
+                        )))
+                        .border(0.5.dp, fsBorderColor, RoundedCornerShape(28.dp))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {}
+                        )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(20.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "内容全屏编辑",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (isLight) Color.Black else Color.White
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .background(
+                                        if (isLight) Color.Black.copy(alpha = 0.05f)
+                                        else Color.White.copy(alpha = 0.08f)
+                                    )
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null,
+                                        onClick = { fullscreen = false }
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    Icons.Filled.Close,
+                                    contentDescription = "关闭",
+                                    tint = if (isLight) Color.Black.copy(alpha = 0.6f) else Color.White.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        OutlinedTextField(
+                            value = c,
+                            onValueChange = { c = it },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .focusRequester(fsFocusRequester),
+                            shape = RoundedCornerShape(16.dp)
                         )
                     }
                 }

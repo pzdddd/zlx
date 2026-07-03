@@ -136,9 +136,9 @@ fun FavoritesPage(
         }
     }
 
-    // 背景高斯模糊动画进度
+    // 背景高斯模糊动画进度（长按菜单或编辑面板弹出时触发）
     val blurProgress by animateFloatAsState(
-        targetValue = if (actionNote != null) 1f else 0f,
+        targetValue = if (actionNote != null || editingNote != null) 1f else 0f,
         animationSpec = tween(durationMillis = 300),
         label = "bgBlur"
     )

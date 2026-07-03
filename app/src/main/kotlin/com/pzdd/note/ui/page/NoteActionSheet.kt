@@ -179,7 +179,10 @@ fun NoteActionSheet(
 }
 
 /**
- * 高透亚克力玻璃面板：大圆角，半透明，柔和光影。
+ * iOS 风格毛玻璃面板（参考 log.txt）。
+ * - 显著毛玻璃模糊效果（多层半透明叠加模拟）
+ * - 大圆角，细白色边框
+ * - 柔和光影，干净专业
  */
 @Composable
 private fun FrostedGlassPanel(
@@ -188,18 +191,26 @@ private fun FrostedGlassPanel(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val glassColor = if (isLight) Color.White.copy(alpha = 0.2f) else Color(0xFF2C2C2E).copy(alpha = 0.2f)
-    val highlightColor = if (isLight) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.08f)
-    val borderColor = if (isLight) Color.White.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.08f)
-    val shadowColor = if (isLight) Color.Black.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.35f)
+    // 毛玻璃底色：多层叠加模拟 frosted glass 模糊感
+    val baseColor = if (isLight) Color(0xFFF0F0F3) else Color(0xFF1C1C1E)
+    val glassColor = baseColor.copy(alpha = 0.55f)
+    val frostLayer = if (isLight) Color.White.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.05f)
+    val highlightColor = if (isLight) Color.White.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.08f)
+    val borderColor = Color.White.copy(alpha = 0.6f)
+    val shadowColor = if (isLight) Color.Black.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.4f)
 
     Box(
         modifier = modifier
             .width(300.dp)
-            .shadow(20.dp, RoundedCornerShape(28.dp), ambientColor = shadowColor, spotColor = shadowColor)
+            .shadow(24.dp, RoundedCornerShape(28.dp), ambientColor = shadowColor, spotColor = shadowColor)
             .clip(RoundedCornerShape(28.dp))
+            // 底层：半透明玻璃底色
             .background(glassColor)
-            .background(Brush.verticalGradient(listOf(highlightColor, Color.Transparent)))
+            // 中层：磨砂层（模拟 frosted glass 的朦胧感）
+            .background(frostLayer)
+            // 顶层：顶部高光渐变
+            .background(Brush.verticalGradient(listOf(highlightColor, Color.Transparent, Color.Transparent)))
+            // 细白色边框
             .border(0.5.dp, borderColor, RoundedCornerShape(28.dp))
     ) {
         content()
@@ -207,11 +218,10 @@ private fun FrostedGlassPanel(
 }
 
 /**
- * 高透亚克力玻璃胶囊按钮（参考 log.txt 规格）。
- * - 横向拉满，大胶囊圆角
- * - 高透亚克力底色 + 细亮反光边框
- * - 左侧彩色图标 + 居中文字
- * - 按压时果冻形变 + 触觉反馈
+ * 胶囊形玻璃按钮（参考 log.txt 规格）。
+ * - 胶囊形圆角，细白色边框
+ * - 左侧彩色图标 + 旁边左对齐文字
+ * - 半透明玻璃质感，按压时缩放反馈
  */
 @Composable
 private fun LiquidGlassButton(
@@ -234,33 +244,33 @@ private fun LiquidGlassButton(
         ),
         label = "jelly"
     )
+    val scale = 1f - pressProgress * 0.03f
 
-    val jellyScaleX = 1f - pressProgress * 0.02f
-    val jellyScaleY = 1f - pressProgress * 0.04f
+    // 图标颜色：蓝色 / 红色（log.txt 明确要求）
+    val iconColor = if (destructive) Color(0xFFFF3B30) else Color(0xFF007AFF)
+    // 文字颜色：黑色（log.txt: "清晰的中文文本"）
+    val textColor = if (destructive) Color(0xFFFF3B30) else if (isLight) Color.Black else Color.White
 
-    val iconTint = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-    val textColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-
-    // 高透亚克力底色
-    val restingColor = if (isLight) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.06f)
-    val pressedColor = if (isLight) Color.White.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.12f)
+    // 半透明玻璃底色
+    val restingColor = if (isLight) Color.White.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.06f)
+    val pressedColor = if (isLight) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.12f)
     val btnColor = lerp(restingColor, pressedColor, pressProgress)
 
-    // 细亮反光边框
-    val borderAlpha = if (isLight) 0.5f + 0.2f * pressProgress else 0.1f + 0.06f * pressProgress
-    val borderColor = if (isLight) Color.White.copy(alpha = borderAlpha) else Color.White.copy(alpha = borderAlpha)
+    // 细白色边框
+    val borderAlpha = 0.6f + 0.2f * pressProgress
+    val borderColor = Color.White.copy(alpha = borderAlpha)
 
     // 顶部高光
-    val highlightAlpha = if (isLight) 0.35f else 0.1f
+    val highlightAlpha = if (isLight) 0.3f else 0.08f
 
     val capsuleShape = RoundedCornerShape(50)
 
-    Box(
+    Row(
         modifier = modifier
             .graphicsLayer {
-                scaleX = jellyScaleX
-                scaleY = jellyScaleY
-                shadowElevation = if (isPressed) 6f else 1f
+                scaleX = scale
+                scaleY = scale
+                shadowElevation = if (isPressed) 4f else 0f
                 shape = capsuleShape
                 clip = true
             }
@@ -269,9 +279,9 @@ private fun LiquidGlassButton(
             .background(Brush.verticalGradient(listOf(
                 Color.White.copy(alpha = highlightAlpha),
                 Color.Transparent,
-                Color.White.copy(alpha = highlightAlpha * 0.2f)
+                Color.White.copy(alpha = highlightAlpha * 0.15f)
             )))
-            .border(1.dp, borderColor, capsuleShape)
+            .border(0.5.dp, borderColor, capsuleShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -280,31 +290,23 @@ private fun LiquidGlassButton(
                     onClick()
                 }
             )
+            .padding(vertical = 13.dp, horizontal = 18.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 14.dp, horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 左侧图标
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(22.dp)
-            )
-            // 居中文字
-            Text(
-                text = label,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = textColor,
-                modifier = Modifier.weight(1f),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-            )
-            // 右侧占位（与左侧图标对称）
-            Spacer(modifier = Modifier.size(22.dp))
-        }
+        // 左侧彩色图标
+        Icon(
+            icon,
+            contentDescription = null,
+            tint = iconColor,
+            modifier = Modifier.size(22.dp)
+        )
+        // 旁边左对齐文字
+        Text(
+            text = label,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            color = textColor
+        )
     }
 }

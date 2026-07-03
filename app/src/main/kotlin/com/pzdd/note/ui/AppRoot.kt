@@ -139,11 +139,8 @@ private fun AppContent(
     onScrollDirectionChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val baseModifier = if (liquidGlassEnabled) {
-        modifier.statusBarsPadding().layerBackdrop(backdrop)
-    } else {
-        modifier.statusBarsPadding()
-    }
+    // 始终附加 layerBackdrop，让 NoteActionSheet 等覆盖层也能使用真实液态玻璃
+    val baseModifier = modifier.statusBarsPadding().layerBackdrop(backdrop)
 
     // 使用 Crossfade 替代 AnimatedContent：
     // 纯 alpha 淡入淡出，不做位移，避免新旧页面同时布局+绘制造成的掉帧
@@ -159,12 +156,14 @@ private fun AppContent(
                 paddingValues = paddingValues,
                 floatingBottomBar = floatingBottomBar,
                 bottomBarVisible = bottomBarVisible,
-                onScrollDirectionChanged = onScrollDirectionChanged
+                onScrollDirectionChanged = onScrollDirectionChanged,
+                backdrop = backdrop,
             )
             1 -> FavoritesPage(
                 vm = noteVm,
                 paddingValues = paddingValues,
-                onScrollDirectionChanged = onScrollDirectionChanged
+                onScrollDirectionChanged = onScrollDirectionChanged,
+                backdrop = backdrop,
             )
             2 -> SettingsPage(vm = settingsVm, paddingValues = paddingValues)
         }

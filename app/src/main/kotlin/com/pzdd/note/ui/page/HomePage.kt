@@ -110,7 +110,8 @@ fun HomePage(
     paddingValues: PaddingValues,
     floatingBottomBar: Boolean = false,
     bottomBarVisible: Boolean = false,
-    onScrollDirectionChanged: (Boolean) -> Unit = {}
+    onScrollDirectionChanged: (Boolean) -> Unit = {},
+    backdrop: com.kyant.backdrop.backdrops.LayerBackdrop? = null
 ) {
     val context = LocalContext.current
     val allNotes by vm.notes.collectAsState()
@@ -564,7 +565,8 @@ fun HomePage(
                 vm.deleteNote(note)
                 actionNote = null
                 Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
-            }
+            },
+            backdrop = backdrop
         )
     }
 }

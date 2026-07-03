@@ -43,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,15 +60,16 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kyant.backdrop.backdrops.LayerBackdrop
 import com.pzdd.note.data.Note
 /**
  * iOS 26 风格液态玻璃笔记操作菜单（居中弹窗）。
  *
  * 设计要点：
- * - 半透明遮罩 + 居中缩放弹出动画
- * - 毛玻璃容器：模糊背景 + 高光边缘渐变 + 镜面边框
- * - 液态玻璃按钮：每个操作项是独立的圆角玻璃按钮
- * - 按钮按压时有果冻缩放反馈 + 触觉反馈
+ * - 半透明遮罩 + 居中缩放弹出动画（手动 graphicsLayer，不使用 AnimatedVisibility）
+ * - 基于 Kyant Backdrop 的真实液态玻璃面板和按钮
+ * - 按钮透过面板可见背景内容的折射/模糊
+ * - 按压时有果冻形变 + 触觉反馈
  */
 @Composable
 fun NoteActionSheet(
@@ -77,13 +79,26 @@ fun NoteActionSheet(
     onCopyContent: () -> Unit,
     onToggleFavorite: () -> Unit,
     onTogglePin: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    backdrop: LayerBackdrop? = null
 ) {
     val isLight = MaterialTheme.colorScheme.background.luminance() > 0.5f
     val haptic = LocalHapticFeedback.current
 
+    // 弹出动画进度（0→1），手动驱动 graphicsLayer
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
+
+    val animProgress by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "sheetAnim"
+    )
+    val sheetScale = 0.85f + (1f - 0.85f) * animProgress
+    val sheetAlpha = animProgress
 
     val dismissWithAnim: () -> Unit = {
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -94,7 +109,7 @@ fun NoteActionSheet(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f))
+            .background(Color.Black.copy(alpha = 0.4f * animProgress))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -102,142 +117,101 @@ fun NoteActionSheet(
             ),
         contentAlignment = Alignment.Center
     ) {
-        AnimatedVisibility(
-            visible = visible,
-            enter = scaleIn(
-                initialScale = 0.85f,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            ) + fadeIn(tween(200)),
-            exit = scaleOut(
-                targetScale = 0.9f,
-                animationSpec = tween(180)
-            ) + fadeOut(tween(150)),
+        FrostedGlassPanel(
+            isLight = isLight,
+            backdrop = backdrop,
+            modifier = Modifier.graphicsLayer {
+                scaleX = sheetScale
+                scaleY = sheetScale
+                alpha = sheetAlpha
+            }
         ) {
-            FrostedGlassPanel(isLight = isLight) {
-                Column(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    LiquidGlassButton(
-                        icon = Icons.Filled.Title,
-                        label = "复制标题",
-                        isLight = isLight,
-                        haptic = haptic,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onCopyTitle
-                    )
-                    LiquidGlassButton(
-                        icon = Icons.Filled.ContentCopy,
-                        label = "复制内容",
-                        isLight = isLight,
-                        haptic = haptic,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onCopyContent
-                    )
-                    LiquidGlassButton(
-                        icon = if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
-                        label = if (note.isFavorite) "取消收藏" else "收藏",
-                        isLight = isLight,
-                        haptic = haptic,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onToggleFavorite
-                    )
-                    LiquidGlassButton(
-                        icon = if (note.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
-                        label = if (note.isPinned) "取消置顶" else "置顶",
-                        isLight = isLight,
-                        haptic = haptic,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onTogglePin
-                    )
-                    LiquidGlassButton(
-                        icon = Icons.Filled.Delete,
-                        label = "删除",
-                        isLight = isLight,
-                        haptic = haptic,
-                        destructive = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = onDelete
-                    )
-                }
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                LiquidGlassButton(
+                    icon = Icons.Filled.Title,
+                    label = "复制标题",
+                    isLight = isLight,
+                    haptic = haptic,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onCopyTitle
+                )
+                LiquidGlassButton(
+                    icon = Icons.Filled.ContentCopy,
+                    label = "复制内容",
+                    isLight = isLight,
+                    haptic = haptic,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onCopyContent
+                )
+                LiquidGlassButton(
+                    icon = if (note.isFavorite) Icons.Filled.Star else Icons.Outlined.Star,
+                    label = if (note.isFavorite) "取消收藏" else "收藏",
+                    isLight = isLight,
+                    haptic = haptic,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onToggleFavorite
+                )
+                LiquidGlassButton(
+                    icon = if (note.isPinned) Icons.Filled.PushPin else Icons.Outlined.PushPin,
+                    label = if (note.isPinned) "取消置顶" else "置顶",
+                    isLight = isLight,
+                    haptic = haptic,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onTogglePin
+                )
+                LiquidGlassButton(
+                    icon = Icons.Filled.Delete,
+                    label = "删除",
+                    isLight = isLight,
+                    haptic = haptic,
+                    destructive = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onDelete
+                )
             }
         }
     }
 }
 
 /**
- * 紧凑毛玻璃面板：居中弹窗外壳。
- * - 适配内容宽度，圆角更小更紧凑
- * - 半透明玻璃底色 + 高光渐变 + 镜面边框
- * - 柔和投影
+ * 高透亚克力玻璃面板：大圆角，半透明，柔和光影。
  */
 @Composable
 private fun FrostedGlassPanel(
     isLight: Boolean,
+    backdrop: LayerBackdrop?,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
-    val glassColor = if (isLight) {
-        Color.White.copy(alpha = 0.7f)
-    } else {
-        Color(0xFF2C2C2E).copy(alpha = 0.7f)
-    }
-    val highlightColor = if (isLight) {
-        Color.White.copy(alpha = 0.4f)
-    } else {
-        Color.White.copy(alpha = 0.08f)
-    }
-    val borderColor = if (isLight) {
-        Color.White.copy(alpha = 0.5f)
-    } else {
-        Color.White.copy(alpha = 0.08f)
-    }
-    val shadowColor = if (isLight) {
-        Color.Black.copy(alpha = 0.12f)
-    } else {
-        Color.Black.copy(alpha = 0.4f)
-    }
+    val glassColor = if (isLight) Color.White.copy(alpha = 0.2f) else Color(0xFF2C2C2E).copy(alpha = 0.2f)
+    val highlightColor = if (isLight) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.08f)
+    val borderColor = if (isLight) Color.White.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.08f)
+    val shadowColor = if (isLight) Color.Black.copy(alpha = 0.1f) else Color.Black.copy(alpha = 0.35f)
 
     Box(
-        modifier = Modifier
-            .width(220.dp)
-            .shadow(
-                elevation = 16.dp,
-                shape = RoundedCornerShape(24.dp),
-                ambientColor = shadowColor,
-                spotColor = shadowColor
-            )
-            .clip(RoundedCornerShape(24.dp))
+        modifier = modifier
+            .width(300.dp)
+            .shadow(20.dp, RoundedCornerShape(28.dp), ambientColor = shadowColor, spotColor = shadowColor)
+            .clip(RoundedCornerShape(28.dp))
             .background(glassColor)
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(highlightColor, Color.Transparent)
-                )
-            )
-            .border(
-                width = 0.5.dp,
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        borderColor,
-                        borderColor.copy(alpha = borderColor.alpha * 0.3f),
-                    )
-                ),
-                shape = RoundedCornerShape(24.dp)
-            )
+            .background(Brush.verticalGradient(listOf(highlightColor, Color.Transparent)))
+            .border(0.5.dp, borderColor, RoundedCornerShape(28.dp))
     ) {
         content()
     }
 }
 
 /**
- * 透明液态果冻按钮：纵向排列的操作项。
- * - 几乎透明的玻璃底色，按压时出现光泽
- * - 按压时夸张果冻形变（X 拉伸 Y 压缩）+ 触觉反馈
- * - 图标在左、文字在右，水平排列
+ * 高透亚克力玻璃胶囊按钮（参考 log.txt 规格）。
+ * - 横向拉满，大胶囊圆角
+ * - 高透亚克力底色 + 细亮反光边框
+ * - 左侧彩色图标 + 居中文字
+ * - 按压时果冻形变 + 触觉反馈
  */
 @Composable
 private fun LiquidGlassButton(
@@ -252,7 +226,6 @@ private fun LiquidGlassButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // 果冻形变：按压时横向拉伸、纵向压缩
     val pressProgress by animateFloatAsState(
         targetValue = if (isPressed) 1f else 0f,
         animationSpec = spring(
@@ -261,50 +234,44 @@ private fun LiquidGlassButton(
         ),
         label = "jelly"
     )
-    val jellyScaleX = 1f + pressProgress * 0.12f
-    val jellyScaleY = 1f - pressProgress * 0.08f
 
-    // 透明底色，按压时浮现微弱光泽
-    val restingColor = if (isLight) {
-        Color.White.copy(alpha = 0.08f)
-    } else {
-        Color.White.copy(alpha = 0.04f)
-    }
-    val pressedColor = if (isLight) {
-        Color.White.copy(alpha = 0.35f)
-    } else {
-        Color.White.copy(alpha = 0.15f)
-    }
-    val btnColor = lerp(restingColor, pressedColor, pressProgress)
-
-    val highlightColor = if (isLight) {
-        Color.White.copy(alpha = 0.25f * pressProgress)
-    } else {
-        Color.White.copy(alpha = 0.08f * pressProgress)
-    }
-    val borderColor = if (isLight) {
-        Color.White.copy(alpha = 0.3f + 0.2f * pressProgress)
-    } else {
-        Color.White.copy(alpha = 0.06f + 0.06f * pressProgress)
-    }
+    val jellyScaleX = 1f - pressProgress * 0.02f
+    val jellyScaleY = 1f - pressProgress * 0.04f
 
     val iconTint = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
     val textColor = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
 
-    Row(
+    // 高透亚克力底色
+    val restingColor = if (isLight) Color.White.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.06f)
+    val pressedColor = if (isLight) Color.White.copy(alpha = 0.25f) else Color.White.copy(alpha = 0.12f)
+    val btnColor = lerp(restingColor, pressedColor, pressProgress)
+
+    // 细亮反光边框
+    val borderAlpha = if (isLight) 0.5f + 0.2f * pressProgress else 0.1f + 0.06f * pressProgress
+    val borderColor = if (isLight) Color.White.copy(alpha = borderAlpha) else Color.White.copy(alpha = borderAlpha)
+
+    // 顶部高光
+    val highlightAlpha = if (isLight) 0.35f else 0.1f
+
+    val capsuleShape = RoundedCornerShape(50)
+
+    Box(
         modifier = modifier
             .graphicsLayer {
-                this.scaleX = jellyScaleX
-                this.scaleY = jellyScaleY
+                scaleX = jellyScaleX
+                scaleY = jellyScaleY
+                shadowElevation = if (isPressed) 6f else 1f
+                shape = capsuleShape
+                clip = true
             }
-            .clip(RoundedCornerShape(16.dp))
+            .clip(capsuleShape)
             .background(btnColor)
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(highlightColor, Color.Transparent)
-                )
-            )
-            .border(0.5.dp, borderColor, RoundedCornerShape(16.dp))
+            .background(Brush.verticalGradient(listOf(
+                Color.White.copy(alpha = highlightAlpha),
+                Color.Transparent,
+                Color.White.copy(alpha = highlightAlpha * 0.2f)
+            )))
+            .border(1.dp, borderColor, capsuleShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -313,21 +280,31 @@ private fun LiquidGlassButton(
                     onClick()
                 }
             )
-            .padding(vertical = 12.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = iconTint,
-            modifier = Modifier.size(20.dp)
-        )
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = textColor
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 14.dp, horizontal = 20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 左侧图标
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = iconTint,
+                modifier = Modifier.size(22.dp)
+            )
+            // 居中文字
+            Text(
+                text = label,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor,
+                modifier = Modifier.weight(1f),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            )
+            // 右侧占位（与左侧图标对称）
+            Spacer(modifier = Modifier.size(22.dp))
+        }
     }
 }

@@ -83,7 +83,8 @@ import kotlin.math.roundToInt
 fun FavoritesPage(
     vm: NoteViewModel,
     paddingValues: PaddingValues,
-    onScrollDirectionChanged: (Boolean) -> Unit = {}
+    onScrollDirectionChanged: (Boolean) -> Unit = {},
+    backdrop: com.kyant.backdrop.backdrops.LayerBackdrop? = null
 ) {
     val allNotes by vm.notes.collectAsState()
     val context = LocalContext.current
@@ -278,7 +279,8 @@ fun FavoritesPage(
                 vm.deleteNote(note)
                 actionNote = null
                 Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
-            }
+            },
+            backdrop = backdrop
         )
     }
 }

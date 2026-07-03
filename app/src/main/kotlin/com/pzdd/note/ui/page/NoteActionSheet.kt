@@ -109,7 +109,7 @@ fun NoteActionSheet(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f * animProgress))
+            .background(Color.Black.copy(alpha = 0.3f * animProgress))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
@@ -117,6 +117,7 @@ fun NoteActionSheet(
             ),
         contentAlignment = Alignment.Center
     ) {
+        // 面板内容
         FrostedGlassPanel(
             isLight = isLight,
             backdrop = backdrop,

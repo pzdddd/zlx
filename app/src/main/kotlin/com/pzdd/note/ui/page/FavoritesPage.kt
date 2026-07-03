@@ -7,6 +7,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -72,6 +73,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.asComposeRenderEffect
+import androidx.compose.ui.graphics.graphicsLayer
 import com.pzdd.note.data.Note
 import com.pzdd.note.data.NoteMode
 import com.pzdd.note.ui.NoteViewModel
@@ -133,12 +136,26 @@ fun FavoritesPage(
         }
     }
 
+    // 背景高斯模糊动画进度
+    val blurProgress by animateFloatAsState(
+        targetValue = if (actionNote != null) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "bgBlur"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
+            .graphicsLayer {
+                if (blurProgress > 0.01f) {
+                    val radius = 25f * blurProgress
+                    renderEffect = android.graphics.RenderEffect.createBlurEffect(
+                        radius, radius, android.graphics.Shader.TileMode.CLAMP
+                    ).asComposeRenderEffect()
+                }
+            }
     ) {
-        // 顶部双文字 Tab
         FavModeTabRow(
             tabs = tabs,
             selectedIndex = selectedTab,

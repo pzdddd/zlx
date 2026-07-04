@@ -80,6 +80,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import com.pzdd.note.data.Note
@@ -121,6 +123,9 @@ fun FavoritesPage(
 
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
+    // 深度模式：添加/编辑子笔记（提升到顶层，NoteEditDialog 在顶层渲染确保全屏居中）
+    var favAddChildParent by remember { mutableStateOf<Note?>(null) }
+    var favEditingChild by remember { mutableStateOf<Note?>(null) }
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
@@ -157,7 +162,7 @@ fun FavoritesPage(
 
     // 背景高斯模糊动画进度（长按菜单或编辑面板弹出时触发）
     val blurProgress by animateFloatAsState(
-        targetValue = if (actionNote != null || editingNote != null) 1f else 0f,
+        targetValue = if (actionNote != null || editingNote != null || favAddChildParent != null || favEditingChild != null) 1f else 0f,
         animationSpec = tween(durationMillis = 300),
         label = "bgBlur"
     )
@@ -270,10 +275,8 @@ fun FavoritesPage(
                                 Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
                             },
                             onRename = { newTitle -> vm.updateNoteTitle(note, newTitle) },
-                            onAddChild = { t, c ->
-                                vm.addNote(t, c, NoteMode.DEEP, parentId = note.id)
-                            },
-                            onUpdateChild = { child, t, c -> vm.updateNote(child, t, c) },
+                            onRequestAddChild = { favAddChildParent = note },
+                            onRequestEditChild = { child -> favEditingChild = child },
                             onDeleteChild = { child -> vm.deleteNote(child) },
                             onCopyChild = { text ->
                                 copyToClipboard(context, "内容", text)
@@ -300,6 +303,36 @@ fun FavoritesPage(
         )
     }
 
+    // 深度模式：新建子笔记（顶层渲染，确保全屏居中）
+    favAddChildParent?.let { parent ->
+        NoteEditDialog(
+            title = "新建子笔记",
+            initialTitle = "",
+            initialContent = "",
+            onDismiss = { favAddChildParent = null },
+            onConfirm = { t, c ->
+                vm.addNote(t, c, NoteMode.DEEP, parentId = parent.id)
+                favAddChildParent = null
+                Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
+            },
+            onHideBottomBar = onHideBottomBar
+        )
+    }
+
+    // 深度模式：编辑子笔记（顶层渲染，确保全屏居中）
+    favEditingChild?.let { child ->
+        NoteEditDialog(
+            title = "编辑子笔记",
+            initialTitle = child.title,
+            initialContent = child.content,
+            onDismiss = { favEditingChild = null },
+            onConfirm = { t, c ->
+                vm.updateNote(child, t, c)
+                favEditingChild = null
+            },
+            onHideBottomBar = onHideBottomBar
+        )
+    }
     actionNote?.let { note ->
         NoteActionSheet(
             note = note,
@@ -384,15 +417,13 @@ private fun FavDeepCard(
     onToggleFavorite: () -> Unit,
     onDelete: () -> Unit,
     onRename: (String) -> Unit,
-    onAddChild: (String, String) -> Unit,
-    onUpdateChild: (Note, String, String) -> Unit,
+    onRequestAddChild: () -> Unit,
+    onRequestEditChild: (Note) -> Unit,
     onDeleteChild: (Note) -> Unit,
     onCopyChild: (String) -> Unit
 ) {
     var expanded by rememberSaveable(note.id) { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
-    var showAddChild by remember { mutableStateOf(false) }
-    var editingChild by remember { mutableStateOf<Note?>(null) }
 
     val dateFormatter = remember {
         java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
@@ -491,7 +522,7 @@ private fun FavDeepCard(
                             FavDeepChildRow(
                                 index = index,
                                 child = child,
-                                onEdit = { editingChild = child },
+                                onEdit = { onRequestEditChild(child) },
                                 onCopy = { onCopyChild(child.content) },
                                 onDelete = { onDeleteChild(child) }
                             )
@@ -507,7 +538,7 @@ private fun FavDeepCard(
                     Spacer(Modifier.size(8.dp))
 
                     OutlinedButton(
-                        onClick = { showAddChild = true },
+                        onClick = onRequestAddChild,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -526,32 +557,6 @@ private fun FavDeepCard(
             onConfirm = {
                 onRename(it)
                 showRenameDialog = false
-            }
-        )
-    }
-
-    if (showAddChild) {
-        NoteEditDialog(
-            title = "新建子笔记",
-            initialTitle = "",
-            initialContent = "",
-            onDismiss = { showAddChild = false },
-            onConfirm = { t, c ->
-                onAddChild(t, c)
-                showAddChild = false
-            }
-        )
-    }
-
-    editingChild?.let { child ->
-        NoteEditDialog(
-            title = "编辑子笔记",
-            initialTitle = child.title,
-            initialContent = child.content,
-            onDismiss = { editingChild = null },
-            onConfirm = { t, c ->
-                onUpdateChild(child, t, c)
-                editingChild = null
             }
         )
     }

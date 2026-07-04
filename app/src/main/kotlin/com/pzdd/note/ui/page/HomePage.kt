@@ -100,6 +100,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.foundation.lazy.LazyListState
@@ -162,6 +164,9 @@ fun HomePage(
     // 深度模式专用状态
     var deepAddNote by remember { mutableStateOf(false) }
     var deepEditingNote by remember { mutableStateOf<Note?>(null) }
+    // 深度模式：添加/编辑子笔记（提升到顶层，NoteEditDialog 在顶层渲染确保全屏居中）
+    var deepAddChildParent by remember { mutableStateOf<Note?>(null) }
+    var deepEditingChild by remember { mutableStateOf<Note?>(null) }
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = rememberLazyListState()
@@ -207,7 +212,7 @@ fun HomePage(
 
     // 背景高斯模糊动画进度（长按菜单或编辑面板弹出时触发）
     val blurProgress by animateFloatAsState(
-        targetValue = if (actionNote != null || editingNote != null || deepEditingNote != null || showAdd || deepAddNote) 1f else 0f,
+        targetValue = if (actionNote != null || editingNote != null || deepEditingNote != null || showAdd || deepAddNote || deepAddChildParent != null || deepEditingChild != null) 1f else 0f,
         animationSpec = tween(durationMillis = 300),
         label = "bgBlur"
     )
@@ -405,12 +410,8 @@ fun HomePage(
                                 Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
                             },
                             onRename = { newTitle -> vm.updateNoteTitle(parentNote, newTitle) },
-                            onAddChild = { title, content ->
-                                vm.addNote(title, content, NoteMode.DEEP, parentId = parentNote.id)
-                            },
-                            onUpdateChild = { child, title, content ->
-                                vm.updateNote(child, title, content)
-                            },
+                            onRequestAddChild = { deepAddChildParent = parentNote },
+                            onRequestEditChild = { child -> deepEditingChild = child },
                             onDeleteChild = { child -> vm.deleteNote(child) },
                             onCopyChild = { text ->
                                 copyToClipboard(context, "内容", text)
@@ -487,6 +488,36 @@ fun HomePage(
         )
     }
 
+    // 深度模式：新建子笔记（顶层渲染，确保全屏居中，与新建笔记完全一致）
+    deepAddChildParent?.let { parent ->
+        NoteEditDialog(
+            title = "新建子笔记",
+            initialTitle = "",
+            initialContent = "",
+            onDismiss = { deepAddChildParent = null },
+            onConfirm = { t, c ->
+                vm.addNote(t, c, NoteMode.DEEP, parentId = parent.id)
+                deepAddChildParent = null
+                Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
+            },
+            onHideBottomBar = onHideBottomBar
+        )
+    }
+
+    // 深度模式：编辑子笔记（顶层渲染，确保全屏居中）
+    deepEditingChild?.let { child ->
+        NoteEditDialog(
+            title = "编辑子笔记",
+            initialTitle = child.title,
+            initialContent = child.content,
+            onDismiss = { deepEditingChild = null },
+            onConfirm = { t, c ->
+                vm.updateNote(child, t, c)
+                deepEditingChild = null
+            },
+            onHideBottomBar = onHideBottomBar
+        )
+    }
     actionNote?.let { note ->
         NoteActionSheet(
             note = note,
@@ -677,21 +708,19 @@ private fun DeepParentCard(
     onToggleFavorite: () -> Unit,
     onDelete: () -> Unit,
     onRename: (String) -> Unit,
-    onAddChild: (String, String) -> Unit,
-    onUpdateChild: (Note, String, String) -> Unit,
+    onRequestAddChild: () -> Unit,
+    onRequestEditChild: (Note) -> Unit,
     onDeleteChild: (Note) -> Unit,
     onCopyChild: (String) -> Unit,
     onReorderChild: (Long, Long) -> Unit
 ) {
     var expanded by rememberSaveable(parentNote.id) { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
-    var showAddChild by remember { mutableStateOf(false) }
-    var editingChild by remember { mutableStateOf<Note?>(null) }
 
     val dateFormatter = remember {
         java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
     }
-    // 拖拽时的视觉反馈：缩放动画（弹簧效果，松手回弹自然）
+    // 拖拽视觉反馈
     val scale by animateFloatAsState(
         targetValue = if (isDragging) 1.03f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
@@ -714,7 +743,6 @@ private fun DeepParentCard(
         modifier = modifier
             .fillMaxWidth()
             .zIndex(if (isDragging) 999f else 0f)
-            // 拖拽手势绑定在 Card 外层，与内层按钮点击完全隔离，杜绝手势冲突
             // 拖拽手势绑定在 Card 外层，与内层按钮点击完全隔离，杜绝手势冲突
             .pointerInput(parentNote.id) {
                 detectDragGesturesAfterLongPress(
@@ -843,7 +871,7 @@ private fun DeepParentCard(
                             DeepChildRow(
                                 index = index,
                                 child = child,
-                                onEdit = { editingChild = child },
+                                onEdit = { onRequestEditChild(child) },
                                 onCopy = { onCopyChild(child.content) },
                                 onDelete = { onDeleteChild(child) },
                                 onMoveUp = {
@@ -870,7 +898,7 @@ private fun DeepParentCard(
 
                     // 添加子笔记按钮
                     OutlinedButton(
-                        onClick = { showAddChild = true },
+                        onClick = onRequestAddChild,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -890,34 +918,6 @@ private fun DeepParentCard(
             onConfirm = {
                 onRename(it)
                 showRenameDialog = false
-            }
-        )
-    }
-
-    // 添加子笔记对话框
-    if (showAddChild) {
-        NoteEditDialog(
-            title = "新建子笔记",
-            initialTitle = "",
-            initialContent = "",
-            onDismiss = { showAddChild = false },
-            onConfirm = { t, c ->
-                onAddChild(t, c)
-                showAddChild = false
-            }
-        )
-    }
-
-    // 编辑子笔记对话框
-    editingChild?.let { child ->
-        NoteEditDialog(
-            title = "编辑子笔记",
-            initialTitle = child.title,
-            initialContent = child.content,
-            onDismiss = { editingChild = null },
-            onConfirm = { t, c ->
-                onUpdateChild(child, t, c)
-                editingChild = null
             }
         )
     }

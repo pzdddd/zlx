@@ -3,6 +3,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -888,59 +893,63 @@ private fun DeepParentCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // 展开内容：子笔记列表 + 添加子笔记按钮
-            if (expanded) {
-                Spacer(Modifier.size(8.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(Modifier.size(8.dp))
+            // 展开内容：子笔记列表 + 添加子笔记按钮（带展开/收起动画）
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(animationSpec = tween(300)) + fadeIn(animationSpec = tween(200)),
+                exit = shrinkVertically(animationSpec = tween(250)) + fadeOut(animationSpec = tween(150))
+            ) {
+                Column {
+                    Spacer(Modifier.size(8.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(Modifier.size(8.dp))
 
-                if (children.isEmpty()) {
-                    Text(
-                        text = "暂无子笔记，点击下方添加",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                } else {
-                    children.forEachIndexed { index, child ->
-                        DeepChildRow(
-                            index = index,
-                            child = child,
-                            onEdit = { editingChild = child },
-                            onCopy = { onCopyChild(child.content) },
-                            onDelete = { onDeleteChild(child) },
-                            onMoveUp = {
-                                if (index > 0) {
-                                    onReorderChild(child.id, children[index - 1].id)
-                                }
-                            },
-                            onMoveDown = {
-                                if (index < children.lastIndex) {
-                                    onReorderChild(child.id, children[index + 1].id)
-                                }
-                            }
+                    if (children.isEmpty()) {
+                        Text(
+                            text = "暂无子笔记，点击下方添加",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
-                        if (index < children.lastIndex) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.padding(vertical = 2.dp)
+                    } else {
+                        children.forEachIndexed { index, child ->
+                            DeepChildRow(
+                                index = index,
+                                child = child,
+                                onEdit = { editingChild = child },
+                                onCopy = { onCopyChild(child.content) },
+                                onDelete = { onDeleteChild(child) },
+                                onMoveUp = {
+                                    if (index > 0) {
+                                        onReorderChild(child.id, children[index - 1].id)
+                                    }
+                                },
+                                onMoveDown = {
+                                    if (index < children.lastIndex) {
+                                        onReorderChild(child.id, children[index + 1].id)
+                                    }
+                                }
                             )
+                            if (index < children.lastIndex) {
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                )
+                            }
                         }
                     }
-                }
 
-                Spacer(Modifier.size(8.dp))
+                    Spacer(Modifier.size(8.dp))
 
-                Spacer(Modifier.size(8.dp))
-
-                // 添加子笔记按钮
-                OutlinedButton(
-                    onClick = { showAddChild = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("添加子笔记", style = MaterialTheme.typography.labelLarge)
+                    // 添加子笔记按钮
+                    OutlinedButton(
+                        onClick = { showAddChild = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("添加子笔记", style = MaterialTheme.typography.labelLarge)
+                    }
                 }
             }
         }

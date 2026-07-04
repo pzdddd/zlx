@@ -530,6 +530,9 @@ fun HomePage(
         }
 
         // FAB 固定位置，不随底栏显示/隐藏而移动
+        // 悬浮底栏：不占 Scaffold 底部空间，需要较大 bottom 避开悬浮底栏
+        // 标准底栏：已通过 paddingValues 扣除底栏高度，只需小间距
+        val fabBottom = if (floatingBottomBar) 140.dp else 20.dp
         FloatingActionButton(
             onClick = { if (selectedTab == 0) showAdd = true else deepAddNote = true },
             shape = androidx.compose.foundation.shape.CircleShape,
@@ -537,7 +540,7 @@ fun HomePage(
             contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 20.dp, bottom = 140.dp)
+                .padding(end = 20.dp, bottom = fabBottom)
                 .size(56.dp)
         ) {
             Icon(Icons.Filled.Add, contentDescription = "添加")

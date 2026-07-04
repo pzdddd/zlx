@@ -4,17 +4,18 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -790,6 +791,7 @@ private fun DeepParentCard(
         modifier = modifier
             .fillMaxWidth()
             .zIndex(if (isDragging) 999f else 0f)
+            .animateContentSize(animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy))
             // 拖拽手势绑定在 Card 外层，与内层按钮点击完全隔离，杜绝手势冲突
             .pointerInput(parentNote.id) {
                 detectDragGesturesAfterLongPress(
@@ -893,11 +895,13 @@ private fun DeepParentCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // 展开内容：子笔记列表 + 添加子笔记按钮（带展开/收起动画）
+            // 展开内容：子笔记列表 + 添加子笔记按钮
+            // AnimatedVisibility + expandVertically 与设置页主题模式展开完全一致
+            // Card 上的 animateContentSize 让 LazyColumn 同步感知高度变化，推动下方卡片
             AnimatedVisibility(
                 visible = expanded,
-                enter = expandVertically(animationSpec = tween(300)) + fadeIn(animationSpec = tween(200)),
-                exit = shrinkVertically(animationSpec = tween(250)) + fadeOut(animationSpec = tween(150))
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
             ) {
                 Column {
                     Spacer(Modifier.size(8.dp))

@@ -63,14 +63,19 @@ fun NoteEditDialog(
     var c by remember { mutableStateOf(initialContent) }
     var fullscreen by remember { mutableStateOf(false) }
     var saved by remember { mutableStateOf(false) }
+    var showDiscardConfirm by remember { mutableStateOf(false) }
     LaunchedEffect(fullscreen) { onHideBottomBar(fullscreen) }
 
     val isLight = MaterialTheme.colorScheme.background.luminance() > 0.5f
 
     var visible by remember { mutableStateOf(false) }
+    var pendingDismiss by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
-    // 关闭时自动保存（返回键、点遮罩、取消按钮都会触发）
+    // 检查内容是否有更改
+    val hasChanges = t != initialTitle || c != initialContent
+
+    // 保存并关闭（保存按钮、确认弹窗"保存"都会触发）
     val dismissWithSave: () -> Unit = {
         if (!saved) {
             saved = true
@@ -78,6 +83,26 @@ fun NoteEditDialog(
             onConfirm(t, c)
         }
         visible = false
+        pendingDismiss = true
+    }
+
+    // 不保存直接关闭（放弃更改）
+    val dismissWithoutSave: () -> Unit = {
+        if (!saved) {
+            saved = true
+            onHideBottomBar(false)
+        }
+        visible = false
+        pendingDismiss = true
+    }
+
+    // 点击取消：有更改时弹出确认，无更改时直接关闭
+    val onCancelClick: () -> Unit = {
+        if (hasChanges) {
+            showDiscardConfirm = true
+        } else {
+            dismissWithoutSave()
+        }
     }
 
     // 全屏↔非全屏切换（不保存不关闭）
@@ -85,12 +110,16 @@ fun NoteEditDialog(
         fullscreen = !fullscreen
     }
 
-    // 拦截系统返回键：全屏时退出全屏，非全屏时自动保存并关闭
+    // 拦截系统返回键：全屏时退出全屏，非全屏时有更改弹确认，无更改直接关闭
     androidx.activity.compose.BackHandler {
         if (fullscreen) {
             fullscreen = false
+        } else if (showDiscardConfirm) {
+            showDiscardConfirm = false
+        } else if (hasChanges) {
+            showDiscardConfirm = true
         } else {
-            dismissWithSave()
+            dismissWithoutSave()
         }
     }
 
@@ -103,6 +132,13 @@ fun NoteEditDialog(
         label = "dialogAnim"
     )
     val sheetScale = 0.85f + 0.15f * animProgress
+
+    // 动画结束后通知父组件移除
+    LaunchedEffect(animProgress, pendingDismiss) {
+        if (pendingDismiss && animProgress < 0.01f) {
+            onDismiss()
+        }
+    }
 
     // 毛玻璃面板颜色
     val baseColor = if (isLight) Color(0xFFF0F0F3) else Color(0xFF1C1C1E)
@@ -118,7 +154,12 @@ fun NoteEditDialog(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = dismissWithSave
+                onClick = {
+                    if (!fullscreen) {
+                        if (hasChanges) showDiscardConfirm = true
+                        else dismissWithoutSave()
+                    }
+                }
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -218,11 +259,11 @@ fun NoteEditDialog(
                         }
                     }
 
-                    // 右侧：取消 + 保存（都会自动保存）
+                    // 右侧：取消 + 保存
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 取消按钮（自动保存并关闭）
+                        // 取消按钮（有更改时弹确认，无更改时直接关闭）
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))
@@ -233,7 +274,7 @@ fun NoteEditDialog(
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
-                                    onClick = dismissWithSave
+                                    onClick = onCancelClick
                                 )
                                 .padding(horizontal = 20.dp, vertical = 10.dp)
                         ) {
@@ -385,7 +426,7 @@ fun NoteEditDialog(
                             horizontalArrangement = Arrangement.End,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // 取消按钮（自动保存并关闭）
+                            // 取消按钮（有更改时弹确认，无更改时直接关闭）
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(50))
@@ -396,7 +437,7 @@ fun NoteEditDialog(
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = null,
-                                        onClick = dismissWithSave
+                                        onClick = onCancelClick
                                     )
                                     .padding(horizontal = 24.dp, vertical = 10.dp)
                             ) {
@@ -433,6 +474,27 @@ fun NoteEditDialog(
                     }
                 }
             }
+        }
+
+        // 二次确认弹窗：是否保存更改
+        if (showDiscardConfirm) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showDiscardConfirm = false },
+                title = { Text("是否保存更改？") },
+                text = { Text("您的内容有未保存的更改。") },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        showDiscardConfirm = false
+                        dismissWithSave()
+                    }) { Text("保存") }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        showDiscardConfirm = false
+                        dismissWithoutSave()
+                    }) { Text("不保存") }
+                }
+            )
         }
     }
 }

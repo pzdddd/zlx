@@ -165,8 +165,8 @@ fun HomePage(
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = rememberLazyListState()
-    // 深度模式列表也有独立的滚动状态
-    val deepListState = rememberLazyListState()
+    // 深度模式用 Column+verticalScroll，AnimatedVisibility 展开才能平滑推动下方内容
+    val deepScrollState = rememberScrollState()
 
     // 将滚动方向检测逻辑提取为可复用的函数
     suspend fun trackScrollDirection(
@@ -194,9 +194,15 @@ fun HomePage(
     LaunchedEffect(listState) {
         trackScrollDirection(listState)
     }
-    // 深度模式滚动检测
-    LaunchedEffect(deepListState) {
-        trackScrollDirection(deepListState)
+    // 深度模式滚动检测（基于 ScrollState）
+    LaunchedEffect(deepScrollState) {
+        var prevValue = deepScrollState.value
+        snapshotFlow { deepScrollState.value }.collect { value ->
+            if (notes.isNotEmpty()) {
+                onScrollDirectionChanged(value > prevValue)
+            }
+            prevValue = value
+        }
     }
 
     // 背景高斯模糊动画进度（长按菜单或编辑面板弹出时触发）
@@ -345,121 +351,43 @@ fun HomePage(
             } else {
                 // ================================================================
                 // 深度模式：可拖动排序的父笔记列表
+                // 使用 Column + verticalScroll（而非 LazyColumn），
+                // 这样 AnimatedVisibility 展开子笔记时能像设置页主题模式那样
+                // 平滑推动下方所有内容（LazyColumn 中 item 高度变化不会动画化其他 item）
                 // ================================================================
-                // 拖拽状态：当前被拖拽条目在列表中的索引，-1 表示无拖拽
                 var deepDragIndex by remember { mutableIntStateOf(-1) }
-                // 被拖拽条目的累计 Y 轴偏移量（像素），仅纵向，横向已锁定
                 var deepDragOffset by remember { mutableStateOf(0f) }
-                // 每个卡片大致高度（含间距），用于计算交换阈值
                 val cardHeightPx = with(LocalDensity.current) { (90.dp).toPx() }
-                // 条目交换阈值：拖拽超过半张卡片高度时与相邻条目换位
                 val swapThreshold = cardHeightPx * 0.5f
-                // 边缘自动滚动触发区域宽度（像素）
-                val edgeScrollZone = with(LocalDensity.current) { (80.dp).toPx() }
-                val coroutineScope = rememberCoroutineScope()
-                // 边缘自动滚动的协程任务，null 表示未在滚动
-                var autoScrollJob by remember { mutableStateOf<Job?>(null) }
 
-                /**
-                 * 启动或更新边缘自动滚动。
-                 * 根据 draggedItemTop / draggedItemBottom 相对视口的位置，
-                 * 动态计算滚动速度：越靠近边缘速度越快，离开边缘则停止。
-                 */
-                fun updateAutoScroll(
-                    draggedItemTop: Float,
-                    draggedItemBottom: Float,
-                    viewportStart: Float,
-                    viewportEnd: Float,
-                    currentIndex: Int,
-                    lastIndex: Int
-                ) {
-                    when {
-                        // 拖拽条目顶部接近视口上边缘 → 向上滚动
-                        draggedItemTop < viewportStart + edgeScrollZone && currentIndex > 0 -> {
-                            // 距离边缘越近，速度越快（最大 cardHeightPx * 0.2f / 帧）
-                            val distance = (draggedItemTop - viewportStart).coerceAtLeast(0f)
-                            val speed = (edgeScrollZone - distance).coerceIn(0f, edgeScrollZone)
-                            val scrollPerFrame = (speed / edgeScrollZone) * cardHeightPx * 0.2f
-                            if (autoScrollJob == null) {
-                                autoScrollJob = coroutineScope.launch {
-                                    while (true) {
-                                        deepListState.scrollBy(-scrollPerFrame)
-                                        delay(16)
-                                    }
-                                }
-                            }
-                        }
-                        // 拖拽条目底部接近视口下边缘 → 向下滚动
-                        draggedItemBottom > viewportEnd - edgeScrollZone && currentIndex < lastIndex -> {
-                            val distance = (viewportEnd - draggedItemBottom).coerceAtLeast(0f)
-                            val speed = (edgeScrollZone - distance).coerceIn(0f, edgeScrollZone)
-                            val scrollPerFrame = (speed / edgeScrollZone) * cardHeightPx * 0.2f
-                            if (autoScrollJob == null) {
-                                autoScrollJob = coroutineScope.launch {
-                                    while (true) {
-                                        deepListState.scrollBy(scrollPerFrame)
-                                        delay(16)
-                                    }
-                                }
-                            }
-                        }
-                        // 不在边缘区域 → 停止自动滚动
-                        else -> {
-                            autoScrollJob?.cancel()
-                            autoScrollJob = null
-                        }
-                    }
-                }
-
-                LazyColumn(
-                    state = deepListState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(deepScrollState)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    itemsIndexed(notes, key = { _, n -> n.id }) { index, parentNote ->
+                    notes.forEachIndexed { index, parentNote ->
                         val isDragging = deepDragIndex == index
                         DeepParentCard(
                             parentNote = parentNote,
                             children = modeNotes.filter { it.parentId == parentNote.id },
                             isDragging = isDragging,
                             dragOffset = if (isDragging) deepDragOffset else 0f,
-                            // 所有条目都加 animateItem()，实现 200ms 平滑换位过渡动画
-                            // 拖拽中的条目除外（它由 graphicsLayer.translationY 手动控制位置）
-                            modifier = if (!isDragging) Modifier.animateItem() else Modifier,
+                            modifier = Modifier,
                             onDragStart = {
                                 deepDragIndex = index
                                 deepDragOffset = 0f
                             },
                             onDragMove = { dragAmount ->
-                                // 严格锁定横向：仅累加 Y 轴偏移，X 轴完全忽略
                                 deepDragOffset += dragAmount
 
-                                // —— 边缘自动滚动检测 ——
-                                val layoutInfo = deepListState.layoutInfo
-                                val vi = layoutInfo.visibleItemsInfo.find { it.index == index }
-                                if (vi != null) {
-                                    val itemTopOnScreen = vi.offset.toFloat() + deepDragOffset
-                                    val itemBottomOnScreen = (vi.offset + vi.size).toFloat() + deepDragOffset
-                                    updateAutoScroll(
-                                        draggedItemTop = itemTopOnScreen,
-                                        draggedItemBottom = itemBottomOnScreen,
-                                        viewportStart = layoutInfo.viewportStartOffset.toFloat(),
-                                        viewportEnd = layoutInfo.viewportEndOffset.toFloat(),
-                                        currentIndex = index,
-                                        lastIndex = notes.lastIndex
-                                    )
-                                }
-
                                 // —— 实时交换逻辑（穿插换位）——
-                                // 向下拖拽：累计偏移超过半张卡片高度 → 与下方条目交换
                                 if (deepDragOffset > swapThreshold && index < notes.lastIndex) {
                                     vm.reorderDeepParents(parentNote.id, notes[index + 1].id)
                                     deepDragIndex = index + 1
-                                    // 交换后扣减阈值，保留残余偏移避免视觉跳跃
                                     deepDragOffset -= swapThreshold
                                 }
-                                // 向上拖拽：累计偏移超过半张卡片高度 → 与上方条目交换
                                 else if (deepDragOffset < -swapThreshold && index > 0) {
                                     vm.reorderDeepParents(parentNote.id, notes[index - 1].id)
                                     deepDragIndex = index - 1
@@ -467,13 +395,8 @@ fun HomePage(
                                 }
                             },
                             onDragEnd = {
-                                // 松手：停止边缘滚动
-                                autoScrollJob?.cancel()
-                                autoScrollJob = null
-                                // 松手：重置拖拽状态，取消阴影上浮效果
                                 deepDragIndex = -1
                                 deepDragOffset = 0f
-                                // 松手：统一持久化排序到本地存储（拖拽过程中不写盘，避免卡顿）
                                 vm.persistDeepOrder()
                             },
                             onToggleFavorite = { vm.toggleFavorite(parentNote) },
@@ -791,7 +714,7 @@ private fun DeepParentCard(
         modifier = modifier
             .fillMaxWidth()
             .zIndex(if (isDragging) 999f else 0f)
-            .animateContentSize(animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy))
+            // 拖拽手势绑定在 Card 外层，与内层按钮点击完全隔离，杜绝手势冲突
             // 拖拽手势绑定在 Card 外层，与内层按钮点击完全隔离，杜绝手势冲突
             .pointerInput(parentNote.id) {
                 detectDragGesturesAfterLongPress(
@@ -897,7 +820,7 @@ private fun DeepParentCard(
 
             // 展开内容：子笔记列表 + 添加子笔记按钮
             // AnimatedVisibility + expandVertically 与设置页主题模式展开完全一致
-            // Card 上的 animateContentSize 让 LazyColumn 同步感知高度变化，推动下方卡片
+            // Column + verticalScroll 结构下，展开时自动平滑推动下方所有内容
             AnimatedVisibility(
                 visible = expanded,
                 enter = expandVertically() + fadeIn(),

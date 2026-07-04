@@ -1,6 +1,7 @@
 package com.pzdd.note.ui.page
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -8,6 +9,10 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,7 +34,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
@@ -136,6 +143,18 @@ fun FavoritesPage(
         }
     }
 
+    // 深度模式滚动状态（Column + verticalScroll）
+    val deepScrollState = rememberScrollState()
+    LaunchedEffect(deepScrollState) {
+        var prevValue = deepScrollState.value
+        snapshotFlow { deepScrollState.value }.collect { value ->
+            if (favorites.isNotEmpty()) {
+                onScrollDirectionChanged(value > prevValue)
+            }
+            prevValue = value
+        }
+    }
+
     // 背景高斯模糊动画进度（长按菜单或编辑面板弹出时触发）
     val blurProgress by animateFloatAsState(
         targetValue = if (actionNote != null || editingNote != null) 1f else 0f,
@@ -216,7 +235,8 @@ fun FavoritesPage(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            } else {
+            } else if (selectedTab == 0) {
+                // 普通模式：LazyColumn
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
@@ -224,33 +244,42 @@ fun FavoritesPage(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(favorites, key = { it.id }) { note ->
-                        if (selectedTab == 0) {
-                            FavCard(
-                                note = note,
-                                onClick = { editingNote = note },
-                                onLongClick = { actionNote = note }
-                            )
-                        } else {
-                            FavDeepCard(
-                                note = note,
-                                children = allNotes.filter { it.parentId == note.id },
-                                onToggleFavorite = { vm.toggleFavorite(note) },
-                                onDelete = {
-                                    vm.deleteNote(note)
-                                    Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
-                                },
-                                onRename = { newTitle -> vm.updateNoteTitle(note, newTitle) },
-                                onAddChild = { t, c ->
-                                    vm.addNote(t, c, NoteMode.DEEP, parentId = note.id)
-                                },
-                                onUpdateChild = { child, t, c -> vm.updateNote(child, t, c) },
-                                onDeleteChild = { child -> vm.deleteNote(child) },
-                                onCopyChild = { text ->
-                                    copyToClipboard(context, "内容", text)
-                                    Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
-                                }
-                            )
-                        }
+                        FavCard(
+                            note = note,
+                            onClick = { editingNote = note },
+                            onLongClick = { actionNote = note }
+                        )
+                    }
+                }
+            } else {
+                // 深度模式：Column + verticalScroll，AnimatedVisibility 展开时平滑推动下方内容
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(deepScrollState)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    favorites.forEach { note ->
+                        FavDeepCard(
+                            note = note,
+                            children = allNotes.filter { it.parentId == note.id },
+                            onToggleFavorite = { vm.toggleFavorite(note) },
+                            onDelete = {
+                                vm.deleteNote(note)
+                                Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
+                            },
+                            onRename = { newTitle -> vm.updateNoteTitle(note, newTitle) },
+                            onAddChild = { t, c ->
+                                vm.addNote(t, c, NoteMode.DEEP, parentId = note.id)
+                            },
+                            onUpdateChild = { child, t, c -> vm.updateNote(child, t, c) },
+                            onDeleteChild = { child -> vm.deleteNote(child) },
+                            onCopyChild = { text ->
+                                copyToClipboard(context, "内容", text)
+                                Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
+                            }
+                        )
                     }
                 }
             }
@@ -439,45 +468,52 @@ private fun FavDeepCard(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (expanded) {
-                Spacer(Modifier.size(8.dp))
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(Modifier.size(8.dp))
+            // 展开内容：AnimatedVisibility + expandVertically，与设置页主题模式展开完全一致
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column {
+                    Spacer(Modifier.size(8.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                    Spacer(Modifier.size(8.dp))
 
-                if (children.isEmpty()) {
-                    Text(
-                        text = "暂无子笔记，点击下方添加",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                } else {
-                    children.forEachIndexed { index, child ->
-                        FavDeepChildRow(
-                            index = index,
-                            child = child,
-                            onEdit = { editingChild = child },
-                            onCopy = { onCopyChild(child.content) },
-                            onDelete = { onDeleteChild(child) }
+                    if (children.isEmpty()) {
+                        Text(
+                            text = "暂无子笔记，点击下方添加",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
-                        if (index < children.lastIndex) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                                modifier = Modifier.padding(vertical = 2.dp)
+                    } else {
+                        children.forEachIndexed { index, child ->
+                            FavDeepChildRow(
+                                index = index,
+                                child = child,
+                                onEdit = { editingChild = child },
+                                onCopy = { onCopyChild(child.content) },
+                                onDelete = { onDeleteChild(child) }
                             )
+                            if (index < children.lastIndex) {
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                                    modifier = Modifier.padding(vertical = 2.dp)
+                                )
+                            }
                         }
                     }
-                }
 
-                Spacer(Modifier.size(8.dp))
+                    Spacer(Modifier.size(8.dp))
 
-                OutlinedButton(
-                    onClick = { showAddChild = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    Text("添加子笔记", style = MaterialTheme.typography.labelLarge)
+                    OutlinedButton(
+                        onClick = { showAddChild = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("添加子笔记", style = MaterialTheme.typography.labelLarge)
+                    }
                 }
             }
         }

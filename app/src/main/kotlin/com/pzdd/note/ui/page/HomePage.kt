@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -94,6 +95,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
@@ -356,14 +358,37 @@ fun HomePage(
             } else {
                 // ================================================================
                 // 深度模式：可拖动排序的父笔记列表
-                // 使用 Column + verticalScroll（而非 LazyColumn），
-                // 这样 AnimatedVisibility 展开子笔记时能像设置页主题模式那样
-                // 平滑推动下方所有内容（LazyColumn 中 item 高度变化不会动画化其他 item）
+                // 拖拽时其他卡片实时平滑让位，可自由拖到任意位置
                 // ================================================================
-                var deepDragIndex by remember { mutableIntStateOf(-1) }
+                var deepDragId by remember { mutableStateOf<Long?>(null) }
                 var deepDragOffset by remember { mutableStateOf(0f) }
-                val cardHeightPx = with(LocalDensity.current) { (90.dp).toPx() }
-                val swapThreshold = cardHeightPx * 0.5f
+                var isSettling by remember { mutableStateOf(false) }
+                // 每个卡片的实际高度（含 spacing），用于计算让位偏移
+                val cardHeights = remember { mutableMapOf<Long, Float>() }
+                val itemSpacingPx = with(LocalDensity.current) { 10.dp.toPx() }
+
+                // 当前拖拽卡片在列表中的 index（通过 id 查找，数据重排后自动更新）
+                val deepDragIndex = notes.indexOfFirst { it.id == deepDragId }
+
+                // 松手后平滑归位动画
+                val settleOffset by animateFloatAsState(
+                    targetValue = if (isSettling) 0f else deepDragOffset,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    ),
+                    label = "settle",
+                    finishedListener = {
+                        if (isSettling) {
+                            isSettling = false
+                            deepDragId = null
+                            deepDragOffset = 0f
+                            vm.persistDeepOrder()
+                        }
+                    }
+                )
+                // 实际使用的拖拽偏移：拖拽中用 deepDragOffset，归位中用 settleOffset
+                val effectiveDragOffset = if (isSettling) settleOffset else deepDragOffset
 
                 Column(
                     modifier = Modifier
@@ -374,35 +399,69 @@ fun HomePage(
                 ) {
                     notes.forEachIndexed { index, parentNote ->
                         val isDragging = deepDragIndex == index
+                        val dragItemHeight = cardHeights[deepDragId] ?: 0f
+
+                        // 计算非拖拽卡片的让位偏移
+                        var displacement = 0f
+                        if (deepDragIndex >= 0 && !isDragging) {
+                            if (index > deepDragIndex) {
+                                val threshold = (index - deepDragIndex - 1) * (dragItemHeight + itemSpacingPx) +
+                                        (dragItemHeight + itemSpacingPx) * 0.5f
+                                if (effectiveDragOffset > threshold) {
+                                    displacement = -(dragItemHeight + itemSpacingPx)
+                                }
+                            } else if (index < deepDragIndex) {
+                                val threshold = -((deepDragIndex - index - 1) * (dragItemHeight + itemSpacingPx) +
+                                        (dragItemHeight + itemSpacingPx) * 0.5f)
+                                if (effectiveDragOffset < threshold) {
+                                    displacement = (dragItemHeight + itemSpacingPx)
+                                }
+                            }
+                        }
+
+                        // 让位偏移动画化
+                        val animatedDisplacement by animateFloatAsState(
+                            targetValue = displacement,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMediumLow
+                            ),
+                            label = "displacement"
+                        )
+
                         DeepParentCard(
                             parentNote = parentNote,
                             children = modeNotes.filter { it.parentId == parentNote.id },
                             isDragging = isDragging,
-                            dragOffset = if (isDragging) deepDragOffset else 0f,
-                            modifier = Modifier,
+                            dragOffset = if (isDragging) effectiveDragOffset else 0f,
+                            placementOffset = if (!isDragging) animatedDisplacement else 0f,
+                            modifier = Modifier.onGloballyPositioned { coords ->
+                                cardHeights[parentNote.id] = coords.size.height.toFloat()
+                            },
                             onDragStart = {
-                                deepDragIndex = index
+                                deepDragId = parentNote.id
                                 deepDragOffset = 0f
                             },
                             onDragMove = { dragAmount ->
                                 deepDragOffset += dragAmount
-
-                                // —— 实时交换逻辑（穿插换位）——
-                                if (deepDragOffset > swapThreshold && index < notes.lastIndex) {
-                                    vm.reorderDeepParents(parentNote.id, notes[index + 1].id)
-                                    deepDragIndex = index + 1
-                                    deepDragOffset -= swapThreshold
-                                }
-                                else if (deepDragOffset < -swapThreshold && index > 0) {
-                                    vm.reorderDeepParents(parentNote.id, notes[index - 1].id)
-                                    deepDragIndex = index - 1
-                                    deepDragOffset += swapThreshold
-                                }
                             },
                             onDragEnd = {
-                                deepDragIndex = -1
-                                deepDragOffset = 0f
-                                vm.persistDeepOrder()
+                                // 松手时根据最终位置一次性重排数据
+                                val dragItemH = cardHeights[parentNote.id] ?: (90.dp.value.toFloat())
+                                val stepHeight = dragItemH + itemSpacingPx
+                                if (stepHeight > 0) {
+                                    // 用四舍五入而非截断，与让位逻辑的半格阈值一致
+                                    val targetShift = (deepDragOffset / stepHeight).roundToInt()
+                                    if (targetShift != 0) {
+                                        val targetIndex = (index + targetShift).coerceIn(0, notes.lastIndex)
+                                        val toId = notes[targetIndex].id
+                                        if (parentNote.id != toId) {
+                                            vm.reorderDeepParents(parentNote.id, toId)
+                                        }
+                                    }
+                                }
+                                // 平滑归位：先动画 deepDragOffset 到 0，再清除拖拽状态
+                                isSettling = true
                             },
                             onToggleFavorite = { vm.toggleFavorite(parentNote) },
                             onDelete = {
@@ -707,6 +766,7 @@ private fun DeepParentCard(
     children: List<Note>,
     isDragging: Boolean = false,
     dragOffset: Float = 0f,
+    placementOffset: Float = 0f,
     modifier: Modifier = Modifier,
     onDragStart: () -> Unit = {},
     onDragMove: (Float) -> Unit = {},
@@ -770,8 +830,8 @@ private fun DeepParentCard(
                 )
             }
             .graphicsLayer {
-                // 纵向位移（仅 Y 轴，横向已锁定）
-                translationY = dragOffset
+                // 纵向位移 = 拖拽偏移 + 位置交换动画偏移
+                translationY = dragOffset + placementOffset
                 this.shadowElevation = shadowElevation
                 scaleX = scale
                 scaleY = scale

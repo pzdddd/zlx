@@ -122,6 +122,21 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
+     * 交换两个深度模式父笔记的顺序（拖拽过程中实时调用）。
+     * 在全局列表中找到 fromId 和 toId，交换它们的位置。
+     */
+    fun swapDeepParents(fromId: Long, toId: Long) {
+        val list = _notes.value.toMutableList()
+        val fromIndex = list.indexOfFirst { it.id == fromId }
+        val toIndex = list.indexOfFirst { it.id == toId }
+        if (fromIndex == -1 || toIndex == -1 || fromIndex == toIndex) return
+        val tmp = list[fromIndex]
+        list[fromIndex] = list[toIndex]
+        list[toIndex] = tmp
+        _notes.value = list
+    }
+
+    /**
      * 重新排列深度模式父笔记顺序（拖拽过程中调用，不立即持久化，避免频繁写盘卡顿）。
      * 将 fromId 移动到 toId 的位置。
      */
@@ -131,16 +146,42 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         val toIndex = list.indexOfFirst { it.id == toId }
         if (fromIndex == -1 || toIndex == -1 || fromIndex == toIndex) return
         val item = list.removeAt(fromIndex)
-        list.add(toIndex, item)
+        // removeAt 后如果 fromIndex < toIndex，后续元素前移了一位，插入位置需要减 1
+        val insertIndex = if (fromIndex < toIndex) toIndex - 1 else toIndex
+        list.add(insertIndex, item)
         _notes.value = list
-        // 拖拽过程中不 persist()，松手时由 persistDeepOrder() 统一保存
+    }
+
+    /**
+     * 将指定笔记移动到目标 index 位置（拖拽松手时调用）。
+     * targetIndex 是在深度模式父笔记列表中的目标位置。
+     */
+    /**
+     * 将指定笔记移动到目标 index 位置（拖拽松手时调用）。
+     * targetIndex 是在深度模式父笔记列表中的目标位置。
+     */
+    fun moveDeepParentToIndex(fromId: Long, targetIndex: Int) {
+        val list = _notes.value.toMutableList()
+        // 只在深度模式父笔记中计算位置
+        val deepParents = list.filter { it.mode == NoteMode.DEEP.value && it.parentId == -1L }
+        if (targetIndex < 0 || targetIndex >= deepParents.size) return
+        val fromDeepIndex = deepParents.indexOfFirst { it.id == fromId }
+        if (fromDeepIndex == -1 || fromDeepIndex == targetIndex) return
+        val fromGlobalIndex = list.indexOfFirst { it.id == fromId }
+        if (fromGlobalIndex == -1) return
+        val item = list.removeAt(fromGlobalIndex)
+        // 目标位置对应的笔记 id（在移除 item 之后的 deepParents 中重新查找）
+        val deepParentsAfterRemove = list.filter { it.mode == NoteMode.DEEP.value && it.parentId == -1L }
+        val targetNoteId = deepParentsAfterRemove[targetIndex.coerceIn(0, deepParentsAfterRemove.lastIndex)].id
+        val targetGlobalIndex = list.indexOfFirst { it.id == targetNoteId }
+        list.add(targetGlobalIndex.coerceIn(0, list.size), item)
+        _notes.value = list
     }
 
     /** 拖拽松手后调用：持久化当前排序到本地存储 */
     fun persistDeepOrder() {
         persist()
     }
-
     /** 重新排列子笔记顺序：在 parentId 下将 fromId 移动到 toId 的位置 */
     fun reorderChildren(parentId: Long, fromId: Long, toId: Long) {
         val list = _notes.value.toMutableList()
@@ -148,7 +189,8 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         val toIndex = list.indexOfFirst { it.id == toId }
         if (fromIndex == -1 || toIndex == -1 || fromIndex == toIndex) return
         val item = list.removeAt(fromIndex)
-        list.add(toIndex, item)
+        val insertIndex = if (fromIndex < toIndex) toIndex - 1 else toIndex
+        list.add(insertIndex, item)
         _notes.value = list
         persist()
     }

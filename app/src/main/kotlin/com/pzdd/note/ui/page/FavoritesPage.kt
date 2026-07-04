@@ -311,9 +311,11 @@ fun FavoritesPage(
             initialContent = "",
             onDismiss = { favAddChildParent = null },
             onConfirm = { t, c ->
-                vm.addNote(t, c, NoteMode.DEEP, parentId = parent.id)
+                if (t.isNotBlank() || c.isNotBlank()) {
+                    vm.addNote(t, c, NoteMode.DEEP, parentId = parent.id)
+                    Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
+                }
                 favAddChildParent = null
-                Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
             },
             onHideBottomBar = onHideBottomBar
         )

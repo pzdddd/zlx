@@ -449,9 +449,11 @@ fun HomePage(
             initialContent = "",
             onDismiss = { showAdd = false },
             onConfirm = { t, c ->
-                vm.addNote(t, c, NoteMode.NORMAL)
+                if (t.isNotBlank() || c.isNotBlank()) {
+                    vm.addNote(t, c, NoteMode.NORMAL)
+                    Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
+                }
                 showAdd = false
-                Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
             },
             onHideBottomBar = onHideBottomBar
         )
@@ -480,9 +482,11 @@ fun HomePage(
             initialContent = "",
             onDismiss = { deepAddNote = false },
             onConfirm = { t, c ->
-                vm.addNote(t, c, NoteMode.DEEP)
+                if (t.isNotBlank() || c.isNotBlank()) {
+                    vm.addNote(t, c, NoteMode.DEEP)
+                    Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
+                }
                 deepAddNote = false
-                Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
             },
             onHideBottomBar = onHideBottomBar
         )
@@ -496,9 +500,11 @@ fun HomePage(
             initialContent = "",
             onDismiss = { deepAddChildParent = null },
             onConfirm = { t, c ->
-                vm.addNote(t, c, NoteMode.DEEP, parentId = parent.id)
+                if (t.isNotBlank() || c.isNotBlank()) {
+                    vm.addNote(t, c, NoteMode.DEEP, parentId = parent.id)
+                    Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
+                }
                 deepAddChildParent = null
-                Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
             },
             onHideBottomBar = onHideBottomBar
         )

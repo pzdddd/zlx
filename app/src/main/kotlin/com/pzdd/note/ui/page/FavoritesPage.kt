@@ -1,18 +1,24 @@
 package com.pzdd.note.ui.page
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -101,9 +107,9 @@ fun FavoritesPage(
     val allNotes by vm.notes.collectAsState()
     val context = LocalContext.current
 
-    // 顶部 Tab：0 = 普通模式收藏，1 = 深度模式收藏
+    // 顶部 Tab：0 = 普通模式收藏，1 = 多列模式收藏
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("普通模式", "深度模式")
+    val tabs = listOf("普通模式", "多列模式")
 
     // 搜索关键词
     var searchQuery by remember { mutableStateOf("") }
@@ -120,10 +126,16 @@ fun FavoritesPage(
             }
         }
     }
+    // 预计算子笔记映射，避免每张卡片 filter 一遍
+    val childrenMap by remember(allNotes) {
+        derivedStateOf {
+            allNotes.filter { it.parentId != -1L }.groupBy { it.parentId }
+        }
+    }
 
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
-    // 深度模式：添加/编辑子笔记（提升到顶层，NoteEditDialog 在顶层渲染确保全屏居中）
+    // 多列模式：添加/编辑子笔记（提升到顶层，NoteEditDialog 在顶层渲染确保全屏居中）
     var favAddChildParent by remember { mutableStateOf<Note?>(null) }
     var favEditingChild by remember { mutableStateOf<Note?>(null) }
 
@@ -148,35 +160,44 @@ fun FavoritesPage(
         }
     }
 
-    // 深度模式滚动状态（Column + verticalScroll）
-    val deepScrollState = rememberScrollState()
-    LaunchedEffect(deepScrollState) {
-        var prevValue = deepScrollState.value
-        snapshotFlow { deepScrollState.value }.collect { value ->
+    // 多列模式也使用 LazyColumn
+    val deepListState = androidx.compose.foundation.lazy.rememberLazyListState()
+    LaunchedEffect(deepListState) {
+        var prevIndex = deepListState.firstVisibleItemIndex
+        var prevOffset = deepListState.firstVisibleItemScrollOffset
+        snapshotFlow {
+            deepListState.firstVisibleItemIndex to deepListState.firstVisibleItemScrollOffset
+        }.collect { (index, offset) ->
             if (favorites.isNotEmpty()) {
-                onScrollDirectionChanged(value > prevValue)
+                val isScrollingUp = when {
+                    index > prevIndex -> true
+                    index < prevIndex -> false
+                    else -> offset > prevOffset
+                }
+                onScrollDirectionChanged(isScrollingUp)
             }
-            prevValue = value
+            prevIndex = index
+            prevOffset = offset
         }
     }
 
-    // 背景高斯模糊动画进度（长按菜单或编辑面板弹出时触发）
-    val blurProgress by animateFloatAsState(
-        targetValue = if (actionNote != null || editingNote != null || favAddChildParent != null || favEditingChild != null) 1f else 0f,
-        animationSpec = tween(durationMillis = 300),
-        label = "bgBlur"
-    )
+    // 背景模糊（长按菜单或编辑面板弹出时触发，即时开关无渐变）
+    val anyOverlay = actionNote != null || editingNote != null || favAddChildParent != null || favEditingChild != null
+    val blurRenderEffect = remember(anyOverlay) {
+        if (anyOverlay) {
+            android.graphics.RenderEffect.createBlurEffect(
+                15f, 15f, android.graphics.Shader.TileMode.CLAMP
+            ).asComposeRenderEffect()
+        } else null
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
             .graphicsLayer {
-                if (blurProgress > 0.01f) {
-                    val radius = 25f * blurProgress
-                    renderEffect = android.graphics.RenderEffect.createBlurEffect(
-                        radius, radius, android.graphics.Shader.TileMode.CLAMP
-                    ).asComposeRenderEffect()
+                if (anyOverlay) {
+                    renderEffect = blurRenderEffect
                 }
             }
     ) {
@@ -222,7 +243,24 @@ fun FavoritesPage(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 4.dp)
         )
+
         Box(modifier = Modifier.fillMaxSize()) {
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    // 纯滑动过渡，不做交叉淡入淡出，避免新旧页面重叠产生残影
+                    val direction = if (targetState > initialState) 1 else -1
+                    slideInHorizontally(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        initialOffsetX = { w -> direction * w }
+                    ) togetherWith slideOutHorizontally(
+                        animationSpec = tween(300, easing = FastOutSlowInEasing),
+                        targetOffsetX = { w -> -direction * w }
+                    )
+                },
+                contentAlignment = Alignment.TopStart,
+                label = "favModeSwitch"
+            ) { tab ->
             if (favorites.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -235,12 +273,12 @@ fun FavoritesPage(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "在${tabs[selectedTab]}中收藏的笔记会显示在这里",
+                        text = "在${tabs[tab]}中收藏的笔记会显示在这里",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            } else if (selectedTab == 0) {
+            } else if (tab == 0) {
                 // 普通模式：LazyColumn
                 LazyColumn(
                     state = listState,
@@ -257,18 +295,17 @@ fun FavoritesPage(
                     }
                 }
             } else {
-                // 深度模式：Column + verticalScroll，AnimatedVisibility 展开时平滑推动下方内容
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(deepScrollState)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                // 多列模式：LazyColumn，只渲染可见项，性能远优于 Column+verticalScroll
+                LazyColumn(
+                    state = deepListState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    favorites.forEach { note ->
+                    items(favorites, key = { it.id }) { note ->
                         FavDeepCard(
                             note = note,
-                            children = allNotes.filter { it.parentId == note.id },
+                            children = childrenMap[note.id] ?: emptyList(),
                             onToggleFavorite = { vm.toggleFavorite(note) },
                             onDelete = {
                                 vm.deleteNote(note)
@@ -286,6 +323,7 @@ fun FavoritesPage(
                     }
                 }
             }
+            } // AnimatedContent
         }
     }
     editingNote?.let { note ->
@@ -303,7 +341,7 @@ fun FavoritesPage(
         )
     }
 
-    // 深度模式：新建子笔记（顶层渲染，确保全屏居中）
+    // 多列模式：新建子笔记（顶层渲染，确保全屏居中）
     favAddChildParent?.let { parent ->
         NoteEditDialog(
             title = "新建子笔记",
@@ -321,7 +359,7 @@ fun FavoritesPage(
         )
     }
 
-    // 深度模式：编辑子笔记（顶层渲染，确保全屏居中）
+    // 多列模式：编辑子笔记（顶层渲染，确保全屏居中）
     favEditingChild?.let { child ->
         NoteEditDialog(
             title = "编辑子笔记",
@@ -410,7 +448,7 @@ private fun FavCard(
 }
 
 /**
- * 深度模式收藏卡片（可折叠，展开后显示子笔记）
+ * 多列模式收藏卡片（可折叠，展开后显示子笔记）
  */
 @Composable
 private fun FavDeepCard(
@@ -638,7 +676,7 @@ private fun FavDeepChildRow(
 }
 
 /**
- * 顶部横向双文字 Tab：普通模式 / 深度模式
+ * 顶部横向双文字 Tab：普通模式 / 多列模式
  */
 @Composable
 private fun FavModeTabRow(

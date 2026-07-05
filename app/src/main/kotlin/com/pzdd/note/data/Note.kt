@@ -17,7 +17,7 @@ data class Note(
 
 enum class NoteMode(val value: Int) {
     NORMAL(0),   // 普通模式
-    DEEP(1);     // 深度模式
+    DEEP(1);     // 多列模式
 
     companion object {
         fun fromValue(v: Int): NoteMode = entries.firstOrNull { it.value == v } ?: NORMAL

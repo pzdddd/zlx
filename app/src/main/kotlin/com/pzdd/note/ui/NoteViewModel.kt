@@ -20,7 +20,11 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
     val notes: StateFlow<List<Note>> = _notes.asStateFlow()
 
     init {
-        _notes.value = repo.loadAll()
+        // 异步加载，避免主线程阻塞导致启动卡顿
+        viewModelScope.launch(Dispatchers.IO) {
+            val loaded = repo.loadAll()
+            _notes.value = loaded
+        }
     }
 
     private fun persist() {
@@ -40,7 +44,42 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
             updatedAt = now
         )
         _notes.value = listOf(note) + _notes.value
+        _notes.value = listOf(note) + _notes.value
         persist()
+    }
+
+    /**
+     * 多列模式：同时创建父笔记和第一个子笔记。
+     * 返回创建的父笔记 id，用于关联子笔记。
+     */
+    fun addDeepNoteWithChild(
+        parentTitle: String,
+        childTitle: String,
+        childContent: String
+    ): Long {
+        val now = System.currentTimeMillis()
+        val parent = Note(
+            id = now,
+            title = parentTitle.trim(),
+            content = "",
+            mode = NoteMode.DEEP.value,
+            parentId = -1L,
+            createdAt = now,
+            updatedAt = now
+        )
+        // 子笔记 id 稍微偏移，避免与父笔记 id 冲突
+        val child = Note(
+            id = now + 1,
+            title = childTitle.trim(),
+            content = childContent.trim(),
+            mode = NoteMode.DEEP.value,
+            parentId = now,
+            createdAt = now + 1,
+            updatedAt = now + 1
+        )
+        _notes.value = listOf(parent, child) + _notes.value
+        persist()
+        return now
     }
 
     /** 删除父笔记及其所有子笔记 */
@@ -122,7 +161,7 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * 交换两个深度模式父笔记的顺序（拖拽过程中实时调用）。
+     * 交换两个多列模式父笔记的顺序（拖拽过程中实时调用）。
      * 在全局列表中找到 fromId 和 toId，交换它们的位置。
      */
     fun swapDeepParents(fromId: Long, toId: Long) {
@@ -137,7 +176,7 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * 重新排列深度模式父笔记顺序（拖拽过程中调用，不立即持久化，避免频繁写盘卡顿）。
+     * 重新排列多列模式父笔记顺序（拖拽过程中调用，不立即持久化，避免频繁写盘卡顿）。
      * 将 fromId 移动到 toId 的位置。
      */
     fun reorderDeepParents(fromId: Long, toId: Long) {
@@ -153,8 +192,8 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * 将指定深度模式父笔记移动到目标 index 位置。
-     * targetIndex 是最终期望在深度父笔记子集中的位置（0-based）。
+     * 将指定多列模式父笔记移动到目标 index 位置。
+     * targetIndex 是最终期望在多列父笔记子集中的位置（0-based）。
      * 例如 fromId 在 index 0，targetIndex=3，则移动后 fromId 出现在 index 3。
      */
     fun moveDeepParentToIndex(fromId: Long, targetIndex: Int) {
@@ -169,10 +208,10 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         if (fromGlobalIndex == -1) return
         val item = list.removeAt(fromGlobalIndex)
 
-        // 移除后重新构建深度父笔记列表，找到目标全局插入位置
+        // 移除后重新构建多列父笔记列表，找到目标全局插入位置
         val deepAfter = list.filter { it.mode == NoteMode.DEEP.value && it.parentId == -1L }
 
-        // 计算在移除后列表中的插入深度索引：
+        // 计算在移除后列表中的插入多列索引：
         // - 向下移动：移除后 fromDeepIndex 之前的元素不变，fromDeepIndex 之后的元素前移一位
         //   要让 item 最终在 targetIndex，需要在 deepAfter 的 targetIndex 位置插入
         //   但 deepAfter 只有 size-1 个元素，如果 targetIndex == deepAfter.size 则追加到末尾
@@ -181,12 +220,12 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         val insertDeepIdx = targetIndex.coerceIn(0, deepAfter.size)
 
         if (insertDeepIdx >= deepAfter.size) {
-            // 插入到最后一个深度父笔记的后面
+            // 插入到最后一个多列父笔记的后面
             val lastDeepId = deepAfter.last().id
             val lastDeepGlobal = list.indexOfFirst { it.id == lastDeepId }
             list.add(lastDeepGlobal + 1, item)
         } else {
-            // 插入到目标深度父笔记的前面
+            // 插入到目标多列父笔记的前面
             val targetNoteId = deepAfter[insertDeepIdx].id
             val targetGlobalIndex = list.indexOfFirst { it.id == targetNoteId }
             list.add(targetGlobalIndex, item)

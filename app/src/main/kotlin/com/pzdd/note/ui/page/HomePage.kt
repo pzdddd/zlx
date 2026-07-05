@@ -3,7 +3,9 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
@@ -12,10 +14,16 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -128,22 +136,29 @@ fun HomePage(
 ) {
     val context = LocalContext.current
     val allNotes by vm.notes.collectAsState()
-    // 顶部 Tab：0 = 普通模式，1 = 深度模式
+    // 顶部 Tab：0 = 普通模式，1 = 多列模式
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("普通模式", "深度模式")
+    val tabs = listOf("普通模式", "多列模式")
 
-    // 搜索关键词（普通模式和深度模式共用）
+    // 搜索关键词（普通模式和多列模式共用）
     var searchQuery by remember { mutableStateOf("") }
 
-    // 按模式过滤：普通模式和深度模式相互独立，互不同步
+    // 按模式过滤：普通模式和多列模式相互独立，互不同步
     val modeNotes by remember(allNotes) {
         derivedStateOf {
             if (selectedTab == 0) allNotes.filter { it.mode == NoteMode.NORMAL.value }
             else allNotes.filter { it.mode == NoteMode.DEEP.value }
         }
     }
+    // 预计算子笔记映射（parentId -> children），避免每张卡片都 filter 一遍（O(n²) → O(n)）
+    val childrenMap by remember(modeNotes) {
+        derivedStateOf {
+            modeNotes.filter { it.parentId != -1L }
+                .groupBy { it.parentId }
+        }
+    }
     // 普通模式：应用搜索过滤
-    // 深度模式：只显示父笔记（parentId == -1），并应用搜索过滤
+    // 多列模式：只显示父笔记（parentId == -1），并应用搜索过滤
     val notes = if (selectedTab == 0) {
         val filtered = if (searchQuery.isBlank()) modeNotes
         else modeNotes.filter {
@@ -163,17 +178,17 @@ fun HomePage(
     var showAdd by remember { mutableStateOf(false) }
     var editingNote by remember { mutableStateOf<Note?>(null) }
     var actionNote by remember { mutableStateOf<Note?>(null) }
-    // 深度模式专用状态
+    // 多列模式专用状态
     var deepAddNote by remember { mutableStateOf(false) }
     var deepEditingNote by remember { mutableStateOf<Note?>(null) }
-    // 深度模式：添加/编辑子笔记（提升到顶层，NoteEditDialog 在顶层渲染确保全屏居中）
+    // 多列模式：添加/编辑子笔记（提升到顶层，NoteEditDialog 在顶层渲染确保全屏居中）
     var deepAddChildParent by remember { mutableStateOf<Note?>(null) }
     var deepEditingChild by remember { mutableStateOf<Note?>(null) }
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = rememberLazyListState()
-    // 深度模式用 Column+verticalScroll，AnimatedVisibility 展开才能平滑推动下方内容
-    val deepScrollState = rememberScrollState()
+    // 多列模式也使用 LazyColumn，性能远优于 Column+verticalScroll
+    val deepListState = rememberLazyListState()
 
     // 将滚动方向检测逻辑提取为可复用的函数
     suspend fun trackScrollDirection(
@@ -201,34 +216,29 @@ fun HomePage(
     LaunchedEffect(listState) {
         trackScrollDirection(listState)
     }
-    // 深度模式滚动检测（基于 ScrollState）
-    LaunchedEffect(deepScrollState) {
-        var prevValue = deepScrollState.value
-        snapshotFlow { deepScrollState.value }.collect { value ->
-            if (notes.isNotEmpty()) {
-                onScrollDirectionChanged(value > prevValue)
-            }
-            prevValue = value
-        }
+    // 多列模式滚动检测（基于 LazyListState）
+    LaunchedEffect(deepListState) {
+        trackScrollDirection(deepListState)
     }
 
-    // 背景高斯模糊动画进度（长按菜单或编辑面板弹出时触发）
-    val blurProgress by animateFloatAsState(
-        targetValue = if (actionNote != null || editingNote != null || deepEditingNote != null || showAdd || deepAddNote || deepAddChildParent != null || deepEditingChild != null) 1f else 0f,
-        animationSpec = tween(durationMillis = 300),
-        label = "bgBlur"
-    )
+    // 背景模糊（长按菜单或编辑面板弹出时触发，即时开关无渐变）
+    val anyOverlay = actionNote != null || editingNote != null || deepEditingNote != null ||
+        showAdd || deepAddNote || deepAddChildParent != null || deepEditingChild != null
+    val blurRenderEffect = remember(anyOverlay) {
+        if (anyOverlay) {
+            android.graphics.RenderEffect.createBlurEffect(
+                15f, 15f, android.graphics.Shader.TileMode.CLAMP
+            ).asComposeRenderEffect()
+        } else null
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
             .graphicsLayer {
-                if (blurProgress > 0.01f) {
-                    val radius = 25f * blurProgress
-                    renderEffect = android.graphics.RenderEffect.createBlurEffect(
-                        radius, radius, android.graphics.Shader.TileMode.CLAMP
-                    ).asComposeRenderEffect()
+                if (anyOverlay) {
+                    renderEffect = blurRenderEffect
                 }
             }
     ) {
@@ -248,7 +258,7 @@ fun HomePage(
             onTabSelected = { selectedTab = it }
         )
 
-        // 搜索框（普通模式和深度模式共用）
+        // 搜索框（普通模式和多列模式共用）
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
@@ -286,7 +296,23 @@ fun HomePage(
         )
 
         Box(modifier = Modifier.fillMaxSize()) {
-        if (selectedTab == 0) {
+        AnimatedContent(
+            targetState = selectedTab,
+            transitionSpec = {
+                // 纯滑动过渡，不做交叉淡入淡出，避免新旧页面重叠产生残影
+                val direction = if (targetState > initialState) 1 else -1
+                slideInHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    initialOffsetX = { w -> direction * w }
+                ) togetherWith slideOutHorizontally(
+                    animationSpec = tween(300, easing = FastOutSlowInEasing),
+                    targetOffsetX = { w -> -direction * w }
+                )
+            },
+            contentAlignment = Alignment.TopStart,
+            label = "modeSwitch"
+        ) { tab ->
+        if (tab == 0) {
             // 普通模式：笔记列表
             if (notes.isEmpty()) {
                 Column(
@@ -337,7 +363,7 @@ fun HomePage(
                 }
             }
         } else {
-            // 深度模式：可折叠父笔记列表
+            // 多列模式：可折叠父笔记列表
             if (notes.isEmpty()) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -357,7 +383,7 @@ fun HomePage(
                 }
             } else {
                 // ================================================================
-                // 深度模式：可拖动排序的父笔记列表
+                // 多列模式：可拖动排序的父笔记列表
                 // ================================================================
                 var deepDragId by remember { mutableStateOf<Long?>(null) }
                 var deepDragOffset by remember { mutableStateOf(0f) }
@@ -393,14 +419,13 @@ fun HomePage(
                 )
                 val effectiveDragOffset = if (isSettling) settleOffset else deepDragOffset
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(deepScrollState)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                LazyColumn(
+                    state = deepListState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    notes.forEachIndexed { index, parentNote ->
+                    itemsIndexed(notes, key = { _, parentNote -> parentNote.id }) { index, parentNote ->
                         val isDragging = deepDragIndex == index
                         val dragItemHeight = cardHeights[deepDragId] ?: 0f
                         val currentItemHeight = cardHeights[parentNote.id] ?: 0f
@@ -440,7 +465,7 @@ fun HomePage(
 
                         DeepParentCard(
                             parentNote = parentNote,
-                            children = modeNotes.filter { it.parentId == parentNote.id },
+                            children = childrenMap[parentNote.id] ?: emptyList(),
                             isDragging = isDragging,
                             dragOffset = if (isDragging) effectiveDragOffset else 0f,
                             placementOffset = if (!isDragging) animatedDisplacement else 0f,
@@ -528,7 +553,7 @@ fun HomePage(
                 }
             }
         }
-
+        } // AnimatedContent
         // FAB 固定位置，不随底栏显示/隐藏而移动
         // 悬浮底栏：不占 Scaffold 底部空间，需要较大 bottom 避开悬浮底栏
         // 标准底栏：已通过 paddingValues 扣除底栏高度，只需小间距
@@ -580,16 +605,14 @@ fun HomePage(
         )
     }
 
-    // 深度模式：新建命令笔记
+    // 多列模式：新建笔记（父标题 + 子标题 + 子内容）
     if (deepAddNote) {
-        NoteEditDialog(
-            title = "新建命令笔记",
-            initialTitle = "",
-            initialContent = "",
+        DeepNoteEditDialog(
+            title = "新建笔记",
             onDismiss = { deepAddNote = false },
-            onConfirm = { t, c ->
-                if (t.isNotBlank() || c.isNotBlank()) {
-                    vm.addNote(t, c, NoteMode.DEEP)
+            onConfirm = { parentTitle, childTitle, childContent ->
+                if (parentTitle.isNotBlank() || childTitle.isNotBlank() || childContent.isNotBlank()) {
+                    vm.addDeepNoteWithChild(parentTitle, childTitle, childContent)
                     Toast.makeText(context, "已添加", Toast.LENGTH_SHORT).show()
                 }
                 deepAddNote = false
@@ -598,7 +621,7 @@ fun HomePage(
         )
     }
 
-    // 深度模式：新建子笔记（顶层渲染，确保全屏居中，与新建笔记完全一致）
+    // 多列模式：新建子笔记（顶层渲染，确保全屏居中，与新建笔记完全一致）
     deepAddChildParent?.let { parent ->
         NoteEditDialog(
             title = "新建子笔记",
@@ -616,7 +639,7 @@ fun HomePage(
         )
     }
 
-    // 深度模式：编辑子笔记（顶层渲染，确保全屏居中）
+    // 多列模式：编辑子笔记（顶层渲染，确保全屏居中）
     deepEditingChild?.let { child ->
         NoteEditDialog(
             title = "编辑子笔记",
@@ -805,7 +828,7 @@ private fun NoteCard(
     }
 }
 
-// ===== 深度模式：可折叠父笔记卡片 =====
+// ===== 多列模式：可折叠父笔记卡片 =====
 
 @Composable
 private fun DeepParentCard(
@@ -1161,7 +1184,7 @@ internal fun RenameDialog(
 }
 
 /**
- * 顶部横向双文字 Tab：普通模式 / 深度模式
+ * 顶部横向双文字 Tab：普通模式 / 多列模式
  * 使用药丸形背景指示当前选中项，点击切换。
  */
 @Composable

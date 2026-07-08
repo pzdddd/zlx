@@ -82,21 +82,20 @@ fun NoteEditDialog(
     // 检查内容是否有更改
     val hasChanges = t != initialTitle || c != initialContent
 
-    // 保存并关闭（保存按钮、确认弹窗"保存"都会触发）
+    // 保存并关闭：先启动退出动画，动画结束后再调用 onConfirm
     val dismissWithSave: () -> Unit = {
         if (!saved) {
             saved = true
             onHideBottomBar(false)
-            onConfirm(t, c)
         }
         visible = false
         pendingDismiss = true
     }
 
-    // 不保存直接关闭（放弃更改）
+    // 不保存直接关闭
     val dismissWithoutSave: () -> Unit = {
         if (!saved) {
-            saved = true
+            saved = false
             onHideBottomBar(false)
         }
         visible = false
@@ -112,12 +111,12 @@ fun NoteEditDialog(
         }
     }
 
-    // 全屏↔非全屏切换（不保存不关闭）
+    // 全屏↔非全屏切换
     val toggleFullscreen: () -> Unit = {
         fullscreen = !fullscreen
     }
 
-    // 拦截系统返回键：全屏时退出全屏，非全屏时有更改弹确认，无更改直接关闭
+    // 拦截系统返回键
     androidx.activity.compose.BackHandler {
         if (fullscreen) {
             fullscreen = false
@@ -140,10 +139,14 @@ fun NoteEditDialog(
     )
     val sheetScale = 0.85f + 0.15f * animProgress
 
-    // 动画结束后通知父组件移除
+    // 动画结束后：保存过的调 onConfirm，否则调 onDismiss
     LaunchedEffect(animProgress, pendingDismiss) {
         if (pendingDismiss && animProgress < 0.01f) {
-            onDismiss()
+            if (saved) {
+                onConfirm(t, c)
+            } else {
+                onDismiss()
+            }
         }
     }
 

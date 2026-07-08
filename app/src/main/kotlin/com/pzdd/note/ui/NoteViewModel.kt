@@ -44,7 +44,6 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
             updatedAt = now
         )
         _notes.value = listOf(note) + _notes.value
-        _notes.value = listOf(note) + _notes.value
         persist()
     }
 

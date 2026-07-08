@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.pzdd.note.data.AppSettings
 import com.pzdd.note.data.SettingsRepository
+import com.pzdd.note.data.SortOrder
 import com.pzdd.note.data.ThemeMode
+import com.pzdd.note.data.ViewMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +37,16 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setLiquidGlassBottomBar(enabled: Boolean) {
         _settings.value = _settings.value.copy(liquidGlassBottomBar = enabled)
+        persist()
+    }
+
+    fun setSortOrder(order: SortOrder) {
+        _settings.value = _settings.value.copy(sortOrder = order)
+        persist()
+    }
+
+    fun setViewMode(mode: ViewMode) {
+        _settings.value = _settings.value.copy(viewMode = mode)
         persist()
     }
 }

@@ -53,8 +53,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items as gridItems
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -68,12 +70,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -100,6 +104,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -109,9 +115,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.foundation.lazy.LazyListState
@@ -121,12 +131,16 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import com.pzdd.note.data.Note
 import com.pzdd.note.data.NoteMode
+import com.pzdd.note.data.SortOrder
+import com.pzdd.note.data.ViewMode
 import com.pzdd.note.ui.NoteViewModel
+import com.pzdd.note.ui.SettingsViewModel
 import com.pzdd.note.ui.copyToClipboard
 
 @Composable
 fun HomePage(
     vm: NoteViewModel,
+    settingsVm: SettingsViewModel,
     paddingValues: PaddingValues,
     floatingBottomBar: Boolean = false,
     bottomBarVisible: Boolean = false,
@@ -136,13 +150,17 @@ fun HomePage(
 ) {
     val context = LocalContext.current
     val allNotes by vm.notes.collectAsState()
+    val appSettings by settingsVm.settings.collectAsState()
+    val sortOrder = appSettings.sortOrder
+    val viewMode = appSettings.viewMode
+    // 菜单弹出状态
+    var showMenu by remember { mutableStateOf(false) }
     // 顶部 Tab：0 = 普通模式，1 = 多列模式
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("普通模式", "多列模式")
 
     // 搜索关键词（普通模式和多列模式共用）
     var searchQuery by remember { mutableStateOf("") }
-
     // 按模式过滤：普通模式和多列模式相互独立，互不同步
     val modeNotes by remember(allNotes) {
         derivedStateOf {
@@ -157,7 +175,7 @@ fun HomePage(
                 .groupBy { it.parentId }
         }
     }
-    // 普通模式：应用搜索过滤
+    // 普通模式：应用搜索过滤，按修改时间排序（置顶笔记始终在前，不参与排序方向）
     // 多列模式：只显示父笔记（parentId == -1），并应用搜索过滤
     val notes = if (selectedTab == 0) {
         val filtered = if (searchQuery.isBlank()) modeNotes
@@ -165,8 +183,16 @@ fun HomePage(
             it.title.contains(searchQuery, ignoreCase = true) ||
             it.content.contains(searchQuery, ignoreCase = true)
         }
-        // 置顶笔记排在前面
-        filtered.sortedByDescending { it.isPinned }
+        // 置顶笔记和非置顶笔记分离，各自按修改时间排序后再合并
+        val pinned = filtered.filter { it.isPinned }
+        val unpinned = filtered.filter { !it.isPinned }
+        val sortedPinned = if (sortOrder == SortOrder.DESCENDING)
+            pinned.sortedByDescending { it.updatedAt }
+        else pinned.sortedBy { it.updatedAt }
+        val sortedUnpinned = if (sortOrder == SortOrder.DESCENDING)
+            unpinned.sortedByDescending { it.updatedAt }
+        else unpinned.sortedBy { it.updatedAt }
+        sortedPinned + sortedUnpinned
     } else {
         val parents = modeNotes.filter { it.parentId == -1L }
         if (searchQuery.isBlank()) parents
@@ -242,14 +268,44 @@ fun HomePage(
                 }
             }
     ) {
-        // 软件名称
-        Text(
-            text = "PZ-NOTE",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 20.dp, top = 12.dp, bottom = 4.dp)
-        )
+        // 软件名称 + 右上角菜单按钮
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 8.dp, top = 12.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "PZ-NOTE",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Box {
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        Icons.Filled.MoreVert,
+                        contentDescription = "菜单",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                HomeMenuPopup(
+                    expanded = showMenu,
+                    onDismiss = { showMenu = false },
+                    sortOrder = sortOrder,
+                    viewMode = viewMode,
+                    onSortOrderSelected = {
+                        settingsVm.setSortOrder(it)
+                        showMenu = false
+                    },
+                    onViewModeSelected = {
+                        settingsVm.setViewMode(it)
+                        showMenu = false
+                    }
+                )
+            }
+        }
 
         // 顶部双文字 Tab
         ModeTabRow(
@@ -331,7 +387,41 @@ fun HomePage(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            } else if (viewMode == ViewMode.GRID) {
+                // 网格视图
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    gridItems(notes, key = { it.id }) { note ->
+                        NoteCard(
+                            note = note,
+                            onClick = { editingNote = note },
+                            onLongClick = { actionNote = note },
+                            onCopyContent = {
+                                copyToClipboard(context, "内容", note.content)
+                                Toast.makeText(context, "已复制内容", Toast.LENGTH_SHORT).show()
+                            },
+                            onCopyTitle = {
+                                copyToClipboard(context, "标题", note.title)
+                                Toast.makeText(context, "已复制标题", Toast.LENGTH_SHORT).show()
+                            },
+                            onToggleFavorite = {
+                                vm.toggleFavorite(note)
+                            },
+                            onDelete = {
+                                vm.deleteNote(note)
+                                Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
+                            },
+                            viewMode = ViewMode.GRID
+                        )
+                    }
+                }
             } else {
+                // 列表视图
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
@@ -694,18 +784,23 @@ private fun NoteCard(
     onCopyContent: () -> Unit,
     onCopyTitle: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    viewMode: ViewMode = ViewMode.LIST
 ) {
+    val isGrid = viewMode == ViewMode.GRID
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .then(if (isGrid) Modifier.height(184.dp) else Modifier)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
     ) {
         Column(
-            modifier = Modifier.padding(14.dp)
+            modifier = Modifier
+                .padding(if (isGrid) 10.dp else 14.dp)
+                .then(if (isGrid) Modifier.fillMaxSize() else Modifier)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (note.title.isNotBlank()) {
@@ -749,9 +844,13 @@ private fun NoteCard(
                     text = note.content,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 4,
-                    overflow = TextOverflow.Ellipsis
+                    maxLines = if (isGrid) 4 else 4,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = if (isGrid) Modifier.weight(1f) else Modifier
                 )
+            } else if (isGrid) {
+                // 网格模式下无内容时也要占位，保持高度统一
+                Spacer(Modifier.weight(1f))
             }
 
             // 分隔线
@@ -762,9 +861,13 @@ private fun NoteCard(
             Spacer(Modifier.size(6.dp))
 
             // 操作按钮行：复制（左）、收藏（中）、删除（右）
+            // 网格模式下用 SpaceBetween 自适应宽度，避免间距过大挤出删除按钮
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(48.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = if (isGrid)
+                    Arrangement.SpaceBetween
+                else
+                    Arrangement.spacedBy(48.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // 复制按钮：单击复制内容，长按复制标题
@@ -1355,6 +1458,140 @@ private fun ModeTabRow(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * 首页右上角弹出菜单：排列方式 + 视图模式（白色圆角 iOS 风格）
+ */
+@Composable
+private fun HomeMenuPopup(
+    expanded: Boolean,
+    onDismiss: () -> Unit,
+    sortOrder: SortOrder,
+    viewMode: ViewMode,
+    onSortOrderSelected: (SortOrder) -> Unit,
+    onViewModeSelected: (ViewMode) -> Unit
+) {
+    if (!expanded) return
+    val density = LocalDensity.current
+    Popup(
+        alignment = Alignment.TopEnd,
+        offset = IntOffset(with(density) { (-8.dp).roundToPx() }, with(density) { 48.dp.roundToPx() }),
+        onDismissRequest = onDismiss,
+        properties = PopupProperties(focusable = true)
+    ) {
+        Surface(
+            modifier = Modifier
+                .width(200.dp)
+                .shadow(8.dp, RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(16.dp)),
+            color = Color.White,
+            tonalElevation = 0.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(vertical = 4.dp)
+            ) {
+                // ── 分组标题：排列方式 ──
+                Text(
+                    text = "排列方式",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF999999),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 2.dp)
+                )
+                // 最新修改在前
+                IOSMenuRow(
+                    label = "最新修改在前",
+                    selected = sortOrder == SortOrder.DESCENDING,
+                    accentColor = MaterialTheme.colorScheme.primary,
+                    onClick = { onSortOrderSelected(SortOrder.DESCENDING) }
+                )
+                // 组内分隔线
+                HorizontalDivider(
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                    thickness = 0.5.dp,
+                    color = Color(0xFFE5E5EA)
+                )
+                // 最早修改在前
+                IOSMenuRow(
+                    label = "最早修改在前",
+                    selected = sortOrder == SortOrder.ASCENDING,
+                    accentColor = MaterialTheme.colorScheme.primary,
+                    onClick = { onSortOrderSelected(SortOrder.ASCENDING) }
+                )
+
+                // ── 组间分隔线（较粗）──
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    thickness = 1.dp,
+                    color = Color(0xFFE5E5EA)
+                )
+
+                // ── 分组标题：视图 ──
+                Text(
+                    text = "视图",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF999999),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 16.dp, top = 2.dp, bottom = 2.dp)
+                )
+                // 列表视图
+                IOSMenuRow(
+                    label = "列表视图",
+                    selected = viewMode == ViewMode.LIST,
+                    accentColor = MaterialTheme.colorScheme.primary,
+                    onClick = { onViewModeSelected(ViewMode.LIST) }
+                )
+                HorizontalDivider(
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                    thickness = 0.5.dp,
+                    color = Color(0xFFE5E5EA)
+                )
+                // 网格视图
+                IOSMenuRow(
+                    label = "网格视图",
+                    selected = viewMode == ViewMode.GRID,
+                    accentColor = MaterialTheme.colorScheme.primary,
+                    onClick = { onViewModeSelected(ViewMode.GRID) }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * iOS 风格菜单行：左对齐文字 + 右侧选中勾
+ */
+@Composable
+private fun IOSMenuRow(
+    label: String,
+    selected: Boolean,
+    accentColor: androidx.compose.ui.graphics.Color,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(44.dp)
+            .combinedClickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (selected) accentColor else Color(0xFF1C1C1E)
+        )
+        if (selected) {
+            Icon(
+                Icons.Filled.Check,
+                contentDescription = null,
+                tint = accentColor,
+                modifier = Modifier.size(18.dp)
+            )
         }
     }
 }

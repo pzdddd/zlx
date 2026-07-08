@@ -157,6 +157,7 @@ private fun AppContent(
         when (page) {
             0 -> HomePage(
                 vm = noteVm,
+                settingsVm = settingsVm,
                 paddingValues = paddingValues,
                 floatingBottomBar = floatingBottomBar,
                 bottomBarVisible = bottomBarVisible,
@@ -201,8 +202,7 @@ private fun AppContent(
         label = "pageTransition",
     ) { page ->
         when (page) {
-            0 -> HomePage(vm = noteVm, paddingValues = paddingValues)
-            1 -> FavoritesPage(vm = noteVm, paddingValues = paddingValues)
+            0 -> HomePage(vm = noteVm, settingsVm = settingsVm, paddingValues = paddingValues)
             2 -> SettingsPage(vm = settingsVm, paddingValues = paddingValues)
         }
     }

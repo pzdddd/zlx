@@ -106,6 +106,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -1476,6 +1477,26 @@ private fun HomeMenuPopup(
 ) {
     if (!expanded) return
     val density = LocalDensity.current
+
+    // 呼出过渡动画：缩放 + 淡入
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.85f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "menuScale"
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(150),
+        label = "menuAlpha"
+    )
+
     Popup(
         alignment = Alignment.TopEnd,
         offset = IntOffset(with(density) { (-8.dp).roundToPx() }, with(density) { 48.dp.roundToPx() }),
@@ -1485,6 +1506,12 @@ private fun HomeMenuPopup(
         Surface(
             modifier = Modifier
                 .width(200.dp)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                    transformOrigin = TransformOrigin(1f, 0f)  // 从右上角缩放
+                }
                 .shadow(8.dp, RoundedCornerShape(16.dp))
                 .clip(RoundedCornerShape(16.dp)),
             color = Color.White,

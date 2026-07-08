@@ -56,6 +56,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items as gridItems
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -76,6 +78,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
@@ -214,9 +217,10 @@ fun HomePage(
 
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = rememberLazyListState()
+    // 宫格视图滚动状态
+    val gridState = rememberLazyGridState()
     // 多列模式也使用 LazyColumn，性能远优于 Column+verticalScroll
     val deepListState = rememberLazyListState()
-
     // 将滚动方向检测逻辑提取为可复用的函数
     suspend fun trackScrollDirection(
         state: androidx.compose.foundation.lazy.LazyListState
@@ -226,28 +230,42 @@ fun HomePage(
         snapshotFlow {
             state.firstVisibleItemIndex to state.firstVisibleItemScrollOffset
         }.collect { (index, offset) ->
-            if (notes.isNotEmpty()) {
-                val isScrollingUp = when {
-                    index > prevIndex -> true
-                    index < prevIndex -> false
-                    else -> offset > prevOffset  // 同一 item 内，offset 增大 = 向上滚动
-                }
-                onScrollDirectionChanged(isScrollingUp)
+            val isScrollingUp = when {
+                index > prevIndex -> true
+                index < prevIndex -> false
+                else -> offset > prevOffset  // 同一 item 内，offset 增大 = 向上滚动
             }
+            onScrollDirectionChanged(isScrollingUp)
             prevIndex = index
             prevOffset = offset
         }
     }
 
-    // 普通模式滚动检测
+    // 普通模式（列表视图）滚动检测
     LaunchedEffect(listState) {
         trackScrollDirection(listState)
     }
-    // 多列模式滚动检测（基于 LazyListState）
+    // 普通模式（宫格视图）滚动检测
+    LaunchedEffect(gridState) {
+        var prevIndex = gridState.firstVisibleItemIndex
+        var prevOffset = gridState.firstVisibleItemScrollOffset
+        snapshotFlow {
+            gridState.firstVisibleItemIndex to gridState.firstVisibleItemScrollOffset
+        }.collect { (index, offset) ->
+            val isScrollingUp = when {
+                index > prevIndex -> true
+                index < prevIndex -> false
+                else -> offset > prevOffset
+            }
+            onScrollDirectionChanged(isScrollingUp)
+            prevIndex = index
+            prevOffset = offset
+        }
+    }
+    // 多列模式滚动检测
     LaunchedEffect(deepListState) {
         trackScrollDirection(deepListState)
     }
-
     // 背景模糊（长按菜单或编辑面板弹出时触发，即时开关无渐变）
     val anyOverlay = actionNote != null || editingNote != null || deepEditingNote != null ||
         showAdd || deepAddNote || deepAddChildParent != null || deepEditingChild != null
@@ -392,6 +410,7 @@ fun HomePage(
                 // 网格视图
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
+                    state = gridState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -790,6 +809,7 @@ private fun NoteCard(
 ) {
     val isGrid = viewMode == ViewMode.GRID
     Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier
             .fillMaxWidth()
             .then(if (isGrid) Modifier.height(184.dp) else Modifier)
@@ -979,6 +999,7 @@ private fun DeepParentCard(
         label = "dragAlpha"
     )
     Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = modifier
             .fillMaxWidth()
             .zIndex(if (isDragging) 999f else 0f)

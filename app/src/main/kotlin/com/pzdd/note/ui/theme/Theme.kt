@@ -18,13 +18,19 @@ import com.pzdd.note.data.ThemeMode
 private fun buildLightScheme(c: ThemeColorScheme) = lightColorScheme(
     primary = c.lightPrimary,
     secondary = c.lightSecondary,
-    tertiary = c.lightTertiary
+    tertiary = c.lightTertiary,
+    background = Color(0xFFEDEDF0),
+    surface = Color(0xFFFFFFFF),
+    surfaceVariant = Color(0xFFE0E0E5)
 )
 
 private fun buildDarkScheme(c: ThemeColorScheme) = darkColorScheme(
     primary = c.darkPrimary,
     secondary = c.darkSecondary,
-    tertiary = c.darkTertiary
+    tertiary = c.darkTertiary,
+    background = Color(0xFF121214),
+    surface = Color(0xFF1E1E22),
+    surfaceVariant = Color(0xFF2C2C30)
 )
 
 @Composable

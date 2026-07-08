@@ -53,6 +53,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -77,6 +78,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
@@ -147,14 +149,12 @@ fun FavoritesPage(
         snapshotFlow {
             listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
         }.collect { (index, offset) ->
-            if (favorites.isNotEmpty()) {
-                val isScrollingUp = when {
-                    index > prevIndex -> true
-                    index < prevIndex -> false
-                    else -> offset > prevOffset
-                }
-                onScrollDirectionChanged(isScrollingUp)
+            val isScrollingUp = when {
+                index > prevIndex -> true
+                index < prevIndex -> false
+                else -> offset > prevOffset
             }
+            onScrollDirectionChanged(isScrollingUp)
             prevIndex = index
             prevOffset = offset
         }
@@ -168,14 +168,12 @@ fun FavoritesPage(
         snapshotFlow {
             deepListState.firstVisibleItemIndex to deepListState.firstVisibleItemScrollOffset
         }.collect { (index, offset) ->
-            if (favorites.isNotEmpty()) {
-                val isScrollingUp = when {
-                    index > prevIndex -> true
-                    index < prevIndex -> false
-                    else -> offset > prevOffset
-                }
-                onScrollDirectionChanged(isScrollingUp)
+            val isScrollingUp = when {
+                index > prevIndex -> true
+                index < prevIndex -> false
+                else -> offset > prevOffset
             }
+            onScrollDirectionChanged(isScrollingUp)
             prevIndex = index
             prevOffset = offset
         }
@@ -412,6 +410,7 @@ private fun FavCard(
     onLongClick: () -> Unit
 ) {
     Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
@@ -469,7 +468,10 @@ private fun FavDeepCard(
         java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
     }
 
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp // 修复：补全了尺寸包
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -50,7 +49,6 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
             AndroidView(
                 modifier = Modifier.weight(1f),
                 factory = { ctx ->
-                    val swipeLayout = SwipeRefreshLayout(ctx)
                     val webView = WebView(ctx).apply {
                         settings.apply {
                             javaScriptEnabled = true
@@ -79,7 +77,6 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
 
                             override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
-                                swipeLayout.isRefreshing = false 
                                 android.webkit.CookieManager.getInstance().flush()
                                 
                                 val injectScript = """
@@ -248,6 +245,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
 
                                         // 🌟 修复网页闪烁的核心点：去除了霸道的 resize 事件！
                                         var lazyLoadEnabled = $isLazyLoad;
+                                        var lazyLoadEnabled = $isLazyLoad;
                                         if (!lazyLoadEnabled) {
                                             setInterval(function() {
                                                 document.querySelectorAll('[loading="lazy"]').forEach(function(el) {
@@ -262,7 +260,6 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                                         }
                                                     }
                                                 });
-                                                // 换成温柔无感知的触发器
                                                 window.dispatchEvent(new Event('scroll'));
                                             }, 2000);
                                         }
@@ -276,9 +273,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                         webViewInstance = this
                     }
 
-                    swipeLayout.setOnRefreshListener { webView.reload() }
-                    swipeLayout.addView(webView)
-                    swipeLayout
+                    webView
                 }
             )
         }

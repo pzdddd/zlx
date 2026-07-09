@@ -1,0 +1,1381 @@
+package com.fuck.zlx
+
+╔═══════════════════════════════════════════════════════════╗
+║                    Powered by LogWire                     ║
+║               Real-time Log Monitoring Tool               ║
+║                                                           ║
+║   Author: Mohammed-baqer-null                             ║
+║   GitHub: https://github.com/Mohammed-baqer-null          ║
+╚═══════════════════════════════════════════════════════════╝
+
+21:42:17.800 [I] com.fuck.zlx: Late-enabling -Xcheck:jni
+21:42:17.806 [I] com.fuck.zlx: Using CollectorTypeCC GC.
+21:42:17.806 [D] nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+21:42:17.806 [I] ActivityThread: Current dynamic renderEngine type=0
+21:42:17.806 [D] MiuiDownscaleImpl: set override inverted scale : 1.0
+21:42:17.806 [I] RENDER_TURBO: onActivityThreadCreate not in white list, pkg=com.fuck.zlx, type=pandora
+21:42:17.807 [D] CompatChangeReporter: Compat change id reported: 242716250; UID 10315; state: ENABLED
+21:42:17.807 [D] AppScoutStateMachine: 32468-ScoutStateMachinecreated
+21:42:17.808 [D] ActivityThread: setEmbeddedParam packageName=com.fuck.zlx processName=com.fuck.zlx isEmbedded=false isIsolated=false
+21:42:17.808 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+21:42:17.808 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+21:42:17.808 [D] nativeloader: Configuring clns-10 for other apk /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/lib/arm64:/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.fuck.zlx
+21:42:17.808 [I] com.fuck.zlx: AssetManager2(0xb400007399e0b958) locale list changing from [] to [zh-CN]
+21:42:17.809 [D] MiuiMonitorThread: Shared singleton Thread for stability monitor start
+21:42:17.809 [V] GraphicsEnvironment: Currently set values for:
+21:42:17.809 [V] GraphicsEnvironment: angle_gl_driver_selection_pkgs=[]
+21:42:17.809 [V] GraphicsEnvironment: angle_gl_driver_selection_values=[]
+21:42:17.809 [V] GraphicsEnvironment: com.fuck.zlx is not listed in per-application setting
+21:42:17.809 [V] GraphicsEnvironment: ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+21:42:17.809 [V] GraphicsEnvironment: com.fuck.zlx is not listed in ANGLE allowlist or settings, returning default
+21:42:17.813 [V] GraphicsEnvironment: Updatable production driver is not supported on the device.
+21:42:17.813 [E] ashmem: Pinning is deprecated since Android Q. Please use trim or other methods.
+21:42:17.813 [D] ResMonitorStub: The current process type is: third_party_app, process name is: com.fuck.zlx
+21:42:17.813 [I] Perf: Connecting to perf service.
+21:42:17.814 [I] ActivityThread: TrafficStats init done
+21:42:17.814 [I] ForceDarkHelperStubImpl: initialize for com.fuck.zlx , ForceDarkOrigin
+21:42:17.814 [D] nativeloader: Load libforcedarkimpl.so using system ns (caller=/system_ext/framework/miui-framework.jar): ok
+21:42:17.814 [I] MiuiForceDarkConfig: setConfig density:3.250000, mainRule:0, secondaryRule:0, tertiaryRule:0
+21:42:17.814 [I] ActivityThread: Miui Feature Init done
+21:42:17.814 [D] FramePredict: FramePredict init: false
+21:42:17.815 [D] com.fuck.zlx: blurUtils, initBackgroundBlurMinInterval processName(com.fuck.zlx), inWhiteLists(0)
+21:42:17.815 [I] ActivityThread: HardwareRenderer preload  done
+21:42:17.815 [D] MIUIAutoUIImpl: MIUIAutoUIImpl has been initialized !!
+21:42:17.815 [I] DisplayManager: Choreographer implicitly registered for the refresh rate.
+21:42:17.815 [I] com.fuck.zlx: AssetManager2(0xb400007399e11d58) locale list changing from [] to [zh-CN]
+21:42:17.815 [D] vulkan: searching for layers in '/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/lib/arm64'
+21:42:17.815 [D] vulkan: searching for layers in '/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk!/lib/arm64-v8a'
+21:42:17.815 [D] DesktopModeFlags: Toggle override initialized to: OVERRIDE_UNSET
+21:42:17.816 [D] Activity: Activity = ActivityInfo{dd6e033 com.fuck.zlx.MainActivity}, Resume onConfigurationChanged = {1.0 460mcc2mnc [zh_CN] ldltr sw375dp w375dp h724dp 520dpi nrml long hdr widecg port finger -keyb/v/h -nav/h winConfig={ mBounds=Rect(0, 0 - 1220, 2656) mAppBounds=Rect(0, 150 - 1220, 2503) mMaxBounds=Rect(0, 0 - 1220, 2656) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0 mInSplitScreen=false letterBoxed=false foScaled=false isSpecificEmbedded=false embeddingScale=1.0} as.3 s.2 fontWeightAdjustment=0/d/o themeChanged=0 themeChangedFlags=0 display=0 extraData = Bundle[{}] screenType=0/o}
+21:42:17.816 [D] RenderLite: trim renderNode enable: false
+21:42:17.816 [D] FramePredict: init success
+21:42:17.816 [E] MI-PreRender: init cloud whiteList failed
+21:42:17.816 [D] com.fuck.zlx: MiuiProcessManagerServiceStub setSchedFifo
+21:42:17.816 [I] MiuiProcessManagerImpl: setSchedFifo pid:32468, mode:3
+21:42:17.816 [E] FramePredict: registerContentObserver fail
+21:42:17.816 [I] com.fuck.zlx: AssetManager2(0xb400007399e18158) locale list changing from [] to [zh-CN]
+21:42:17.816 [D] ApplicationLoaders: Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+21:42:17.816 [D] qdgralloc: Fetching IMapper5 from QtiMapper5
+21:42:17.816 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:17.816 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:17.817 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:17.817 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:17.817 [D] qdgralloc: Fetching IMapper5 from QtiMapper5
+21:42:17.817 [I] SnapAlloc: Graphics lib is available
+21:42:17.817 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:17.817 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:17.817 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:17.817 [I] AdrenoVK-0: Local Branch            :
+21:42:17.817 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:17.817 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:17.817 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:17.817 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:17.818 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:17.818 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:17.818 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:17.818 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:17.818 [I] AdrenoVK-0: Application Name    : android framework
+21:42:17.818 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:17.818 [I] AdrenoVK-0: Application Version : 0x00000000
+21:42:17.818 [I] AdrenoVK-0: Engine Name         : android framework
+21:42:17.818 [I] AdrenoVK-0: Engine Version      : 0x00000000
+21:42:17.818 [I] AdrenoVK-0: Api Version         : 0x00401000
+21:42:17.818 [D] nativeloader: InitLlndkLibrariesProduct: libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libRS.so:libandroid_net.so:libapexsupport.so:libavf.so:libbinder_ndk.so:libc.so:libcgrouprc.so:libclang_rt.asan-aarch64-android.so:libclang_rt.asan-arm-android.so:libclang_rt.hwasan-aarch64-android.so:libcom.android.tethering.connectivity_native.so:libdl.so:libft2.so:liblog.so:libm.so:libmediandk.so:libnativewindow.so:libneuralnetworks.so:libselinux.so:libsync.so:libvendorsupport.so:libvndksupport.so:libvulkan.so
+21:42:17.819 [D] nativeloader: Configuring product-clns-11 for unbundled product apk /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk. target_sdk_version=35, uses_libraries=, library_path=/product/app/ContentCatcherOS3_1/lib/arm64:/product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:17.819 [D] nativeloader: InitVndkspLibrariesProduct: VNDK is deprecated with product
+21:42:17.819 [D] ViewContentFactory: initViewContentFetcherClass
+21:42:17.819 [D] ViewContentFactory: getInterceptorPackageInfo
+21:42:17.819 [D] ViewContentFactory: getInitialApplication took 0ms
+21:42:17.819 [D] ViewContentFactory: packageInfo.packageName: com.miui.contentcatcher
+21:42:17.819 [D] ViewContentFactory: initViewContentFetcherClass took 0ms
+21:42:17.819 [I] ContentCatcher: ViewContentFetcher : ViewContentFetcher
+21:42:17.819 [D] ViewContentFactory: createInterceptor took 0ms
+21:42:17.819 [D] SKIA: [Skia] Flag vulkan_enhance_pipeline_cache enabled
+21:42:17.819 [D] SKIA: [Skia] EnhanceVkPipelineCache is true
+21:42:17.820 [I] ContentCatcher: Interceptor_Catcher : Catcher list invalid for com.fuck.zlx@com.fuck.zlx.MainActivity@29306017
+21:42:17.820 [I] ContentCatcher: Interceptor_Catcher : Get featureInfo from config image_pick_mode
+21:42:17.820 [I] ContentCatcher: Interceptor_Catcher : Get featureInfo from config pick_mode
+21:42:17.820 [D] FirstFrameSpeedUp: bls: [com.xcj.hm.kangfuyixue]
+21:42:17.820 [I] ViewRootImpl: com.fuck.zlx/com.fuck.zlx.MainActivity use first frame acceleration
+21:42:17.820 [I] ContentCatcher: SettingTrigger : register screen QA status observer com.fuck.zlx.MainActivity
+21:42:17.820 [I] ContentCatcher: SettingTrigger : register global collect status observer com.fuck.zlx.MainActivity
+21:42:17.820 [I] ContentCatcher: SettingTrigger : registerUIAgentListener com.fuck.zlx.MainActivity, uid:10315
+21:42:17.820 [I] ContentCatcher_TaplusBlackListHelper: mActivities isEmpty
+21:42:17.820 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.820 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.821 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.821 [I] ContentCatcher_TaplusBlackListHelper: blackList size: 14 package is com.fuck.zlx isInTaplusWhiteList: true
+21:42:17.821 [I] ComputilityLevel: getComputilityLevel(): 6
+21:42:17.822 [D] MiuiNBIManagerImpl: init success, pkgName=com.fuck.zlx mIsNBIEnable=false mDisableVersionCode=-1 mActivityRulesSize=0
+21:42:17.822 [I] com.fuck.zlx: hiddenapi: Accessing hidden method Landroid/os/SystemProperties;->addChangeCallback(Ljava/lang/Runnable;)V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/compose/ui/platform/AndroidComposeView$Companion; (domain=app) using reflection: allowed
+21:42:17.835 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.835 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.835 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.835 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.842 [W] WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+21:42:17.842 [W] WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+21:42:17.842 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.842 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.842 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.842 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.884 [I] NativeTurboSchedManager: Load libmiui_runtime
+21:42:17.884 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:17.898 [I] com.fuck.zlx: AssetManager2(0xb400007399e37b98) locale list changing from [] to [zh-CN]
+21:42:17.899 [I] WebViewFactory: Loading com.google.android.webview version 140.0.7339.207 (code 733920733)
+21:42:17.899 [I] MiResource: Start adding sharedLibAssets
+21:42:17.899 [I] com.fuck.zlx: AssetManager2(0xb400007399e36298) locale list changing from [] to [zh-CN]
+21:42:17.900 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@5da58f5, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:17.900 [I] com.fuck.zlx: AssetManager2(0xb400007399e32a58) locale list changing from [] to [zh-CN]
+21:42:17.901 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@1d11c06, old impl = android.content.res.MiuiResourcesImpl@448b05f, new impl = android.content.res.MiuiResourcesImpl@f66f1f1 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:17.901 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@d2641ea, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:17.902 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@aba9a51, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:17.902 [I] com.fuck.zlx: AssetManager2(0xb400007399e36f18) locale list changing from [] to [zh-CN]
+21:42:17.902 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@9068152, old impl = android.content.res.MiuiResourcesImpl@12a3aac, new impl = android.content.res.MiuiResourcesImpl@df2a1d6 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:17.902 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@a983c23, old impl = android.content.res.MiuiResourcesImpl@12a3aac, new impl = android.content.res.MiuiResourcesImpl@df2a1d6 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:17.903 [I] com.fuck.zlx: AssetManager2(0xb400007399e35618) locale list changing from [] to [zh-CN]
+21:42:17.903 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@db370fe, old impl = android.content.res.MiuiResourcesImpl@e519f0a, new impl = android.content.res.MiuiResourcesImpl@f224c57 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:17.903 [W] com.fuck.zlx: Failed to find entry 'classes.dex': Entry not found
+21:42:17.904 [D] nativeloader: Configuring product-clns-12 for unbundled product apk /product/app/TrichromeLibrary64/TrichromeLibrary64.apk. target_sdk_version=36, uses_libraries=ALL, library_path=/product/app/WebViewGoogle64/lib/arm64:/product/app/WebViewGoogle64/WebViewGoogle64.apk!/lib/arm64-v8a:/product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:17.904 [D] nativeloader: Extending system_exposed_libraries: libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libmisys_jni.xiaomi.so:libpag.hyperos.so:libffavc.hyperos.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libmodemsmartengine_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libdiag_system.qti.so:libqape.qti.so:libqesdk_ndk_platform.qti.so:liblistenjni.qti.so:libautoui_image.xiaomi.so
+21:42:17.904 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+21:42:17.904 [D] nativeloader: Configuring product-clns-13 for unbundled product apk /product/app/WebViewGoogle64/WebViewGoogle64.apk. target_sdk_version=36, uses_libraries=, library_path=/product/app/WebViewGoogle64/lib/arm64:/product/app/WebViewGoogle64/WebViewGoogle64.apk!/lib/arm64-v8a:/product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:17.926 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:17.927 [I] cr_WVCFactoryProvider: version=140.0.7339.207 (733920733) minSdkVersion=29 multiprocess=true packageId=2 splits=<none>
+21:42:17.928 [D] nativeloader: Load /product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a/libmonochrome_64.so using class loader ns product-clns-13 (caller=/product/app/WebViewGoogle64/WebViewGoogle64.apk): ok
+21:42:17.929 [D] nativeloader: Load /system/lib64/libwebviewchromium_plat_support.so using class loader ns product-clns-13 (caller=/product/app/WebViewGoogle64/WebViewGoogle64.apk): ok
+21:42:17.934 [I] chromium: [0626/214217.930230:INFO:android_webview/browser/variations/variations_seed_loader.cc:67] Failed to open file for reading.: No such file or directory (2)
+21:42:17.951 [I] cr_LibraryLoader: Successfully loaded native library
+21:42:17.953 [I] cr_CachingUmaRecorder: Flushed 14 samples from 14 histograms, 0 samples were dropped.
+21:42:17.966 [I] cr_CombinedPProvider: #registerProvider() provider:WV.zj@cc0f4e0 isPolicyCacheEnabled:false policyProvidersSize:0
+21:42:17.966 [I] cr_PolicyProvider: #setManagerAndSource() 0
+21:42:17.966 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:17.967 [I] com.fuck.zlx: AssetManager2(0xb400007399e174d8) locale list changing from [] to [zh-CN]
+21:42:17.967 [I] com.fuck.zlx: AssetManager2(0xb400007399e34fd8) locale list changing from [] to [zh-CN]
+21:42:17.967 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.967 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.967 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.967 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.990 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.991 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.991 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:17.991 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.045 [I] cr_CombinedPProvider: #linkNativeInternal() 1
+21:42:18.045 [I] cr_AppResProvider: #getApplicationRestrictionsFromUserManager() Bundle[EMPTY_PARCEL]
+21:42:18.045 [I] cr_PolicyProvider: #notifySettingsAvailable() 0
+21:42:18.045 [I] cr_CombinedPProvider: #onSettingsAvailable() 0
+21:42:18.046 [I] cr_CombinedPProvider: #flushPolicies()
+21:42:18.167 [W] chromium: [WARNING:android_webview/browser/network_service/net_helpers.cc:143] HTTP Cache size is: 20971520
+21:42:18.168 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:18.204 [I] ContentCatcher: Interceptor_Catcher : notifyWebView view: android.webkit.WebView{b3336f4 VFEDHVC.. ......I. 0,0-0,0}, size:1, isLoad:true
+21:42:18.205 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.205 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.208 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.208 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.208 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.209 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.209 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.307 [I] libMiGL: EnableDR: 0
+21:42:18.307 [D] libMiGL: mDFIInterval: -1
+21:42:18.307 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:18.307 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:18.308 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:18.315 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:18.317 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:18.317 [I] AdrenoVK-0: Local Branch            :
+21:42:18.320 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:18.320 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:18.320 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:18.320 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:18.320 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:18.321 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:18.321 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:18.322 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:18.322 [I] AdrenoVK-0: Application Name    :
+21:42:18.322 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:18.322 [I] AdrenoVK-0: Application Version : 0x00000001
+21:42:18.323 [I] AdrenoVK-0: Engine Name         :
+21:42:18.323 [I] AdrenoVK-0: Engine Version      : 0x00000001
+21:42:18.323 [I] AdrenoVK-0: Api Version         : 0x00404000
+21:42:18.325 [W] cr_media: BLUETOOTH_CONNECT permission is missing.
+21:42:18.329 [W] cr_media: getBluetoothAdapter() requires BLUETOOTH permission
+21:42:18.329 [W] cr_media: registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+21:42:18.329 [I] AdrenoGLES-0: QUALCOMM build                   : 0a73ec43e7, I489da0dd30
+21:42:18.330 [I] AdrenoGLES-0: Build Date                       : 02/03/26
+21:42:18.330 [I] AdrenoGLES-0: OpenGL ES Shader Compiler Version: E031.50.19.18
+21:42:18.334 [I] AdrenoGLES-0: Local Branch                     :
+21:42:18.334 [I] AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:18.355 [I] AdrenoGLES-0: Remote Branch                    : NONE
+21:42:18.355 [I] AdrenoGLES-0: Reconstruct Branch               : NOTHING
+21:42:18.355 [I] AdrenoGLES-0: Build Config                     : C P 20.0.0 AArch64
+21:42:18.355 [I] AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+21:42:18.355 [I] AdrenoGLES-0: Driver Version                   : 0842.27.1
+21:42:18.355 [I] AdrenoGLES-0: Process Name                     : com.fuck.zlx
+21:42:18.356 [I] AdrenoGLES-0: PFP: 0x01510094, ME: 0x01510025
+21:42:18.356 [I] AdrenoUtils: <ReadGpuID:1333>: Reading chip ID through GSL
+21:42:18.356 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:18.356 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:18.356 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:18.356 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:18.356 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:18.357 [I] AdrenoVK-0: Local Branch            :
+21:42:18.357 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:18.357 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:18.357 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:18.357 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:18.357 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:18.357 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:18.359 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:18.359 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:18.359 [I] AdrenoVK-0: Application Name    : Chromium
+21:42:18.359 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:18.359 [I] AdrenoVK-0: Application Version : 0x00000000
+21:42:18.360 [I] AdrenoVK-0: Engine Name         : (null)
+21:42:18.360 [I] AdrenoVK-0: Engine Version      : 0x00000000
+21:42:18.360 [I] AdrenoVK-0: Api Version         : 0x00401000
+21:42:18.361 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 5.63 ms.
+21:42:18.361 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.10 ms.
+21:42:18.361 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.08 ms.
+21:42:18.361 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.10 ms.
+21:42:18.362 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.12 ms.
+21:42:18.362 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:18.363 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.08 ms.
+21:42:18.363 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+21:42:18.363 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+21:42:18.363 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+21:42:18.364 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.27 ms.
+21:42:18.364 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.22 ms.
+21:42:18.364 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.53 ms.
+21:42:18.365 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:18.366 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.06 ms.
+21:42:18.366 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:18.366 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+21:42:18.367 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.49 ms.
+21:42:18.367 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:18.367 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.53 ms.
+21:42:18.367 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.20 ms.
+21:42:18.367 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.49 ms.
+21:42:18.368 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.21 ms.
+21:42:18.368 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.22 ms.
+21:42:18.368 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.23 ms.
+21:42:18.368 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.38 ms.
+21:42:18.405 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.43 ms.
+21:42:18.408 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+21:42:18.419 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:18.423 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:18.423 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:18.423 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.46 ms.
+21:42:18.423 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:18.424 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.20 ms.
+21:42:18.424 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.31 ms.
+21:42:18.424 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.12 ms.
+21:42:18.426 [I] CameraManagerGlobal: Connecting to camera service
+21:42:18.426 [D] CameraExtStub: init android.hardware.camera2.impl.CameraExtImplXiaoMi
+21:42:18.426 [D] CameraInjector: waitForResult:
+21:42:18.426 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.426 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.426 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.427 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.427 [D] CameraInjector: updateCloudCameraControllerInfoAsync: E
+21:42:18.457 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.31 ms.
+21:42:18.492 [D] CameraInjector: isMiviInfo4: use MiviInfo V4.0
+21:42:18.495 [D] CameraInjector: parseMiviInfo4 cameraExposedRoleIdList: 21#23#60#61#0#63#64
+21:42:18.496 [D] CameraInjector: updateCloudCameraControllerInfoAsync: X
+21:42:18.501 [W] CameraExtImplXiaoMi: ignore the status update of camera: 2
+21:42:18.504 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.506 [D] CameraInjector: waitForResult:
+21:42:18.520 [W] CameraExtImplXiaoMi: ignore the status update of camera: 3
+21:42:18.523 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.525 [D] CameraInjector: waitForResult:
+21:42:18.529 [W] CameraExtImplXiaoMi: ignore the status update of camera: 4
+21:42:18.572 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.572 [D] CameraInjector: waitForResult:
+21:42:18.573 [W] CameraExtImplXiaoMi: ignore the status update of camera: 5
+21:42:18.573 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.573 [D] CameraInjector: waitForResult:
+21:42:18.574 [W] CameraExtImplXiaoMi: ignore the status update of camera: 6
+21:42:18.576 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.576 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.576 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.577 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.577 [D] CameraInjector: waitForResult:
+21:42:18.577 [W] CameraManagerGlobal: ignore the torch status update of camera: 2
+21:42:18.577 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.577 [D] CameraInjector: waitForResult:
+21:42:18.578 [W] CameraManagerGlobal: ignore the torch status update of camera: 3
+21:42:18.578 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.578 [D] CameraInjector: waitForResult:
+21:42:18.582 [W] CameraManagerGlobal: ignore the torch status update of camera: 4
+21:42:18.583 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.584 [D] CameraInjector: waitForResult:
+21:42:18.606 [W] CameraManagerGlobal: ignore the torch status update of camera: 5
+21:42:18.606 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:18.606 [D] CameraInjector: waitForResult:
+21:42:18.607 [W] CameraManagerGlobal: ignore the torch status update of camera: 6
+21:42:18.607 [W] AudioCapabilities: Unsupported mediaType audio/alac
+21:42:18.608 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+21:42:18.608 [W] AudioCapabilities: Unsupported mediaType audio/dsd
+21:42:18.608 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb-plus
+21:42:18.608 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb+
+21:42:18.608 [I] HandWritingStubImpl: refreshLastKeyboardType: 1
+21:42:18.608 [W] AudioCapabilities: Unsupported mediaType audio/x-ms-wma
+21:42:18.608 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+21:42:18.609 [W] AudioCapabilities: Unsupported mediaType audio/alac
+21:42:18.609 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+21:42:18.609 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+21:42:18.609 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+21:42:18.609 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.31 ms.
+21:42:18.609 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.610 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.610 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.610 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:18.613 [D] InsetsController: hide(ime(), fromIme=false)
+21:42:18.614 [I] ImeTracker: com.fuck.zlx:962a09c: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+21:42:18.615 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:18.616 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:18.620 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:18.626 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+21:42:18.626 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+21:42:18.626 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:18.638 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:18.653 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:20.784 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+21:42:20.785 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+21:42:20.785 [W] VideoCapabilities: Unsupported mime video/x-mvhevc
+21:42:20.785 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:20.785 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.119 [I] com.fuck.zlx: Late-enabling -Xcheck:jni
+21:42:25.119 [I] com.fuck.zlx: Using CollectorTypeCC GC.
+21:42:25.123 [D] nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+21:42:25.123 [I] ActivityThread: Current dynamic renderEngine type=0
+21:42:25.123 [D] MiuiDownscaleImpl: set override inverted scale : 1.0
+21:42:25.124 [I] RENDER_TURBO: onActivityThreadCreate not in white list, pkg=com.fuck.zlx, type=pandora
+21:42:25.124 [D] CompatChangeReporter: Compat change id reported: 242716250; UID 10315; state: ENABLED
+21:42:25.124 [D] AppScoutStateMachine: 32714-ScoutStateMachinecreated
+21:42:25.124 [D] ActivityThread: setEmbeddedParam packageName=com.fuck.zlx processName=com.fuck.zlx isEmbedded=false isIsolated=false
+21:42:25.125 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+21:42:25.125 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+21:42:25.125 [D] nativeloader: Configuring clns-10 for other apk /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/lib/arm64:/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.fuck.zlx
+21:42:25.125 [I] com.fuck.zlx: AssetManager2(0xb400007399e0b958) locale list changing from [] to [zh-CN]
+21:42:25.126 [D] MiuiMonitorThread: Shared singleton Thread for stability monitor start
+21:42:25.126 [V] GraphicsEnvironment: Currently set values for:
+21:42:25.126 [V] GraphicsEnvironment: angle_gl_driver_selection_pkgs=[]
+21:42:25.126 [V] GraphicsEnvironment: angle_gl_driver_selection_values=[]
+21:42:25.127 [V] GraphicsEnvironment: com.fuck.zlx is not listed in per-application setting
+21:42:25.127 [V] GraphicsEnvironment: ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+21:42:25.127 [V] GraphicsEnvironment: com.fuck.zlx is not listed in ANGLE allowlist or settings, returning default
+21:42:25.127 [V] GraphicsEnvironment: Updatable production driver is not supported on the device.
+21:42:25.127 [D] ResMonitorStub: The current process type is: third_party_app, process name is: com.fuck.zlx
+21:42:25.127 [E] ashmem: Pinning is deprecated since Android Q. Please use trim or other methods.
+21:42:25.128 [I] Perf: Connecting to perf service.
+21:42:25.128 [I] ActivityThread: TrafficStats init done
+21:42:25.128 [I] ForceDarkHelperStubImpl: initialize for com.fuck.zlx , ForceDarkOrigin
+21:42:25.128 [D] nativeloader: Load libforcedarkimpl.so using system ns (caller=/system_ext/framework/miui-framework.jar): ok
+21:42:25.128 [I] MiuiForceDarkConfig: setConfig density:3.250000, mainRule:0, secondaryRule:0, tertiaryRule:0
+21:42:25.129 [I] ActivityThread: Miui Feature Init done
+21:42:25.129 [D] FramePredict: FramePredict init: false
+21:42:25.131 [D] com.fuck.zlx: blurUtils, initBackgroundBlurMinInterval processName(com.fuck.zlx), inWhiteLists(0)
+21:42:25.131 [I] ActivityThread: HardwareRenderer preload  done
+21:42:25.132 [I] DisplayManager: Choreographer implicitly registered for the refresh rate.
+21:42:25.132 [D] MIUIAutoUIImpl: MIUIAutoUIImpl has been initialized !!
+21:42:25.132 [I] com.fuck.zlx: AssetManager2(0xb400007399e13018) locale list changing from [] to [zh-CN]
+21:42:25.132 [D] vulkan: searching for layers in '/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/lib/arm64'
+21:42:25.133 [D] vulkan: searching for layers in '/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk!/lib/arm64-v8a'
+21:42:25.133 [I] com.fuck.zlx: AssetManager2(0xb400007399e16e98) locale list changing from [] to [zh-CN]
+21:42:25.133 [D] ApplicationLoaders: Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+21:42:25.133 [D] DesktopModeFlags: Toggle override initialized to: OVERRIDE_UNSET
+21:42:25.133 [D] nativeloader: InitLlndkLibrariesProduct: libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libRS.so:libandroid_net.so:libapexsupport.so:libavf.so:libbinder_ndk.so:libc.so:libcgrouprc.so:libclang_rt.asan-aarch64-android.so:libclang_rt.asan-arm-android.so:libclang_rt.hwasan-aarch64-android.so:libcom.android.tethering.connectivity_native.so:libdl.so:libft2.so:liblog.so:libm.so:libmediandk.so:libnativewindow.so:libneuralnetworks.so:libselinux.so:libsync.so:libvendorsupport.so:libvndksupport.so:libvulkan.so
+21:42:25.134 [D] nativeloader: Configuring product-clns-11 for unbundled product apk /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk. target_sdk_version=35, uses_libraries=, library_path=/product/app/ContentCatcherOS3_1/lib/arm64:/product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:25.134 [D] nativeloader: InitVndkspLibrariesProduct: VNDK is deprecated with product
+21:42:25.134 [D] ViewContentFactory: initViewContentFetcherClass
+21:42:25.134 [D] ViewContentFactory: getInterceptorPackageInfo
+21:42:25.134 [D] ViewContentFactory: getInitialApplication took 0ms
+21:42:25.135 [D] ViewContentFactory: packageInfo.packageName: com.miui.contentcatcher
+21:42:25.135 [D] ViewContentFactory: initViewContentFetcherClass took 1ms
+21:42:25.135 [I] ContentCatcher: ViewContentFetcher : ViewContentFetcher
+21:42:25.135 [D] ViewContentFactory: createInterceptor took 1ms
+21:42:25.135 [I] ContentCatcher: Interceptor_Catcher : Catcher list invalid for com.fuck.zlx@com.fuck.zlx.MainActivity@42287753
+21:42:25.135 [I] ContentCatcher: Interceptor_Catcher : Get featureInfo from config image_pick_mode
+21:42:25.135 [I] ContentCatcher: Interceptor_Catcher : Get featureInfo from config pick_mode
+21:42:25.136 [D] Activity: Activity = ActivityInfo{3248325 com.fuck.zlx.MainActivity}, Resume onConfigurationChanged = {1.0 460mcc2mnc [zh_CN] ldltr sw375dp w375dp h724dp 520dpi nrml long hdr widecg port finger -keyb/v/h -nav/h winConfig={ mBounds=Rect(0, 0 - 1220, 2656) mAppBounds=Rect(0, 150 - 1220, 2503) mMaxBounds=Rect(0, 0 - 1220, 2656) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0 mInSplitScreen=false letterBoxed=false foScaled=false isSpecificEmbedded=false embeddingScale=1.0} as.3 s.2 fontWeightAdjustment=0/d/o themeChanged=0 themeChangedFlags=0 display=0 extraData = Bundle[{}] screenType=0/o}
+21:42:25.136 [I] ContentCatcher: SettingTrigger : register screen QA status observer com.fuck.zlx.MainActivity
+21:42:25.136 [D] RenderLite: trim renderNode enable: false
+21:42:25.136 [I] ContentCatcher: SettingTrigger : register global collect status observer com.fuck.zlx.MainActivity
+21:42:25.136 [D] FramePredict: init success
+21:42:25.136 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.137 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.137 [E] MI-PreRender: init cloud whiteList failed
+21:42:25.137 [I] ContentCatcher: SettingTrigger : registerUIAgentListener com.fuck.zlx.MainActivity, uid:10315
+21:42:25.137 [D] com.fuck.zlx: MiuiProcessManagerServiceStub setSchedFifo
+21:42:25.137 [I] MiuiProcessManagerImpl: setSchedFifo pid:32714, mode:3
+21:42:25.137 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.137 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.137 [E] FramePredict: registerContentObserver fail
+21:42:25.138 [D] qdgralloc: Fetching IMapper5 from QtiMapper5
+21:42:25.138 [I] ContentCatcher_TaplusBlackListHelper: mActivities isEmpty
+21:42:25.138 [I] ContentCatcher_TaplusBlackListHelper: blackList size: 14 package is com.fuck.zlx isInTaplusWhiteList: true
+21:42:25.138 [D] qdgralloc: Fetching IMapper5 from QtiMapper5
+21:42:25.138 [I] SnapAlloc: Graphics lib is available
+21:42:25.138 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:25.139 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:25.139 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:25.139 [I] AdrenoVK-0: Local Branch            :
+21:42:25.139 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:25.139 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:25.139 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:25.140 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:25.141 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:25.141 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:25.141 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:25.141 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:25.141 [I] AdrenoVK-0: Application Name    : android framework
+21:42:25.142 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:25.142 [I] AdrenoVK-0: Application Version : 0x00000000
+21:42:25.142 [I] AdrenoVK-0: Engine Name         : android framework
+21:42:25.142 [I] AdrenoVK-0: Engine Version      : 0x00000000
+21:42:25.142 [I] AdrenoVK-0: Api Version         : 0x00401000
+21:42:25.143 [D] SKIA: [Skia] Flag vulkan_enhance_pipeline_cache enabled
+21:42:25.143 [D] SKIA: [Skia] EnhanceVkPipelineCache is true
+21:42:25.143 [D] FirstFrameSpeedUp: bls: [com.xcj.hm.kangfuyixue]
+21:42:25.143 [I] ViewRootImpl: com.fuck.zlx/com.fuck.zlx.MainActivity use first frame acceleration
+21:42:25.143 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.144 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.144 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.144 [I] ComputilityLevel: getComputilityLevel(): 6
+21:42:25.144 [D] MiuiNBIManagerImpl: init success, pkgName=com.fuck.zlx mIsNBIEnable=false mDisableVersionCode=-1 mActivityRulesSize=0
+21:42:25.172 [I] com.fuck.zlx: hiddenapi: Accessing hidden method Landroid/os/SystemProperties;->addChangeCallback(Ljava/lang/Runnable;)V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/compose/ui/platform/AndroidComposeView$Companion; (domain=app) using reflection: allowed
+21:42:25.189 [I] NativeTurboSchedManager: Load libmiui_runtime
+21:42:25.190 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:25.193 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.194 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.194 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.194 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.200 [W] WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+21:42:25.200 [W] WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+21:42:25.201 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.201 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.201 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.201 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.234 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:25.246 [I] com.fuck.zlx: AssetManager2(0xb400007399e37878) locale list changing from [] to [zh-CN]
+21:42:25.247 [I] WebViewFactory: Loading com.google.android.webview version 140.0.7339.207 (code 733920733)
+21:42:25.247 [I] MiResource: Start adding sharedLibAssets
+21:42:25.247 [I] com.fuck.zlx: AssetManager2(0xb400007399e35938) locale list changing from [] to [zh-CN]
+21:42:25.247 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@5da58f5, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:25.247 [I] com.fuck.zlx: AssetManager2(0xb400007399e368d8) locale list changing from [] to [zh-CN]
+21:42:25.248 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@f5f601d, old impl = android.content.res.MiuiResourcesImpl@448b05f, new impl = android.content.res.MiuiResourcesImpl@f66f1f1 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:25.248 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@92b75d5, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:25.249 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@aba9a51, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:25.249 [I] com.fuck.zlx: AssetManager2(0xb400007399e30e38) locale list changing from [] to [zh-CN]
+21:42:25.250 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@81e92b6, old impl = android.content.res.MiuiResourcesImpl@12a3aac, new impl = android.content.res.MiuiResourcesImpl@df2a1d6 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:25.250 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@bf9428e, old impl = android.content.res.MiuiResourcesImpl@12a3aac, new impl = android.content.res.MiuiResourcesImpl@df2a1d6 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:25.250 [I] com.fuck.zlx: AssetManager2(0xb400007399e31798) locale list changing from [] to [zh-CN]
+21:42:25.250 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@db370fe, old impl = android.content.res.MiuiResourcesImpl@e519f0a, new impl = android.content.res.MiuiResourcesImpl@f224c57 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:25.250 [W] com.fuck.zlx: Failed to find entry 'classes.dex': Entry not found
+21:42:25.250 [D] nativeloader: Configuring product-clns-12 for unbundled product apk /product/app/TrichromeLibrary64/TrichromeLibrary64.apk. target_sdk_version=36, uses_libraries=ALL, library_path=/product/app/WebViewGoogle64/lib/arm64:/product/app/WebViewGoogle64/WebViewGoogle64.apk!/lib/arm64-v8a:/product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:25.251 [D] nativeloader: Extending system_exposed_libraries: libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libmisys_jni.xiaomi.so:libpag.hyperos.so:libffavc.hyperos.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libmodemsmartengine_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libdiag_system.qti.so:libqape.qti.so:libqesdk_ndk_platform.qti.so:liblistenjni.qti.so:libautoui_image.xiaomi.so
+21:42:25.251 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+21:42:25.251 [D] nativeloader: Configuring product-clns-13 for unbundled product apk /product/app/WebViewGoogle64/WebViewGoogle64.apk. target_sdk_version=36, uses_libraries=, library_path=/product/app/WebViewGoogle64/lib/arm64:/product/app/WebViewGoogle64/WebViewGoogle64.apk!/lib/arm64-v8a:/product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:25.262 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:25.264 [I] cr_WVCFactoryProvider: version=140.0.7339.207 (733920733) minSdkVersion=29 multiprocess=true packageId=2 splits=<none>
+21:42:25.270 [D] nativeloader: Load /product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a/libmonochrome_64.so using class loader ns product-clns-13 (caller=/product/app/WebViewGoogle64/WebViewGoogle64.apk): ok
+21:42:25.271 [D] nativeloader: Load /system/lib64/libwebviewchromium_plat_support.so using class loader ns product-clns-13 (caller=/product/app/WebViewGoogle64/WebViewGoogle64.apk): ok
+21:42:25.272 [I] chromium: [0626/214225.271727:INFO:android_webview/browser/variations/variations_seed_loader.cc:67] Failed to open file for reading.: No such file or directory (2)
+21:42:25.275 [I] cr_LibraryLoader: Successfully loaded native library
+21:42:25.275 [I] cr_CachingUmaRecorder: Flushed 14 samples from 14 histograms, 0 samples were dropped.
+21:42:25.276 [I] cr_CombinedPProvider: #registerProvider() provider:WV.zj@cc0f4e0 isPolicyCacheEnabled:false policyProvidersSize:0
+21:42:25.276 [I] cr_PolicyProvider: #setManagerAndSource() 0
+21:42:25.277 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:25.278 [I] com.fuck.zlx: AssetManager2(0xb400007399e36f18) locale list changing from [] to [zh-CN]
+21:42:25.279 [I] com.fuck.zlx: AssetManager2(0xb400007399e32a58) locale list changing from [] to [zh-CN]
+21:42:25.279 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.280 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.280 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.280 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.280 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.280 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.281 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.281 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.283 [I] cr_CombinedPProvider: #linkNativeInternal() 1
+21:42:25.283 [I] cr_AppResProvider: #getApplicationRestrictionsFromUserManager() Bundle[EMPTY_PARCEL]
+21:42:25.283 [I] cr_PolicyProvider: #notifySettingsAvailable() 0
+21:42:25.284 [I] cr_CombinedPProvider: #onSettingsAvailable() 0
+21:42:25.284 [I] cr_CombinedPProvider: #flushPolicies()
+21:42:25.326 [W] chromium: [WARNING:android_webview/browser/network_service/net_helpers.cc:143] HTTP Cache size is: 20971520
+21:42:25.334 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:25.403 [W] cr_media: BLUETOOTH_CONNECT permission is missing.
+21:42:25.403 [W] cr_media: getBluetoothAdapter() requires BLUETOOTH permission
+21:42:25.403 [W] cr_media: registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+21:42:25.410 [I] ContentCatcher: Interceptor_Catcher : notifyWebView view: android.webkit.WebView{44c7bde VFEDHVC.. ......I. 0,0-0,0}, size:1, isLoad:true
+21:42:25.419 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.420 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.421 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.421 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.427 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.427 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.429 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.508 [I] libMiGL: EnableDR: 0
+21:42:25.508 [D] libMiGL: mDFIInterval: -1
+21:42:25.508 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.509 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.509 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:25.509 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:25.510 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:25.510 [I] AdrenoVK-0: Local Branch            :
+21:42:25.511 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:25.511 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:25.511 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:25.512 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:25.512 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:25.512 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:25.512 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:25.513 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:25.513 [I] AdrenoVK-0: Application Name    :
+21:42:25.513 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:25.513 [I] AdrenoVK-0: Application Version : 0x00000001
+21:42:25.513 [I] AdrenoVK-0: Engine Name         :
+21:42:25.513 [I] AdrenoVK-0: Engine Version      : 0x00000001
+21:42:25.514 [I] AdrenoVK-0: Api Version         : 0x00404000
+21:42:25.514 [I] AdrenoGLES-0: QUALCOMM build                   : 0a73ec43e7, I489da0dd30
+21:42:25.515 [I] AdrenoGLES-0: Build Date                       : 02/03/26
+21:42:25.515 [I] AdrenoGLES-0: OpenGL ES Shader Compiler Version: E031.50.19.18
+21:42:25.515 [I] AdrenoGLES-0: Local Branch                     :
+21:42:25.515 [I] AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:25.515 [I] AdrenoGLES-0: Remote Branch                    : NONE
+21:42:25.516 [I] AdrenoGLES-0: Reconstruct Branch               : NOTHING
+21:42:25.516 [I] AdrenoGLES-0: Build Config                     : C P 20.0.0 AArch64
+21:42:25.516 [I] AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+21:42:25.516 [I] AdrenoGLES-0: Driver Version                   : 0842.27.1
+21:42:25.518 [I] AdrenoGLES-0: Process Name                     : com.fuck.zlx
+21:42:25.519 [I] AdrenoGLES-0: PFP: 0x01510094, ME: 0x01510025
+21:42:25.520 [I] AdrenoUtils: <ReadGpuID:1333>: Reading chip ID through GSL
+21:42:25.550 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.551 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:25.552 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:25.552 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:25.552 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:25.553 [I] AdrenoVK-0: Local Branch            :
+21:42:25.553 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:25.553 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:25.553 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:25.553 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:25.553 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:25.554 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:25.554 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:25.554 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:25.554 [I] AdrenoVK-0: Application Name    : Chromium
+21:42:25.555 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:25.555 [I] AdrenoVK-0: Application Version : 0x00000000
+21:42:25.555 [I] AdrenoVK-0: Engine Name         : (null)
+21:42:25.556 [I] AdrenoVK-0: Engine Version      : 0x00000000
+21:42:25.556 [I] AdrenoVK-0: Api Version         : 0x00401000
+21:42:25.567 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 1.78 ms.
+21:42:25.583 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.21 ms.
+21:42:25.584 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:25.585 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.21 ms.
+21:42:25.585 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+21:42:25.586 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:25.586 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:25.587 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.13 ms.
+21:42:25.587 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:25.588 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.12 ms.
+21:42:25.588 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+21:42:25.588 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:25.588 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:25.589 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.24 ms.
+21:42:25.589 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.10 ms.
+21:42:25.590 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:25.590 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:25.590 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.21 ms.
+21:42:25.590 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:25.590 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.23 ms.
+21:42:25.591 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:25.591 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:25.592 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+21:42:25.592 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.23 ms.
+21:42:25.592 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.20 ms.
+21:42:25.593 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:25.600 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.30 ms.
+21:42:25.601 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+21:42:25.603 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+21:42:25.604 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:25.605 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:25.605 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:25.611 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:25.615 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+21:42:25.615 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:25.616 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.13 ms.
+21:42:25.618 [I] CameraManagerGlobal: Connecting to camera service
+21:42:25.624 [W] AudioCapabilities: Unsupported mediaType audio/alac
+21:42:25.641 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+21:42:25.642 [W] AudioCapabilities: Unsupported mediaType audio/dsd
+21:42:25.643 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb-plus
+21:42:25.643 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb+
+21:42:25.643 [W] AudioCapabilities: Unsupported mediaType audio/x-ms-wma
+21:42:25.643 [D] CameraExtStub: init android.hardware.camera2.impl.CameraExtImplXiaoMi
+21:42:25.644 [W] AudioCapabilities: Unsupported mediaType audio/alac
+21:42:25.644 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+21:42:25.644 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+21:42:25.644 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+21:42:25.648 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.649 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.650 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.650 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.650 [D] CameraInjector: waitForResult:
+21:42:25.651 [D] CameraInjector: updateCloudCameraControllerInfoAsync: E
+21:42:25.709 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.31 ms.
+21:42:25.709 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.712 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.712 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.713 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+21:42:25.714 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.714 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.715 [D] CameraInjector: isMiviInfo4: use MiviInfo V4.0
+21:42:25.716 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.716 [D] CameraInjector: parseMiviInfo4 cameraExposedRoleIdList: 21#23#60#61#0#63#64
+21:42:25.717 [D] CameraInjector: updateCloudCameraControllerInfoAsync: X
+21:42:25.758 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+21:42:25.766 [W] CameraExtImplXiaoMi: ignore the status update of camera: 2
+21:42:25.766 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+21:42:25.767 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.767 [D] CameraInjector: waitForResult:
+21:42:25.768 [W] CameraExtImplXiaoMi: ignore the status update of camera: 3
+21:42:25.768 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.768 [D] CameraInjector: waitForResult:
+21:42:25.769 [W] CameraExtImplXiaoMi: ignore the status update of camera: 4
+21:42:25.769 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.770 [D] CameraInjector: waitForResult:
+21:42:25.771 [W] CameraExtImplXiaoMi: ignore the status update of camera: 5
+21:42:25.772 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.773 [D] CameraInjector: waitForResult:
+21:42:25.774 [W] CameraExtImplXiaoMi: ignore the status update of camera: 6
+21:42:25.775 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.775 [D] CameraInjector: waitForResult:
+21:42:25.778 [W] CameraManagerGlobal: ignore the torch status update of camera: 2
+21:42:25.778 [W] VideoCapabilities: Unsupported mime video/x-mvhevc
+21:42:25.779 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.779 [D] CameraInjector: waitForResult:
+21:42:25.789 [W] CameraManagerGlobal: ignore the torch status update of camera: 3
+21:42:25.789 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.789 [D] CameraInjector: waitForResult:
+21:42:25.791 [W] CameraManagerGlobal: ignore the torch status update of camera: 4
+21:42:25.791 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.791 [D] CameraInjector: waitForResult:
+21:42:25.792 [W] CameraManagerGlobal: ignore the torch status update of camera: 5
+21:42:25.793 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:25.794 [D] CameraInjector: waitForResult:
+21:42:25.799 [W] CameraManagerGlobal: ignore the torch status update of camera: 6
+21:42:25.800 [W] VideoCapabilities: Unsupported mime video/x-mvhevc
+21:42:25.800 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:25.800 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:25.802 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.802 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.802 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.803 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:25.803 [W] AudioCapabilities: Unsupported mime audio/alac
+21:42:25.804 [W] AudioCapabilities: Unsupported mime audio/x-ape
+21:42:25.804 [W] AudioCapabilities: Unsupported mime audio/dsd
+21:42:25.804 [W] AudioCapabilities: Unsupported mime audio/amr-wb-plus
+21:42:25.804 [W] AudioCapabilities: Unsupported mime audio/amr-wb+
+21:42:25.805 [W] AudioCapabilities: Unsupported mime audio/x-ms-wma
+21:42:25.805 [W] AudioCapabilities: Unsupported mime audio/alac
+21:42:25.806 [I] HandWritingStubImpl: refreshLastKeyboardType: 1
+21:42:25.806 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.33 ms.
+21:42:25.806 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+21:42:25.806 [W] AudioCapabilities: Unsupported mime audio/x-ape
+21:42:25.807 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:25.807 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:25.807 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:25.807 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:25.807 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.807 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.807 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.807 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.808 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.808 [D] InsetsController: hide(ime(), fromIme=false)
+21:42:25.808 [I] ImeTracker: com.fuck.zlx:1dfd98be: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+21:42:25.808 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+21:42:25.808 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.809 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.809 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.809 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.809 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.809 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.809 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.810 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:25.811 [W] Utils: could not parse integer range '1-3536000000'
+21:42:25.811 [W] Utils: could not parse integer range '1-3536000000'
+21:42:25.811 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.811 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.811 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.812 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.812 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:25.812 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+21:42:25.812 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+21:42:25.812 [W] Utils: could not parse integer range '1-3536000000'
+21:42:25.813 [W] Utils: could not parse integer range '1-3536000000'
+21:42:25.815 [W] VideoCapabilities: Unrecognized profile 8 for video/x-mvhevc
+21:42:25.815 [W] VideoCapabilities: Unrecognized profile 8 for video/x-mvhevc
+21:42:25.816 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:25.816 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:25.816 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:25.847 [W] cr_VAUtil: Unknown profile: 8 for codec video/hevc
+21:42:25.850 [W] cr_VAUtil: Unknown profile: 8 for codec video/hevc
+21:42:25.853 [W] cr_VAUtil: Unknown level: 2048 for profile 32 of codec video/dolby-vision
+21:42:25.853 [W] cr_VAUtil: Unknown level: 2048 for profile 256 of codec video/dolby-vision
+21:42:25.853 [W] cr_VAUtil: Unknown level: 2048 for profile 32 of codec video/dolby-vision
+21:42:25.853 [W] cr_VAUtil: Unknown level: 2048 for profile 256 of codec video/dolby-vision
+21:42:26.359 [W] BpBinder: Large outgoing transaction of 31864 bytes, interface descriptor android.view.accessibility.IAccessibilityInteractionConnectionCallback, code 3 was sent
+21:42:26.475 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=306924694, downTime=306924694, phoneEventTime=1782481346468 } moveCount:0
+21:42:26.530 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=306924753, downTime=306924694, phoneEventTime=1782481346527 } moveCount:0
+21:42:26.608 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:27.321 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=306925545, downTime=306925545, phoneEventTime=1782481347319 } moveCount:0
+21:42:27.338 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.39 ms.
+21:42:27.343 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=306925567, downTime=306925545, phoneEventTime=1782481347341 } moveCount:0
+21:42:27.500 [E] ComposeInternal: Error was captured in composition.
+21:42:27.501 [E] ComposeInternal: java.lang.IllegalArgumentException: clickable only supports IndicationNodeFactory instances provided to LocalIndication, but Indication was provided instead. Either migrate the Indication implementation to implement IndicationNodeFactory, or use the other clickable overload that takes an Indication parameter, and explicitly pass LocalIndication.current there. The Indication instance provided here was: androidx.compose.material.ripple.PlatformRipple@80be53e3
+21:42:27.501 [E] ComposeInternal: at androidx.compose.foundation.internal.InlineClassHelperKt.throwIllegalArgumentException(InlineClassHelper.kt:34)
+21:42:27.501 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged$lambda$0(Clickable.kt:1940)
+21:42:27.501 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.$r8$lambda$0NYE0E6SUj_qhL0H2zRlte2VELs(Unknown Source:0)
+21:42:27.501 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+21:42:27.501 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.502 [E] ComposeInternal: at androidx.compose.ui.node.ObserverModifierNodeKt.observeReads(ObserverModifierNode.kt:66)
+21:42:27.502 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged(Clickable.kt:1396)
+21:42:27.502 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.onAttach(Clickable.kt:1385)
+21:42:27.502 [E] ComposeInternal: at androidx.compose.ui.Modifier$Node.runAttachLifecycle$ui(Modifier.kt:266)
+21:42:27.502 [E] ComposeInternal: at androidx.compose.ui.node.DelegatingNode.runAttachLifecycle$ui(DelegatingNode.kt:261)
+21:42:27.502 [E] ComposeInternal: at androidx.compose.ui.node.NodeChain.runAttachLifecycle(NodeChain.kt:283)
+21:42:27.503 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:561)
+21:42:27.503 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.insertAt$ui(LayoutNode.kt:314)
+21:42:27.503 [E] ComposeInternal: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:29)
+21:42:27.503 [E] ComposeInternal: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:21)
+21:42:27.503 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation$PostInsertNodeFixup.execute(Operation.kt:777)
+21:42:27.503 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.changelist.FixupList.executeAndFlushAllPendingFixups(FixupList.kt:54)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation$InsertSlotsWithFixups.execute(Operation.kt:683)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.changelist.ChangeList.executeAndFlushAllPendingChanges(ChangeList.kt:90)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.applyChangesInLocked(Composition.kt:1120)
+21:42:27.504 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.applyChanges(Composition.kt:1160)
+21:42:27.505 [E] ComposeInternal: at androidx.compose.runtime.Recomposer.composeInitial$runtime(Recomposer.kt:1299)
+21:42:27.505 [E] ComposeInternal: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+21:42:27.505 [E] ComposeInternal: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+21:42:27.505 [E] ComposeInternal: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+21:42:27.505 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.composeInitial(Composition.kt:672)
+21:42:27.505 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.setContent(Composition.kt:639)
+21:42:27.506 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:721)
+21:42:27.506 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:658)
+21:42:27.506 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:624)
+21:42:27.506 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState$Scope.subcompose(SubcomposeLayout.kt:1352)
+21:42:27.506 [E] ComposeInternal: at androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScopeImpl.compose(LazyLayoutMeasureScope.kt:94)
+21:42:27.506 [E] ComposeInternal: at androidx.compose.foundation.lazy.layout.LazyLayoutMeasuredItemProvider.getPlaceables-3p2s80s(LazyLayoutMeasuredItem.kt:60)
+21:42:27.507 [E] ComposeInternal: at androidx.compose.foundation.lazy.LazyListMeasuredItemProvider.getAndMeasure-0kLqBqw(LazyListMeasuredItemProvider.kt:53)
+21:42:27.507 [E] ComposeInternal: at androidx.compose.foundation.lazy.LazyListMeasuredItemProvider.getAndMeasure-0kLqBqw$default(LazyListMeasuredItemProvider.kt:47)
+21:42:27.507 [E] ComposeInternal: at androidx.compose.foundation.lazy.LazyListMeasureKt.measureLazyList-_s_dbAc(LazyListMeasure.kt:221)
+21:42:27.507 [E] ComposeInternal: at androidx.compose.foundation.lazy.LazyListKt$rememberLazyListMeasurePolicy$1$1.measure-0kLqBqw(LazyList.kt:353)
+21:42:27.507 [E] ComposeInternal: at androidx.compose.foundation.lazy.layout.LazyLayoutKt.LazyLayout$lambda$1$3$0(LazyLayout.kt:141)
+21:42:27.507 [E] ComposeInternal: at androidx.compose.foundation.lazy.layout.LazyLayoutKt.$r8$lambda$rf3vllu87hDgmhs57JbwRZ1rpS4(Unknown Source:0)
+21:42:27.507 [E] ComposeInternal: at androidx.compose.foundation.lazy.layout.LazyLayoutKt$$ExternalSyntheticLambda5.invoke(D8$$SyntheticClass:0)
+21:42:27.508 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState$createMeasurePolicy$1.measure-3p2s80s(SubcomposeLayout.kt:955)
+21:42:27.508 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.508 [E] ComposeInternal: at androidx.compose.ui.graphics.SimpleGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:843)
+21:42:27.508 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.508 [E] ComposeInternal: at androidx.compose.foundation.lazy.layout.LazyLayoutBeyondBoundsProviderModifierNode.measure-3p2s80s(LazyLayoutBeyondBoundsModifierLocal.kt:122)
+21:42:27.508 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.509 [E] ComposeInternal: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+21:42:27.509 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.509 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.509 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.509 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.509 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.509 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.510 [E] ComposeInternal: at androidx.compose.animation.AnimatedEnterExitMeasurePolicy.measure-3p2s80s(AnimatedVisibility.kt:791)
+21:42:27.510 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.510 [E] ComposeInternal: at androidx.compose.animation.EnterExitTransitionModifierNode.measure-3p2s80s(EnterExitTransition.kt:1269)
+21:42:27.510 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.510 [E] ComposeInternal: at androidx.compose.ui.graphics.BlockGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:725)
+21:42:27.511 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.511 [E] ComposeInternal: at androidx.compose.animation.AnimatedContentKt$AnimatedContent$6$1$1$1.invoke-3p2s80s(AnimatedContent.kt:842)
+21:42:27.511 [E] ComposeInternal: at androidx.compose.animation.AnimatedContentKt$AnimatedContent$6$1$1$1.invoke(AnimatedContent.kt:841)
+21:42:27.511 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutModifierImpl.measure-3p2s80s(LayoutModifier.kt:278)
+21:42:27.511 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.511 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.511 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.512 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.512 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.512 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.512 [E] ComposeInternal: at androidx.compose.animation.AnimatedContentMeasurePolicy.measure-3p2s80s(AnimatedContent.kt:894)
+21:42:27.512 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.512 [E] ComposeInternal: at androidx.compose.animation.AnimatedContentTransitionScopeImpl$SizeModifierNode.measure-3p2s80s(AnimatedContent.kt:655)
+21:42:27.512 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.513 [E] ComposeInternal: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+21:42:27.513 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.513 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.513 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.513 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.513 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.513 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.514 [E] ComposeInternal: at androidx.compose.foundation.layout.RowColumnMeasurePolicyKt.measure(RowColumnMeasurePolicy.kt:126)
+21:42:27.514 [E] ComposeInternal: at androidx.compose.foundation.layout.RowColumnMeasurePolicyKt.measure$default(RowColumnMeasurePolicy.kt:77)
+21:42:27.514 [E] ComposeInternal: at androidx.compose.foundation.layout.ColumnMeasurePolicy.measure-3p2s80s(Column.kt:205)
+21:42:27.514 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.514 [E] ComposeInternal: at androidx.compose.foundation.layout.PaddingValuesModifier.measure-3p2s80s(Padding.kt:470)
+21:42:27.515 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.515 [E] ComposeInternal: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+21:42:27.515 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.515 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.515 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.515 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.515 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.516 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.516 [E] ComposeInternal: at androidx.compose.material3.ScaffoldKt$ScaffoldLayoutWithMeasureFix$1$1.invoke-0kLqBqw(Scaffold.kt:304)
+21:42:27.516 [E] ComposeInternal: at androidx.compose.material3.ScaffoldKt$ScaffoldLayoutWithMeasureFix$1$1.invoke(Scaffold.kt:179)
+21:42:27.517 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState$createMeasurePolicy$1.measure-3p2s80s(SubcomposeLayout.kt:955)
+21:42:27.517 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.517 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.517 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.517 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.517 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.517 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.518 [E] ComposeInternal: at androidx.compose.foundation.layout.BoxMeasurePolicy.measure-3p2s80s(Box.kt:145)
+21:42:27.518 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.518 [E] ComposeInternal: at androidx.compose.ui.graphics.SimpleGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:843)
+21:42:27.518 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.518 [E] ComposeInternal: at androidx.compose.ui.graphics.SimpleGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:843)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.foundation.layout.BoxMeasurePolicy.measure-3p2s80s(Box.kt:145)
+21:42:27.519 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.foundation.layout.PaddingValuesModifier.measure-3p2s80s(Padding.kt:470)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:728)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.520 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.remeasure-_Sx5XlM$ui(LayoutNode.kt:1281)
+21:42:27.521 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.remeasure-_Sx5XlM$ui$default(LayoutNode.kt:1274)
+21:42:27.521 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.doRemeasure-sdFAvZA(MeasureAndLayoutDelegate.kt:380)
+21:42:27.521 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.remeasureAndRelayoutIfNeeded(MeasureAndLayoutDelegate.kt:595)
+21:42:27.521 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.access$remeasureAndRelayoutIfNeeded(MeasureAndLayoutDelegate.kt:43)
+21:42:27.521 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.measureAndLayout(MeasureAndLayoutDelegate.kt:402)
+21:42:27.521 [E] ComposeInternal: at androidx.compose.ui.platform.AndroidComposeView.measureAndLayout(AndroidComposeView.android.kt:1735)
+21:42:27.521 [E] ComposeInternal: at androidx.compose.ui.node.Owner.measureAndLayout$default(Owner.kt:258)
+21:42:27.522 [E] ComposeInternal: at androidx.compose.ui.platform.AndroidComposeView.dispatchDraw(AndroidComposeView.android.kt:2063)
+21:42:27.522 [E] ComposeInternal: at android.view.View.draw(View.java:26719)
+21:42:27.522 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25490)
+21:42:27.522 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+21:42:27.522 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+21:42:27.522 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+21:42:27.522 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+21:42:27.523 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+21:42:27.523 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+21:42:27.523 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+21:42:27.523 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+21:42:27.523 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+21:42:27.523 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+21:42:27.523 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+21:42:27.523 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+21:42:27.523 [E] ComposeInternal: at android.view.ThreadedRenderer.updateViewTreeDisplayList(ThreadedRenderer.java:759)
+21:42:27.523 [E] ComposeInternal: at android.view.ThreadedRenderer.updateRootDisplayList(ThreadedRenderer.java:765)
+21:42:27.524 [E] ComposeInternal: at android.view.ThreadedRenderer.draw(ThreadedRenderer.java:867)
+21:42:27.524 [E] ComposeInternal: at android.view.ViewRootImpl.draw(ViewRootImpl.java:7242)
+21:42:27.524 [E] ComposeInternal: at android.view.ViewRootImpl.performDraw(ViewRootImpl.java:6856)
+21:42:27.524 [E] ComposeInternal: at android.view.ViewRootImpl.performTraversals(ViewRootImpl.java:5742)
+21:42:27.524 [E] ComposeInternal: at android.view.ViewRootImpl.doTraversal(ViewRootImpl.java:4177)
+21:42:27.524 [E] ComposeInternal: at android.view.ViewRootImpl$TraversalRunnable.run(ViewRootImpl.java:12647)
+21:42:27.524 [E] ComposeInternal: at android.view.Choreographer$CallbackRecord.run(Choreographer.java:2083)
+21:42:27.524 [E] ComposeInternal: at android.view.Choreographer$CallbackRecord.run(Choreographer.java:2092)
+21:42:27.524 [E] ComposeInternal: at android.view.Choreographer.doCallbacks(Choreographer.java:1567)
+21:42:27.525 [E] ComposeInternal: at android.view.Choreographer.doFrame(Choreographer.java:1448)
+21:42:27.525 [E] ComposeInternal: at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:2046)
+21:42:27.525 [E] ComposeInternal: at android.os.Handler.handleCallback(Handler.java:1029)
+21:42:27.525 [E] ComposeInternal: at android.os.Handler.dispatchMessage(Handler.java:107)
+21:42:27.525 [E] ComposeInternal: at android.os.Looper.loopOnce(Looper.java:274)
+21:42:27.526 [E] ComposeInternal: at android.os.Looper.loop(Looper.java:369)
+21:42:27.526 [E] ComposeInternal: at android.app.ActivityThread.main(ActivityThread.java:10090)
+21:42:27.526 [E] ComposeInternal: at java.lang.reflect.Method.invoke(Native Method)
+21:42:27.526 [E] ComposeInternal: at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:616)
+21:42:27.527 [E] ComposeInternal: at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1137)
+21:42:27.527 [D] AndroidRuntime: Shutting down VM
+21:42:27.527 [E] AndroidRuntime: FATAL EXCEPTION: main
+21:42:27.527 [E] AndroidRuntime: Process: com.fuck.zlx, PID: 32714
+21:42:27.527 [E] AndroidRuntime: java.lang.IllegalArgumentException: clickable only supports IndicationNodeFactory instances provided to LocalIndication, but Indication was provided instead. Either migrate the Indication implementation to implement IndicationNodeFactory, or use the other clickable overload that takes an Indication parameter, and explicitly pass LocalIndication.current there. The Indication instance provided here was: androidx.compose.material.ripple.PlatformRipple@80be53e3
+21:42:27.528 [E] AndroidRuntime: at androidx.compose.foundation.internal.InlineClassHelperKt.throwIllegalArgumentException(InlineClassHelper.kt:34)
+21:42:27.528 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged$lambda$0(Clickable.kt:1940)
+21:42:27.528 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.$r8$lambda$0NYE0E6SUj_qhL0H2zRlte2VELs(Unknown Source:0)
+21:42:27.528 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+21:42:27.528 [E] AndroidRuntime: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.528 [E] AndroidRuntime: at androidx.compose.ui.node.ObserverModifierNodeKt.observeReads(ObserverModifierNode.kt:66)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged(Clickable.kt:1396)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.onAttach(Clickable.kt:1385)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.ui.Modifier$Node.runAttachLifecycle$ui(Modifier.kt:266)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.ui.node.DelegatingNode.runAttachLifecycle$ui(DelegatingNode.kt:261)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.ui.node.NodeChain.runAttachLifecycle(NodeChain.kt:283)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:561)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.insertAt$ui(LayoutNode.kt:314)
+21:42:27.529 [E] AndroidRuntime: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:29)
+21:42:27.530 [E] AndroidRuntime: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:21)
+21:42:27.530 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation$PostInsertNodeFixup.execute(Operation.kt:777)
+21:42:27.530 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+21:42:27.530 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+21:42:27.530 [E] AndroidRuntime: at androidx.compose.runtime.changelist.FixupList.executeAndFlushAllPendingFixups(FixupList.kt:54)
+21:42:27.530 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation$InsertSlotsWithFixups.execute(Operation.kt:683)
+21:42:27.530 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+21:42:27.531 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+21:42:27.531 [E] AndroidRuntime: at androidx.compose.runtime.changelist.ChangeList.executeAndFlushAllPendingChanges(ChangeList.kt:90)
+21:42:27.531 [E] AndroidRuntime: at androidx.compose.runtime.CompositionImpl.applyChangesInLocked(Composition.kt:1120)
+21:42:27.531 [E] AndroidRuntime: at androidx.compose.runtime.CompositionImpl.applyChanges(Composition.kt:1160)
+21:42:27.531 [E] AndroidRuntime: at androidx.compose.runtime.Recomposer.composeInitial$runtime(Recomposer.kt:1299)
+21:42:27.531 [E] AndroidRuntime: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.runtime.CompositionImpl.composeInitial(Composition.kt:672)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.runtime.CompositionImpl.setContent(Composition.kt:639)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:721)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:658)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:624)
+21:42:27.532 [E] AndroidRuntime: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState$Scope.subcompose(SubcomposeLayout.kt:1352)
+21:42:27.533 [E] AndroidRuntime: at androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScopeImpl.compose(LazyLayoutMeasureScope.kt:94)
+21:42:27.533 [E] AndroidRuntime: at androidx.compose.foundation.lazy.layout.LazyLayoutMeasuredItemProvider.getPlaceables-3p2s80s(LazyLayoutMeasuredItem.kt:60)
+21:42:27.533 [E] AndroidRuntime: at androidx.compose.foundation.lazy.LazyListMeasuredItemProvider.getAndMeasure-0kLqBqw(LazyListMeasuredItemProvider.kt:53)
+21:42:27.533 [E] AndroidRuntime: at androidx.compose.foundation.lazy.LazyListMeasuredItemProvider.getAndMeasure-0kLqBqw$default(LazyListMeasuredItemProvider.kt:47)
+21:42:27.533 [E] AndroidRuntime: at androidx.compose.foundation.lazy.LazyListMeasureKt.measureLazyList-_s_dbAc(LazyListMeasure.kt:221)
+21:42:27.533 [E] AndroidRuntime: at androidx.compose.foundation.lazy.LazyListKt$rememberLazyListMeasurePolicy$1$1.measure-0kLqBqw(LazyList.kt:353)
+21:42:27.533 [E] AndroidRuntime: at androidx.compose.foundation.lazy.layout.LazyLayoutKt.LazyLayout$lambda$1$3$0(LazyLayout.kt:141)
+21:42:27.534 [E] AndroidRuntime: at androidx.compose.foundation.lazy.layout.LazyLayoutKt.$r8$lambda$rf3vllu87hDgmhs57JbwRZ1rpS4(Unknown Source:0)
+21:42:27.534 [E] AndroidRuntime: at androidx.compose.foundation.lazy.layout.LazyLayoutKt$$ExternalSyntheticLambda5.invoke(D8$$SyntheticClass:0)
+21:42:27.534 [E] AndroidRuntime: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState$createMeasurePolicy$1.measure-3p2s80s(SubcomposeLayout.kt:955)
+21:42:27.534 [E] AndroidRuntime: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.534 [E] AndroidRuntime: at androidx.compose.ui.graphics.SimpleGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:843)
+21:42:27.534 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.534 [E] AndroidRuntime: at androidx.compose.foundation.lazy.layout.LazyLayoutBeyondBoundsProviderModifierNode.measure-3p2s80s(LazyLayoutBeyondBoundsModifierLocal.kt:122)
+21:42:27.535 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.535 [E] AndroidRuntime: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+21:42:27.535 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.535 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.536 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.536 [E] AndroidRuntime: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.536 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.536 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.536 [E] AndroidRuntime: at androidx.compose.animation.AnimatedEnterExitMeasurePolicy.measure-3p2s80s(AnimatedVisibility.kt:791)
+21:42:27.536 [E] AndroidRuntime: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.537 [E] AndroidRuntime: at androidx.compose.animation.EnterExitTransitionModifierNode.measure-3p2s80s(EnterExitTransition.kt:1269)
+21:42:27.537 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.537 [E] AndroidRuntime: at androidx.compose.ui.graphics.BlockGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:725)
+21:42:27.538 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.538 [E] AndroidRuntime: at androidx.compose.animation.AnimatedContentKt$AnimatedContent$6$1$1$1.invoke-3p2s80s(AnimatedContent.kt:842)
+21:42:27.539 [E] AndroidRuntime: at androidx.compose.animation.AnimatedContentKt$AnimatedContent$6$1$1$1.invoke(AnimatedContent.kt:841)
+21:42:27.539 [E] AndroidRuntime: at androidx.compose.ui.layout.LayoutModifierImpl.measure-3p2s80s(LayoutModifier.kt:278)
+21:42:27.539 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.539 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+21:42:27.540 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+21:42:27.540 [E] AndroidRuntime: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+21:42:27.540 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+21:42:27.540 [E] AndroidRuntime: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+21:42:27.541 [E] AndroidRuntime: at androidx.compose.animation.AnimatedContentMeasurePolicy.measure-3p2s80s(AnimatedContent.kt:894)
+21:42:27.541 [E] AndroidRuntime: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+21:42:27.542 [E] AndroidRuntime: at androidx.compose.animation.AnimatedContentTransitionScopeImpl$SizeModifierNode.measure-3p2s80s(AnimatedContent.kt:655)
+21:42:27.542 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+21:42:27.542 [E] AndroidRuntime: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+21:42:31.009 [I] com.fuck.zlx: Late-enabling -Xcheck:jni
+21:42:31.009 [I] com.fuck.zlx: Using CollectorTypeCC GC.
+21:42:31.009 [D] nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+21:42:31.009 [I] ActivityThread: Current dynamic renderEngine type=0
+21:42:31.010 [D] MiuiDownscaleImpl: set override inverted scale : 1.0
+21:42:31.010 [I] RENDER_TURBO: onActivityThreadCreate not in white list, pkg=com.fuck.zlx, type=pandora
+21:42:31.011 [D] CompatChangeReporter: Compat change id reported: 242716250; UID 10315; state: ENABLED
+21:42:31.011 [D] ActivityThread: setEmbeddedParam packageName=com.fuck.zlx processName=com.fuck.zlx isEmbedded=false isIsolated=false
+21:42:31.011 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+21:42:31.011 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+21:42:31.011 [D] AppScoutStateMachine: 23333-ScoutStateMachinecreated
+21:42:31.011 [D] nativeloader: Configuring clns-10 for other apk /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk. target_sdk_version=34, uses_libraries=, library_path=/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/lib/arm64:/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.fuck.zlx
+21:42:31.011 [I] com.fuck.zlx: AssetManager2(0xb400007399e0b958) locale list changing from [] to [zh-CN]
+21:42:31.011 [D] MiuiMonitorThread: Shared singleton Thread for stability monitor start
+21:42:31.012 [I] Perf: Connecting to perf service.
+21:42:31.012 [V] GraphicsEnvironment: Currently set values for:
+21:42:31.012 [V] GraphicsEnvironment: angle_gl_driver_selection_pkgs=[]
+21:42:31.012 [V] GraphicsEnvironment: angle_gl_driver_selection_values=[]
+21:42:31.012 [V] GraphicsEnvironment: com.fuck.zlx is not listed in per-application setting
+21:42:31.013 [V] GraphicsEnvironment: ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+21:42:31.013 [V] GraphicsEnvironment: com.fuck.zlx is not listed in ANGLE allowlist or settings, returning default
+21:42:31.013 [V] GraphicsEnvironment: Updatable production driver is not supported on the device.
+21:42:31.013 [E] ashmem: Pinning is deprecated since Android Q. Please use trim or other methods.
+21:42:31.013 [I] ActivityThread: TrafficStats init done
+21:42:31.013 [I] ForceDarkHelperStubImpl: initialize for com.fuck.zlx , ForceDarkOrigin
+21:42:31.013 [D] ResMonitorStub: The current process type is: third_party_app, process name is: com.fuck.zlx
+21:42:31.014 [D] nativeloader: Load libforcedarkimpl.so using system ns (caller=/system_ext/framework/miui-framework.jar): ok
+21:42:31.014 [I] MiuiForceDarkConfig: setConfig density:3.250000, mainRule:0, secondaryRule:0, tertiaryRule:0
+21:42:31.015 [I] ActivityThread: Miui Feature Init done
+21:42:31.015 [D] com.fuck.zlx: blurUtils, initBackgroundBlurMinInterval processName(com.fuck.zlx), inWhiteLists(0)
+21:42:31.015 [I] ActivityThread: HardwareRenderer preload  done
+21:42:31.016 [D] MIUIAutoUIImpl: MIUIAutoUIImpl has been initialized !!
+21:42:31.016 [I] DisplayManager: Choreographer implicitly registered for the refresh rate.
+21:42:31.016 [I] com.fuck.zlx: AssetManager2(0xb400007399e19418) locale list changing from [] to [zh-CN]
+21:42:31.017 [D] vulkan: searching for layers in '/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/lib/arm64'
+21:42:31.018 [D] vulkan: searching for layers in '/data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk!/lib/arm64-v8a'
+21:42:31.018 [I] com.fuck.zlx: AssetManager2(0xb400007399e18478) locale list changing from [] to [zh-CN]
+21:42:31.018 [D] ApplicationLoaders: Returning zygote-cached class loader: /system/framework/org.apache.http.legacy.jar
+21:42:31.018 [D] nativeloader: InitLlndkLibrariesProduct: libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libRS.so:libandroid_net.so:libapexsupport.so:libavf.so:libbinder_ndk.so:libc.so:libcgrouprc.so:libclang_rt.asan-aarch64-android.so:libclang_rt.asan-arm-android.so:libclang_rt.hwasan-aarch64-android.so:libcom.android.tethering.connectivity_native.so:libdl.so:libft2.so:liblog.so:libm.so:libmediandk.so:libnativewindow.so:libneuralnetworks.so:libselinux.so:libsync.so:libvendorsupport.so:libvndksupport.so:libvulkan.so
+21:42:31.018 [D] nativeloader: Configuring product-clns-11 for unbundled product apk /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk. target_sdk_version=35, uses_libraries=, library_path=/product/app/ContentCatcherOS3_1/lib/arm64:/product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:31.018 [D] nativeloader: InitVndkspLibrariesProduct: VNDK is deprecated with product
+21:42:31.018 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.019 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.019 [D] DesktopModeFlags: Toggle override initialized to: OVERRIDE_UNSET
+21:42:31.019 [D] ViewContentFactory: initViewContentFetcherClass
+21:42:31.019 [D] ViewContentFactory: getInterceptorPackageInfo
+21:42:31.019 [D] ViewContentFactory: getInitialApplication took 0ms
+21:42:31.019 [D] ViewContentFactory: packageInfo.packageName: com.miui.contentcatcher
+21:42:31.019 [D] ViewContentFactory: initViewContentFetcherClass took 0ms
+21:42:31.019 [I] ContentCatcher: ViewContentFetcher : ViewContentFetcher
+21:42:31.019 [D] ViewContentFactory: createInterceptor took 0ms
+21:42:31.020 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.020 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.020 [I] ContentCatcher: Interceptor_Catcher : Catcher list invalid for com.fuck.zlx@com.fuck.zlx.MainActivity@259597378
+21:42:31.020 [I] ContentCatcher: Interceptor_Catcher : Get featureInfo from config image_pick_mode
+21:42:31.020 [I] ContentCatcher: Interceptor_Catcher : Get featureInfo from config pick_mode
+21:42:31.022 [D] qdgralloc: Fetching IMapper5 from QtiMapper5
+21:42:31.023 [D] Activity: Activity = ActivityInfo{3248325 com.fuck.zlx.MainActivity}, Resume onConfigurationChanged = {1.0 460mcc2mnc [zh_CN] ldltr sw375dp w375dp h724dp 520dpi nrml long hdr widecg port finger -keyb/v/h -nav/h winConfig={ mBounds=Rect(0, 0 - 1220, 2656) mAppBounds=Rect(0, 150 - 1220, 2503) mMaxBounds=Rect(0, 0 - 1220, 2656) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0 mInSplitScreen=false letterBoxed=false foScaled=false isSpecificEmbedded=false embeddingScale=1.0} as.3 s.2 fontWeightAdjustment=0/d/o themeChanged=0 themeChangedFlags=0 display=0 extraData = Bundle[{}] screenType=0/o}
+21:42:31.023 [I] SnapAlloc: Graphics lib is available
+21:42:31.024 [I] ContentCatcher: SettingTrigger : register screen QA status observer com.fuck.zlx.MainActivity
+21:42:31.024 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:31.024 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:31.024 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:31.024 [I] AdrenoVK-0: Local Branch            :
+21:42:31.025 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:31.025 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:31.025 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:31.025 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:31.025 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:31.025 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:31.025 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:31.025 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:31.025 [I] AdrenoVK-0: Application Name    : android framework
+21:42:31.025 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:31.026 [I] AdrenoVK-0: Application Version : 0x00000000
+21:42:31.026 [I] AdrenoVK-0: Engine Name         : android framework
+21:42:31.026 [I] AdrenoVK-0: Engine Version      : 0x00000000
+21:42:31.026 [I] AdrenoVK-0: Api Version         : 0x00401000
+21:42:31.026 [D] RenderLite: trim renderNode enable: false
+21:42:31.027 [D] SKIA: [Skia] Flag vulkan_enhance_pipeline_cache enabled
+21:42:31.027 [D] SKIA: [Skia] EnhanceVkPipelineCache is true
+21:42:31.027 [D] FramePredict: FramePredict init: false
+21:42:31.027 [D] FramePredict: init success
+21:42:31.027 [E] MI-PreRender: init cloud whiteList failed
+21:42:31.027 [E] FramePredict: registerContentObserver fail
+21:42:31.027 [D] com.fuck.zlx: MiuiProcessManagerServiceStub setSchedFifo
+21:42:31.027 [I] MiuiProcessManagerImpl: setSchedFifo pid:23333, mode:3
+21:42:31.028 [D] FirstFrameSpeedUp: bls: [com.xcj.hm.kangfuyixue]
+21:42:31.028 [I] ViewRootImpl: com.fuck.zlx/com.fuck.zlx.MainActivity use first frame acceleration
+21:42:31.028 [I] ContentCatcher: SettingTrigger : register global collect status observer com.fuck.zlx.MainActivity
+21:42:31.028 [I] ContentCatcher: SettingTrigger : registerUIAgentListener com.fuck.zlx.MainActivity, uid:10315
+21:42:31.028 [I] ContentCatcher_TaplusBlackListHelper: mActivities isEmpty
+21:42:31.028 [I] ContentCatcher_TaplusBlackListHelper: blackList size: 14 package is com.fuck.zlx isInTaplusWhiteList: true
+21:42:31.028 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.028 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.028 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.029 [I] ComputilityLevel: getComputilityLevel(): 6
+21:42:31.029 [D] MiuiNBIManagerImpl: init success, pkgName=com.fuck.zlx mIsNBIEnable=false mDisableVersionCode=-1 mActivityRulesSize=0
+21:42:31.047 [I] com.fuck.zlx: hiddenapi: Accessing hidden method Landroid/os/SystemProperties;->addChangeCallback(Ljava/lang/Runnable;)V (runtime_flags=0, domain=platform, api=unsupported) from Landroidx/compose/ui/platform/AndroidComposeView$Companion; (domain=app) using reflection: allowed
+21:42:31.068 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.068 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.068 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.068 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.074 [W] WindowOnBackDispatcher: OnBackInvokedCallback is not enabled for the application.
+21:42:31.074 [W] WindowOnBackDispatcher: Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+21:42:31.074 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.075 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.075 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.075 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.106 [I] NativeTurboSchedManager: Load libmiui_runtime
+21:42:31.108 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:31.118 [I] com.fuck.zlx: AssetManager2(0xb400007399e13c98) locale list changing from [] to [zh-CN]
+21:42:31.118 [I] WebViewFactory: Loading com.google.android.webview version 140.0.7339.207 (code 733920733)
+21:42:31.119 [I] MiResource: Start adding sharedLibAssets
+21:42:31.119 [I] com.fuck.zlx: AssetManager2(0xb400007399e333b8) locale list changing from [] to [zh-CN]
+21:42:31.119 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@5da58f5, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:31.119 [I] com.fuck.zlx: AssetManager2(0xb400007399e35c58) locale list changing from [] to [zh-CN]
+21:42:31.120 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@e52f292, old impl = android.content.res.MiuiResourcesImpl@448b05f, new impl = android.content.res.MiuiResourcesImpl@f66f1f1 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:31.120 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@d2641ea, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:31.120 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@aba9a51, old impl = android.content.res.MiuiResourcesImpl@9e39375, new impl = android.content.res.MiuiResourcesImpl@5565598 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /data/app/~~Dvc5nnDEppV2Jwbj9_Aepg==/com.fuck.zlx-_BzLz5C6YXmkHYQdOI599Q==/base.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:31.120 [I] com.fuck.zlx: AssetManager2(0xb400007399e34678) locale list changing from [] to [zh-CN]
+21:42:31.121 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@81e92b6, old impl = android.content.res.MiuiResourcesImpl@12a3aac, new impl = android.content.res.MiuiResourcesImpl@df2a1d6 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:31.121 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@21fa990, old impl = android.content.res.MiuiResourcesImpl@12a3aac, new impl = android.content.res.MiuiResourcesImpl@df2a1d6 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/ContentCatcherOS3_1/ContentCatcherOS3_1.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:31.121 [I] com.fuck.zlx: AssetManager2(0xb400007399e37558) locale list changing from [] to [zh-CN]
+21:42:31.121 [I] MiResource: Updating cached ResourcesImpl for resources : android.content.res.MiuiResources@db370fe, old impl = android.content.res.MiuiResourcesImpl@e519f0a, new impl = android.content.res.MiuiResourcesImpl@f224c57 , new paths = [/system/framework/framework-res.apk, /odm/overlay/FrameworksResTarget_Vendor.apk, /product/overlay/GmsCnConfigOverlay.apk, /product/overlay/MiuiServiceOverlay/MiuiServiceOverlay.apk, /product/overlay/framework-res__nosdcard__auto_generated_characteristics_rro.apk, /product/overlay/FrameworksResCommon_Sys.apk, /product/overlay/MiuiHomeLauncherResOverlay.apk, /product/overlay/AospFrameworkResOverlay.apk, /product/overlay/DevicesAndroidOverlay.apk, /product/overlay/VoiceAssistAndroidOverlay/VoiceAssistAndroidOverlay.apk, /product/overlay/AospFrameworkTelephonyResOverlay.apk, /system_ext/framework/framework-ext-res/framework-ext-res.apk, /product/overlay/MiuiFrameworkResOverlay.apk, /product/overlay/MiuiFrameworkTelephonyResOverlay.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /product/app/TrichromeLibrary64/TrichromeLibrary64.apk, /product/app/WebViewGoogle64/WebViewGoogle64.apk, /data/resource-cache/com.android.systemui-neutral-U8IT.frro, /data/resource-cache/com.android.systemui-accent-32KU.frro, /data/resource-cache/com.android.systemui-dynamic-agAh.frro]
+21:42:31.121 [W] com.fuck.zlx: Failed to find entry 'classes.dex': Entry not found
+21:42:31.122 [D] nativeloader: Configuring product-clns-12 for unbundled product apk /product/app/TrichromeLibrary64/TrichromeLibrary64.apk. target_sdk_version=36, uses_libraries=ALL, library_path=/product/app/WebViewGoogle64/lib/arm64:/product/app/WebViewGoogle64/WebViewGoogle64.apk!/lib/arm64-v8a:/product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:31.122 [D] nativeloader: Extending system_exposed_libraries: libbinauralrenderer_wrapper.qti.so:libhoaeffects.qti.so:libmisys_jni.xiaomi.so:libpag.hyperos.so:libffavc.hyperos.so:libxiaomi_modemdumpsdx55_jni.modem.so:libxiaomi_modemdump_jni.modem.so:libmodemsmartengine_jni.modem.so:libupdateprof.qti.so:libthermalclient.qti.so:libdiag_system.qti.so:libqape.qti.so:libqesdk_ndk_platform.qti.so:liblistenjni.qti.so:libautoui_image.xiaomi.so
+21:42:31.123 [D] ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+21:42:31.123 [D] nativeloader: Configuring product-clns-13 for unbundled product apk /product/app/WebViewGoogle64/WebViewGoogle64.apk. target_sdk_version=36, uses_libraries=, library_path=/product/app/WebViewGoogle64/lib/arm64:/product/app/WebViewGoogle64/WebViewGoogle64.apk!/lib/arm64-v8a:/product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a:/product/lib64:/system/product/lib64, permitted_path=/data:/mnt/expand:/product/lib64:/system/product/lib64
+21:42:31.130 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:31.132 [I] cr_WVCFactoryProvider: version=140.0.7339.207 (733920733) minSdkVersion=29 multiprocess=true packageId=2 splits=<none>
+21:42:31.138 [D] nativeloader: Load /product/app/TrichromeLibrary64/TrichromeLibrary64.apk!/lib/arm64-v8a/libmonochrome_64.so using class loader ns product-clns-13 (caller=/product/app/WebViewGoogle64/WebViewGoogle64.apk): ok
+21:42:31.138 [D] nativeloader: Load /system/lib64/libwebviewchromium_plat_support.so using class loader ns product-clns-13 (caller=/product/app/WebViewGoogle64/WebViewGoogle64.apk): ok
+21:42:31.139 [I] chromium: [0626/214231.139423:INFO:android_webview/browser/variations/variations_seed_loader.cc:67] Failed to open file for reading.: No such file or directory (2)
+21:42:31.142 [I] cr_LibraryLoader: Successfully loaded native library
+21:42:31.143 [I] cr_CachingUmaRecorder: Flushed 14 samples from 14 histograms, 0 samples were dropped.
+21:42:31.143 [I] cr_CombinedPProvider: #registerProvider() provider:WV.zj@cc0f4e0 isPolicyCacheEnabled:false policyProvidersSize:0
+21:42:31.144 [I] cr_PolicyProvider: #setManagerAndSource() 0
+21:42:31.145 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:31.145 [I] com.fuck.zlx: AssetManager2(0xb400007399e36bf8) locale list changing from [] to [zh-CN]
+21:42:31.146 [I] com.fuck.zlx: AssetManager2(0xb400007399e365b8) locale list changing from [] to [zh-CN]
+21:42:31.147 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.147 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.147 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.147 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.148 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.148 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.148 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.148 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.150 [I] cr_CombinedPProvider: #linkNativeInternal() 1
+21:42:31.150 [I] cr_AppResProvider: #getApplicationRestrictionsFromUserManager() Bundle[EMPTY_PARCEL]
+21:42:31.151 [I] cr_PolicyProvider: #notifySettingsAvailable() 0
+21:42:31.151 [I] cr_CombinedPProvider: #onSettingsAvailable() 0
+21:42:31.151 [I] cr_CombinedPProvider: #flushPolicies()
+21:42:31.176 [W] chromium: [WARNING:android_webview/browser/network_service/net_helpers.cc:143] HTTP Cache size is: 20971520
+21:42:31.176 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+21:42:31.199 [W] cr_media: BLUETOOTH_CONNECT permission is missing.
+21:42:31.201 [W] cr_media: getBluetoothAdapter() requires BLUETOOTH permission
+21:42:31.202 [W] cr_media: registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+21:42:31.203 [I] ContentCatcher: Interceptor_Catcher : notifyWebView view: android.webkit.WebView{bc74f19 VFEDHVC.. ......I. 0,0-0,0}, size:1, isLoad:true
+21:42:31.207 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.207 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.208 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.212 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.212 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.212 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.212 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.308 [I] libMiGL: EnableDR: 0
+21:42:31.308 [D] libMiGL: mDFIInterval: -1
+21:42:31.316 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.317 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.317 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:31.317 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:31.317 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:31.317 [I] AdrenoVK-0: Local Branch            :
+21:42:31.318 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:31.318 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:31.318 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:31.318 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:31.318 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:31.319 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:31.319 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:31.319 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:31.320 [I] AdrenoVK-0: Application Name    :
+21:42:31.320 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:31.320 [I] AdrenoVK-0: Application Version : 0x00000001
+21:42:31.320 [I] AdrenoVK-0: Engine Name         :
+21:42:31.321 [I] AdrenoVK-0: Engine Version      : 0x00000001
+21:42:31.321 [I] AdrenoVK-0: Api Version         : 0x00404000
+21:42:31.325 [I] AdrenoGLES-0: QUALCOMM build                   : 0a73ec43e7, I489da0dd30
+21:42:31.325 [I] AdrenoGLES-0: Build Date                       : 02/03/26
+21:42:31.326 [I] AdrenoGLES-0: OpenGL ES Shader Compiler Version: E031.50.19.18
+21:42:31.326 [I] AdrenoGLES-0: Local Branch                     :
+21:42:31.326 [I] AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:31.327 [I] AdrenoGLES-0: Remote Branch                    : NONE
+21:42:31.327 [I] AdrenoGLES-0: Reconstruct Branch               : NOTHING
+21:42:31.327 [I] AdrenoGLES-0: Build Config                     : C P 20.0.0 AArch64
+21:42:31.327 [I] AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+21:42:31.328 [I] AdrenoGLES-0: Driver Version                   : 0842.27.1
+21:42:31.328 [I] AdrenoGLES-0: Process Name                     : com.fuck.zlx
+21:42:31.331 [I] AdrenoGLES-0: PFP: 0x01510094, ME: 0x01510025
+21:42:31.332 [I] AdrenoUtils: <ReadGpuID:1333>: Reading chip ID through GSL
+21:42:31.358 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.358 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+21:42:31.358 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+21:42:31.359 [I] AdrenoVK-0: Build Date              : 02/03/26
+21:42:31.359 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+21:42:31.359 [I] AdrenoVK-0: Local Branch            :
+21:42:31.359 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+21:42:31.359 [I] AdrenoVK-0: Remote Branch           : NONE
+21:42:31.359 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+21:42:31.359 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+21:42:31.359 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+21:42:31.360 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+21:42:31.360 [I] AdrenoVK-0: PFP                     : 0x01510094
+21:42:31.360 [I] AdrenoVK-0: ME                      : 0x01510025
+21:42:31.360 [I] AdrenoVK-0: Application Name    : Chromium
+21:42:31.360 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+21:42:31.360 [I] AdrenoVK-0: Application Version : 0x00000000
+21:42:31.360 [I] AdrenoVK-0: Engine Name         : (null)
+21:42:31.361 [I] AdrenoVK-0: Engine Version      : 0x00000000
+21:42:31.361 [I] AdrenoVK-0: Api Version         : 0x00401000
+21:42:31.372 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 2.29 ms.
+21:42:31.374 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.20 ms.
+21:42:31.374 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:31.374 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.20 ms.
+21:42:31.374 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+21:42:31.375 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+21:42:31.375 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:31.375 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:31.375 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:31.375 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.12 ms.
+21:42:31.376 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:31.376 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:31.376 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+21:42:31.377 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.22 ms.
+21:42:31.377 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.10 ms.
+21:42:31.377 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.13 ms.
+21:42:31.377 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:31.378 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.22 ms.
+21:42:31.379 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:31.379 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.21 ms.
+21:42:31.379 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.21 ms.
+21:42:31.380 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:31.384 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+21:42:31.385 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.23 ms.
+21:42:31.385 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+21:42:31.385 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:31.402 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.30 ms.
+21:42:31.402 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+21:42:31.405 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:31.406 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:31.406 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+21:42:31.406 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:31.406 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+21:42:31.407 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+21:42:31.407 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+21:42:31.408 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.12 ms.
+21:42:31.452 [I] CameraManagerGlobal: Connecting to camera service
+21:42:31.459 [D] CameraExtStub: init android.hardware.camera2.impl.CameraExtImplXiaoMi
+21:42:31.459 [D] CameraInjector: waitForResult:
+21:42:31.459 [D] CameraInjector: updateCloudCameraControllerInfoAsync: E
+21:42:31.460 [W] AudioCapabilities: Unsupported mediaType audio/alac
+21:42:31.460 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+21:42:31.460 [W] AudioCapabilities: Unsupported mediaType audio/dsd
+21:42:31.462 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb-plus
+21:42:31.462 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb+
+21:42:31.462 [W] AudioCapabilities: Unsupported mediaType audio/x-ms-wma
+21:42:31.462 [W] AudioCapabilities: Unsupported mediaType audio/alac
+21:42:31.462 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+21:42:31.463 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+21:42:31.463 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+21:42:31.463 [D] CameraInjector: isMiviInfo4: use MiviInfo V4.0
+21:42:31.463 [D] CameraInjector: parseMiviInfo4 cameraExposedRoleIdList: 21#23#60#61#0#63#64
+21:42:31.463 [D] CameraInjector: updateCloudCameraControllerInfoAsync: X
+21:42:31.464 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.464 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.465 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.465 [W] CameraExtImplXiaoMi: ignore the status update of camera: 2
+21:42:31.465 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.465 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.465 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.465 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.467 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.467 [D] CameraInjector: waitForResult:
+21:42:31.468 [W] CameraExtImplXiaoMi: ignore the status update of camera: 3
+21:42:31.469 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.470 [D] CameraInjector: waitForResult:
+21:42:31.471 [W] CameraExtImplXiaoMi: ignore the status update of camera: 4
+21:42:31.471 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.471 [D] CameraInjector: waitForResult:
+21:42:31.474 [W] CameraExtImplXiaoMi: ignore the status update of camera: 5
+21:42:31.474 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.474 [D] CameraInjector: waitForResult:
+21:42:31.475 [W] CameraExtImplXiaoMi: ignore the status update of camera: 6
+21:42:31.475 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+21:42:31.475 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.475 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.476 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.476 [D] CameraInjector: waitForResult:
+21:42:31.476 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.477 [W] CameraManagerGlobal: ignore the torch status update of camera: 2
+21:42:31.477 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.479 [D] CameraInjector: waitForResult:
+21:42:31.484 [W] CameraManagerGlobal: ignore the torch status update of camera: 3
+21:42:31.484 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.485 [D] CameraInjector: waitForResult:
+21:42:31.485 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+21:42:31.486 [W] CameraManagerGlobal: ignore the torch status update of camera: 4
+21:42:31.486 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.487 [D] CameraInjector: waitForResult:
+21:42:31.487 [W] CameraManagerGlobal: ignore the torch status update of camera: 5
+21:42:31.487 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+21:42:31.487 [D] CameraInjector: waitForResult:
+21:42:31.488 [W] CameraManagerGlobal: ignore the torch status update of camera: 6
+21:42:31.489 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+21:42:31.489 [W] VideoCapabilities: Unsupported mime video/x-mvhevc
+21:42:31.489 [W] VideoCapabilities: Unsupported mime video/x-mvhevc
+21:42:31.489 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:31.489 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:31.490 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:31.490 [W] AudioCapabilities: Unsupported mime audio/alac
+21:42:31.491 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.32 ms.
+21:42:31.493 [W] AudioCapabilities: Unsupported mime audio/x-ape
+21:42:31.493 [W] AudioCapabilities: Unsupported mime audio/dsd
+21:42:31.493 [W] AudioCapabilities: Unsupported mime audio/amr-wb-plus
+21:42:31.494 [W] AudioCapabilities: Unsupported mime audio/amr-wb+
+21:42:31.494 [W] AudioCapabilities: Unsupported mime audio/x-ms-wma
+21:42:31.494 [W] AudioCapabilities: Unsupported mime audio/alac
+21:42:31.494 [W] AudioCapabilities: Unsupported mime audio/x-ape
+21:42:31.495 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:31.495 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:31.495 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:31.495 [W] AudioCapabilities: Unsupported mime audio/mihc
+21:42:31.496 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.498 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.498 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.498 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.498 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.499 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.507 [W] Utils: could not parse integer range '1-3536000000'
+21:42:31.508 [W] Utils: could not parse integer range '1-3536000000'
+21:42:31.510 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.513 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.514 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.515 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.515 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.517 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.517 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.517 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+21:42:31.518 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+21:42:31.518 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+21:42:31.519 [I] HandWritingStubImpl: refreshLastKeyboardType: 1
+21:42:31.520 [W] Utils: could not parse integer range '1-3536000000'
+21:42:31.520 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+21:42:31.521 [W] Utils: could not parse integer range '1-3536000000'
+21:42:31.521 [W] VideoCapabilities: Unrecognized profile 8 for video/x-mvhevc
+21:42:31.525 [W] VideoCapabilities: Unrecognized profile 8 for video/x-mvhevc
+21:42:31.560 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:31.560 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:31.560 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+21:42:31.561 [D] InsetsController: hide(ime(), fromIme=false)
+21:42:31.561 [I] ImeTracker: com.fuck.zlx:f6a31393: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+21:42:31.561 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+21:42:31.561 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 1.50 ms.
+21:42:31.562 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.562 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.562 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.562 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.566 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.567 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.567 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.568 [W] cr_VAUtil: Unknown profile: 8 for codec video/hevc
+21:42:31.568 [W] cr_VAUtil: Unknown profile: 8 for codec video/hevc
+21:42:31.570 [W] cr_VAUtil: Unknown level: 2048 for profile 32 of codec video/dolby-vision
+21:42:31.570 [W] cr_VAUtil: Unknown level: 2048 for profile 256 of codec video/dolby-vision
+21:42:31.570 [W] cr_VAUtil: Unknown level: 2048 for profile 32 of codec video/dolby-vision
+21:42:31.570 [W] cr_VAUtil: Unknown level: 2048 for profile 256 of codec video/dolby-vision
+21:42:31.802 [W] BpBinder: Large outgoing transaction of 31864 bytes, interface descriptor android.view.accessibility.IAccessibilityInteractionConnectionCallback, code 3 was sent
+21:42:31.857 [I] ContentCatcher: SettingTrigger : unregister status observer com.fuck.zlx.MainActivity
+21:42:31.863 [I] ContentCatcher: SettingTrigger : unregisterUIAgentListener com.fuck.zlx.MainActivity, uid:10315
+21:42:31.886 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.891 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.891 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.938 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.938 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:31.938 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:32.723 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:32.723 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:32.723 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:32.723 [W] com.fuck.zlx: Binder 0xb4000073a9e5f5e0 destroyed after setInheritRt before being parceled.
+21:42:32.731 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:32.731 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+21:42:32.732 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false

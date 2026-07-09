@@ -1,0 +1,401 @@
+package com.fuck.zlx20:04:51.352 [I] cr_PolicyProvider: #notifySettingsAvailable() 0
+20:04:51.352 [I] cr_CombinedPProvider: #onSettingsAvailable() 0
+20:04:51.353 [I] cr_CombinedPProvider: #flushPolicies()
+20:04:51.353 [W] chromium: [WARNING:android_webview/browser/network_service/net_helpers.cc:143] HTTP Cache size is: 20971520
+20:04:51.353 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+20:04:51.353 [W] cr_media: BLUETOOTH_CONNECT permission is missing.
+20:04:51.353 [W] cr_media: getBluetoothAdapter() requires BLUETOOTH permission
+20:04:51.353 [W] cr_media: registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+20:04:51.353 [I] ContentCatcher: Interceptor_Catcher : notifyWebView view: android.webkit.WebView{5140d3d VFEDHVC.. ......I. 0,0-0,0}, size:1, isLoad:true
+20:04:51.353 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.353 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.353 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.353 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.353 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.354 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.354 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.354 [I] libMiGL: EnableDR: 0
+20:04:51.354 [D] libMiGL: mDFIInterval: -1
+20:04:51.354 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+20:04:51.354 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+20:04:51.354 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+20:04:51.354 [I] AdrenoVK-0: Build Date              : 02/03/26
+20:04:51.354 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+20:04:51.354 [I] AdrenoVK-0: Local Branch            :
+20:04:51.354 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+20:04:51.354 [I] AdrenoVK-0: Remote Branch           : NONE
+20:04:51.354 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+20:04:51.354 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+20:04:51.355 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+20:04:51.355 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+20:04:51.355 [I] AdrenoVK-0: PFP                     : 0x01510094
+20:04:51.355 [I] AdrenoVK-0: ME                      : 0x01510025
+20:04:51.355 [I] AdrenoVK-0: Application Name    :
+20:04:51.355 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+20:04:51.355 [I] AdrenoVK-0: Application Version : 0x00000001
+20:04:51.355 [I] AdrenoVK-0: Engine Name         :
+20:04:51.355 [I] AdrenoVK-0: Engine Version      : 0x00000001
+20:04:51.355 [I] AdrenoVK-0: Api Version         : 0x00404000
+20:04:51.355 [I] AdrenoGLES-0: QUALCOMM build                   : 0a73ec43e7, I489da0dd30
+20:04:51.355 [I] AdrenoGLES-0: Build Date                       : 02/03/26
+20:04:51.355 [I] AdrenoGLES-0: OpenGL ES Shader Compiler Version: E031.50.19.18
+20:04:51.356 [I] AdrenoGLES-0: Local Branch                     :
+20:04:51.356 [I] AdrenoGLES-0: Remote Branch                    : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+20:04:51.356 [I] AdrenoGLES-0: Remote Branch                    : NONE
+20:04:51.356 [I] AdrenoGLES-0: Reconstruct Branch               : NOTHING
+20:04:51.356 [I] AdrenoGLES-0: Build Config                     : C P 20.0.0 AArch64
+20:04:51.356 [I] AdrenoGLES-0: Driver Path                      : /vendor/lib64/egl/libGLESv2_adreno.so
+20:04:51.356 [I] AdrenoGLES-0: Driver Version                   : 0842.27.1
+20:04:51.356 [I] AdrenoGLES-0: Process Name                     : com.fuck.zlx
+20:04:51.356 [I] AdrenoGLES-0: PFP: 0x01510094, ME: 0x01510025
+20:04:51.356 [I] AdrenoUtils: <ReadGpuID:1333>: Reading chip ID through GSL
+20:04:51.357 [I] AdrenoVK-0: ===== BEGIN DUMP OF OVERRIDDEN SETTINGS =====
+20:04:51.357 [I] AdrenoVK-0: ===== END DUMP OF OVERRIDDEN SETTINGS =====
+20:04:51.357 [I] AdrenoVK-0: QUALCOMM build          : 0a73ec43e7, I489da0dd30
+20:04:51.357 [I] AdrenoVK-0: Build Date              : 02/03/26
+20:04:51.357 [I] AdrenoVK-0: Shader Compiler Version : E031.50.19.18
+20:04:51.357 [I] AdrenoVK-0: Local Branch            :
+20:04:51.357 [I] AdrenoVK-0: Remote Branch           : refs/tags/AU_LINUX_ANDROID_LA.VENDOR.16.2.0.11.00.00.1195.535
+20:04:51.357 [I] AdrenoVK-0: Remote Branch           : NONE
+20:04:51.357 [I] AdrenoVK-0: Reconstruct Branch      : NOTHING
+20:04:51.358 [I] AdrenoVK-0: Build Config            : C P 20.0.0 AArch64
+20:04:51.358 [I] AdrenoVK-0: Driver Path             : /vendor/lib64/hw/vulkan.adreno.so
+20:04:51.358 [I] AdrenoVK-0: Driver Version          : 0842.27.1
+20:04:51.358 [I] AdrenoVK-0: PFP                     : 0x01510094
+20:04:51.358 [I] AdrenoVK-0: ME                      : 0x01510025
+20:04:51.358 [I] AdrenoVK-0: Application Name    : Chromium
+20:04:51.358 [I] AdrenoVK-0: Process Name        : com.fuck.zlx
+20:04:51.358 [I] AdrenoVK-0: Application Version : 0x00000000
+20:04:51.358 [I] AdrenoVK-0: Engine Name         : (null)
+20:04:51.358 [I] AdrenoVK-0: Engine Version      : 0x00000000
+20:04:51.358 [I] AdrenoVK-0: Api Version         : 0x00401000
+20:04:51.358 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 1.68 ms.
+20:04:51.358 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+20:04:51.358 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.11 ms.
+20:04:51.358 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.13 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.21 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.12 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.11 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.10 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.13 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.11 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.18 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.08 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.09 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.10 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.12 ms.
+20:04:51.359 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.17 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.44 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.13 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.16 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.14 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.20 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.15 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.08 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.09 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.08 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+20:04:51.360 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+20:04:51.361 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.09 ms.
+20:04:51.361 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.07 ms.
+20:04:51.361 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.06 ms.
+20:04:51.361 [I] CameraManagerGlobal: Connecting to camera service
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/alac
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/dsd
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb-plus
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/amr-wb+
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/x-ms-wma
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/alac
+20:04:51.362 [W] AudioCapabilities: Unsupported mediaType audio/x-ape
+20:04:51.363 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+20:04:51.363 [W] AudioCapabilities: Unsupported mediaType audio/mihc
+20:04:51.363 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.363 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.363 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.363 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.363 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.363 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.363 [D] CameraExtStub: init android.hardware.camera2.impl.CameraExtImplXiaoMi
+20:04:51.363 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.364 [D] CameraInjector: waitForResult:
+20:04:51.364 [D] CameraInjector: updateCloudCameraControllerInfoAsync: E
+20:04:51.364 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.19 ms.
+20:04:51.364 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+20:04:51.364 [D] CameraInjector: isMiviInfo4: use MiviInfo V4.0
+20:04:51.364 [D] CameraInjector: parseMiviInfo4 cameraExposedRoleIdList: 21#23#60#61#0#63#64
+20:04:51.364 [D] CameraInjector: updateCloudCameraControllerInfoAsync: X
+20:04:51.364 [W] CameraExtImplXiaoMi: ignore the status update of camera: 2
+20:04:51.364 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.365 [D] CameraInjector: waitForResult:
+20:04:51.365 [W] CameraExtImplXiaoMi: ignore the status update of camera: 3
+20:04:51.365 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.365 [D] CameraInjector: waitForResult:
+20:04:51.365 [W] CameraExtImplXiaoMi: ignore the status update of camera: 4
+20:04:51.365 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.366 [D] CameraInjector: waitForResult:
+20:04:51.366 [W] CameraExtImplXiaoMi: ignore the status update of camera: 5
+20:04:51.366 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.366 [D] CameraInjector: waitForResult:
+20:04:51.366 [W] CameraExtImplXiaoMi: ignore the status update of camera: 6
+20:04:51.366 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.366 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.366 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.366 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.367 [D] CameraInjector: waitForResult:
+20:04:51.367 [W] CameraManagerGlobal: ignore the torch status update of camera: 2
+20:04:51.367 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.367 [D] CameraInjector: waitForResult:
+20:04:51.367 [W] CameraManagerGlobal: ignore the torch status update of camera: 3
+20:04:51.367 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.367 [D] CameraInjector: waitForResult:
+20:04:51.368 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.368 [W] CameraManagerGlobal: ignore the torch status update of camera: 4
+20:04:51.368 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.368 [D] CameraInjector: waitForResult:
+20:04:51.368 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.368 [W] CameraManagerGlobal: ignore the torch status update of camera: 5
+20:04:51.368 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.368 [D] CameraInjector: updateCloudCameraControllerInfoAsync: has aleardy start update task.
+20:04:51.368 [D] CameraInjector: waitForResult:
+20:04:51.368 [W] CameraManagerGlobal: ignore the torch status update of camera: 6
+20:04:51.369 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+20:04:51.369 [I] HandWritingStubImpl: refreshLastKeyboardType: 1
+20:04:51.369 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+20:04:51.369 [W] AudioCapabilities: could not parse integer range: 1-3536000000
+20:04:51.369 [W] VideoCapabilities: Unsupported mime video/x-mvhevc
+20:04:51.369 [W] VideoCapabilities: Unsupported mime video/x-mvhevc
+20:04:51.369 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+20:04:51.369 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+20:04:51.369 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+20:04:51.369 [W] AudioCapabilities: Unsupported mime audio/alac
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/x-ape
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/dsd
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/amr-wb-plus
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/amr-wb+
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/x-ms-wma
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/alac
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/x-ape
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/mihc
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/mihc
+20:04:51.370 [W] AudioCapabilities: Unsupported mime audio/mihc
+20:04:51.371 [W] AudioCapabilities: Unsupported mime audio/mihc
+20:04:51.371 [I] SKIA: CreateGraphicsPipeline pipeline cache hit. elpased time: 0.24 ms.
+20:04:51.371 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.371 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.371 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.371 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.371 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.371 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.371 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.371 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.371 [D] InsetsController: hide(ime(), fromIme=false)
+20:04:51.371 [I] ImeTracker: com.fuck.zlx:b30d04d4: onCancelled at PHASE_CLIENT_ALREADY_HIDDEN
+20:04:51.372 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.372 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.372 [W] Utils: could not parse integer range '1-3536000000'
+20:04:51.372 [W] Utils: could not parse integer range '1-3536000000'
+20:04:51.373 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.373 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.373 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.373 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.374 [W] VideoCapabilities: Unrecognized profile 8 for video/hevc
+20:04:51.374 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+20:04:51.374 [W] VideoCapabilities: Unsupported mime image/vnd.android.heic
+20:04:51.374 [W] Utils: could not parse integer range '1-3536000000'
+20:04:51.374 [W] Utils: could not parse integer range '1-3536000000'
+20:04:51.374 [W] VideoCapabilities: Unrecognized profile 8 for video/x-mvhevc
+20:04:51.374 [W] VideoCapabilities: Unrecognized profile 8 for video/x-mvhevc
+20:04:51.374 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+20:04:51.374 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+20:04:51.374 [W] VideoCapabilities: Unsupported mime video/dolby-vision
+20:04:51.374 [I] HandWritingStubImpl: getCurrentKeyboardType: 1
+20:04:51.374 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.374 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.374 [W] InsetsSource: Has no intersection or mTmpFrame.height(), return Insets.NONE mTmpFrame.height() =0 hasIntersection =false
+20:04:51.374 [W] cr_VAUtil: Unknown profile: 8 for codec video/hevc
+20:04:51.375 [W] cr_VAUtil: Unknown profile: 8 for codec video/hevc
+20:04:51.375 [W] cr_VAUtil: Unknown level: 2048 for profile 32 of codec video/dolby-vision
+20:04:51.375 [W] cr_VAUtil: Unknown level: 2048 for profile 256 of codec video/dolby-vision
+20:04:51.375 [W] cr_VAUtil: Unknown level: 2048 for profile 32 of codec video/dolby-vision
+20:04:51.375 [W] cr_VAUtil: Unknown level: 2048 for profile 256 of codec video/dolby-vision
+20:04:51.767 [W] BpBinder: Large outgoing transaction of 31776 bytes, interface descriptor android.view.accessibility.IAccessibilityInteractionConnectionCallback, code 3 was sent
+20:04:52.205 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=377750176, downTime=377750176, phoneEventTime=1782561892193 } moveCount:0
+20:04:52.255 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=377750235, downTime=377750176, phoneEventTime=1782561892252 } moveCount:0
+20:04:52.336 [E] TurboSchedMonitor: failed to find setSchedAffinity method com.fuck.zlx
+20:04:52.941 [D] CompatChangeReporter: Compat change id reported: 263076149; UID 10315; state: ENABLED
+20:04:53.080 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_DOWN, id[0]=0, pointerCount=1, eventTime=377751053, downTime=377751053, phoneEventTime=1782561893070 } moveCount:0
+20:04:53.125 [I] MIUIInput: [MotionEvent] ViewRootImpl windowName 'com.fuck.zlx/com.fuck.zlx.MainActivity', { action=ACTION_UP, id[0]=0, pointerCount=1, eventTime=377751106, downTime=377751053, phoneEventTime=1782561893123 } moveCount:0
+20:04:53.236 [I] AdrenoVK-0: Shader compilation failed for shaderType: 0
+20:04:53.236 [I] AdrenoVK-0: Pipeline create failed
+20:04:53.243 [E] ComposeInternal: Error was captured in composition.
+20:04:53.243 [E] ComposeInternal: java.lang.IllegalArgumentException: clickable only supports IndicationNodeFactory instances provided to LocalIndication, but Indication was provided instead. Either migrate the Indication implementation to implement IndicationNodeFactory, or use the other clickable overload that takes an Indication parameter, and explicitly pass LocalIndication.current there. The Indication instance provided here was: androidx.compose.material.ripple.PlatformRipple@8598c08e
+20:04:53.243 [E] ComposeInternal: at androidx.compose.foundation.internal.InlineClassHelperKt.throwIllegalArgumentException(InlineClassHelper.kt:34)
+20:04:53.244 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged$lambda$0(Clickable.kt:1940)
+20:04:53.244 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.$r8$lambda$0NYE0E6SUj_qhL0H2zRlte2VELs(Unknown Source:0)
+20:04:53.244 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+20:04:53.244 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+20:04:53.244 [E] ComposeInternal: at androidx.compose.ui.node.ObserverModifierNodeKt.observeReads(ObserverModifierNode.kt:66)
+20:04:53.245 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged(Clickable.kt:1396)
+20:04:53.246 [E] ComposeInternal: at androidx.compose.foundation.AbstractClickableNode.onAttach(Clickable.kt:1385)
+20:04:53.246 [E] ComposeInternal: at androidx.compose.ui.Modifier$Node.runAttachLifecycle$ui(Modifier.kt:266)
+20:04:53.246 [E] ComposeInternal: at androidx.compose.ui.node.DelegatingNode.runAttachLifecycle$ui(DelegatingNode.kt:261)
+20:04:53.246 [E] ComposeInternal: at androidx.compose.ui.node.NodeChain.runAttachLifecycle(NodeChain.kt:283)
+20:04:53.246 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:561)
+20:04:53.246 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.247 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.247 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.247 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.247 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.247 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.247 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.247 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.insertAt$ui(LayoutNode.kt:314)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:29)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:21)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation$PostInsertNodeFixup.execute(Operation.kt:777)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.runtime.changelist.FixupList.executeAndFlushAllPendingFixups(FixupList.kt:54)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation$InsertSlotsWithFixups.execute(Operation.kt:683)
+20:04:53.248 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+20:04:53.249 [E] ComposeInternal: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+20:04:53.249 [E] ComposeInternal: at androidx.compose.runtime.changelist.ChangeList.executeAndFlushAllPendingChanges(ChangeList.kt:90)
+20:04:53.249 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.applyChangesInLocked(Composition.kt:1120)
+20:04:53.249 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.applyChanges(Composition.kt:1160)
+20:04:53.249 [E] ComposeInternal: at androidx.compose.runtime.Recomposer.composeInitial$runtime(Recomposer.kt:1299)
+20:04:53.249 [E] ComposeInternal: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+20:04:53.249 [E] ComposeInternal: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+20:04:53.250 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.composeInitial(Composition.kt:672)
+20:04:53.250 [E] ComposeInternal: at androidx.compose.runtime.CompositionImpl.setContent(Composition.kt:639)
+20:04:53.250 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:721)
+20:04:53.250 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:658)
+20:04:53.250 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState.subcompose(SubcomposeLayout.kt:624)
+20:04:53.250 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState$Scope.subcompose(SubcomposeLayout.kt:1352)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.material3.ScaffoldKt$ScaffoldLayoutWithMeasureFix$1$1.invoke-0kLqBqw(Scaffold.kt:285)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.material3.ScaffoldKt$ScaffoldLayoutWithMeasureFix$1$1.invoke(Scaffold.kt:179)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.ui.layout.LayoutNodeSubcompositionsState$createMeasurePolicy$1.measure-3p2s80s(SubcomposeLayout.kt:955)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+20:04:53.251 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.foundation.layout.BoxMeasurePolicy.measure-3p2s80s(Box.kt:145)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.ui.graphics.SimpleGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:843)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.ui.graphics.SimpleGraphicsLayerModifier.measure-3p2s80s(GraphicsLayerModifier.kt:843)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+20:04:53.252 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.foundation.layout.BoxMeasurePolicy.measure-3p2s80s(Box.kt:145)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.foundation.layout.PaddingValuesModifier.measure-3p2s80s(Padding.kt:470)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+20:04:53.253 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.measure-BRTryo0(MeasurePassDelegate.kt:470)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.foundation.layout.BoxMeasurePolicy.measure-3p2s80s(Box.kt:168)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.ui.node.InnerNodeCoordinator.measure-BRTryo0(InnerNodeCoordinator.kt:128)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.foundation.layout.FillNode.measure-3p2s80s(Size.kt:721)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.ui.node.LayoutModifierNodeCoordinator.measure-BRTryo0(LayoutModifierNodeCoordinator.kt:190)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:173)
+20:04:53.254 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate$performMeasureBlock$1.invoke(MeasurePassDelegate.kt:172)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:728)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.node.MeasurePassDelegate.remeasure-BRTryo0(MeasurePassDelegate.kt:1064)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.remeasure-_Sx5XlM$ui(LayoutNode.kt:1281)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.node.LayoutNode.remeasure-_Sx5XlM$ui$default(LayoutNode.kt:1274)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.doRemeasure-sdFAvZA(MeasureAndLayoutDelegate.kt:380)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.remeasureAndRelayoutIfNeeded(MeasureAndLayoutDelegate.kt:595)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.access$remeasureAndRelayoutIfNeeded(MeasureAndLayoutDelegate.kt:43)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.node.MeasureAndLayoutDelegate.measureAndLayout(MeasureAndLayoutDelegate.kt:402)
+20:04:53.255 [E] ComposeInternal: at androidx.compose.ui.platform.AndroidComposeView.measureAndLayout(AndroidComposeView.android.kt:1735)
+20:04:53.256 [E] ComposeInternal: at androidx.compose.ui.node.Owner.measureAndLayout$default(Owner.kt:258)
+20:04:53.256 [E] ComposeInternal: at androidx.compose.ui.platform.AndroidComposeView.dispatchDraw(AndroidComposeView.android.kt:2063)
+20:04:53.256 [E] ComposeInternal: at android.view.View.draw(View.java:26719)
+20:04:53.256 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25490)
+20:04:53.256 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+20:04:53.256 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+20:04:53.256 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+20:04:53.256 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+20:04:53.257 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+20:04:53.257 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+20:04:53.257 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+20:04:53.257 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+20:04:53.257 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+20:04:53.259 [E] ComposeInternal: at android.view.ViewGroup.recreateChildDisplayList(ViewGroup.java:4598)
+20:04:53.262 [E] ComposeInternal: at android.view.ViewGroup.dispatchGetDisplayList(ViewGroup.java:4571)
+20:04:53.262 [E] ComposeInternal: at android.view.View.updateDisplayListIfDirty(View.java:25426)
+20:04:53.262 [E] ComposeInternal: at android.view.ThreadedRenderer.updateViewTreeDisplayList(ThreadedRenderer.java:759)
+20:04:53.263 [E] ComposeInternal: at android.view.ThreadedRenderer.updateRootDisplayList(ThreadedRenderer.java:765)
+20:04:53.264 [E] ComposeInternal: at android.view.ThreadedRenderer.draw(ThreadedRenderer.java:867)
+20:04:53.265 [E] ComposeInternal: at android.view.ViewRootImpl.draw(ViewRootImpl.java:7242)
+20:04:53.265 [E] ComposeInternal: at android.view.ViewRootImpl.performDraw(ViewRootImpl.java:6856)
+20:04:53.266 [E] ComposeInternal: at android.view.ViewRootImpl.performTraversals(ViewRootImpl.java:5742)
+20:04:53.266 [E] ComposeInternal: at android.view.ViewRootImpl.doTraversal(ViewRootImpl.java:4177)
+20:04:53.266 [E] ComposeInternal: at android.view.ViewRootImpl$TraversalRunnable.run(ViewRootImpl.java:12647)
+20:04:53.266 [E] ComposeInternal: at android.view.Choreographer$CallbackRecord.run(Choreographer.java:2083)
+20:04:53.266 [E] ComposeInternal: at android.view.Choreographer$CallbackRecord.run(Choreographer.java:2092)
+20:04:53.266 [E] ComposeInternal: at android.view.Choreographer.doCallbacks(Choreographer.java:1567)
+20:04:53.266 [E] ComposeInternal: at android.view.Choreographer.doFrame(Choreographer.java:1448)
+20:04:53.267 [E] ComposeInternal: at android.view.Choreographer$FrameDisplayEventReceiver.run(Choreographer.java:2046)
+20:04:53.267 [E] ComposeInternal: at android.os.Handler.handleCallback(Handler.java:1029)
+20:04:53.268 [E] ComposeInternal: at android.os.Handler.dispatchMessage(Handler.java:107)
+20:04:53.268 [E] ComposeInternal: at android.os.Looper.loopOnce(Looper.java:274)
+20:04:53.269 [E] ComposeInternal: at android.os.Looper.loop(Looper.java:369)
+20:04:53.270 [E] ComposeInternal: at android.app.ActivityThread.main(ActivityThread.java:10090)
+20:04:53.270 [E] ComposeInternal: at java.lang.reflect.Method.invoke(Native Method)
+20:04:53.270 [E] ComposeInternal: at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:616)
+20:04:53.270 [E] ComposeInternal: at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:1137)
+20:04:53.271 [D] AndroidRuntime: Shutting down VM
+20:04:53.271 [E] AndroidRuntime: FATAL EXCEPTION: main
+20:04:53.271 [E] AndroidRuntime: Process: com.fuck.zlx, PID: 22430
+20:04:53.271 [E] AndroidRuntime: java.lang.IllegalArgumentException: clickable only supports IndicationNodeFactory instances provided to LocalIndication, but Indication was provided instead. Either migrate the Indication implementation to implement IndicationNodeFactory, or use the other clickable overload that takes an Indication parameter, and explicitly pass LocalIndication.current there. The Indication instance provided here was: androidx.compose.material.ripple.PlatformRipple@8598c08e
+20:04:53.271 [E] AndroidRuntime: at androidx.compose.foundation.internal.InlineClassHelperKt.throwIllegalArgumentException(InlineClassHelper.kt:34)
+20:04:53.272 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged$lambda$0(Clickable.kt:1940)
+20:04:53.272 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.$r8$lambda$0NYE0E6SUj_qhL0H2zRlte2VELs(Unknown Source:0)
+20:04:53.272 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+20:04:53.272 [E] AndroidRuntime: at androidx.compose.runtime.snapshots.SnapshotStateObserver.observeReads(SnapshotStateObserver.kt:699)
+20:04:53.272 [E] AndroidRuntime: at androidx.compose.ui.node.ObserverModifierNodeKt.observeReads(ObserverModifierNode.kt:66)
+20:04:53.273 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.onObservedReadsChanged(Clickable.kt:1396)
+20:04:53.273 [E] AndroidRuntime: at androidx.compose.foundation.AbstractClickableNode.onAttach(Clickable.kt:1385)
+20:04:53.273 [E] AndroidRuntime: at androidx.compose.ui.Modifier$Node.runAttachLifecycle$ui(Modifier.kt:266)
+20:04:53.274 [E] AndroidRuntime: at androidx.compose.ui.node.DelegatingNode.runAttachLifecycle$ui(DelegatingNode.kt:261)
+20:04:53.274 [E] AndroidRuntime: at androidx.compose.ui.node.NodeChain.runAttachLifecycle(NodeChain.kt:283)
+20:04:53.274 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:561)
+20:04:53.274 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.274 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.275 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.275 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.275 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.275 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.275 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.attach$ui(LayoutNode.kt:559)
+20:04:53.275 [E] AndroidRuntime: at androidx.compose.ui.node.LayoutNode.insertAt$ui(LayoutNode.kt:314)
+20:04:53.275 [E] AndroidRuntime: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:29)
+20:04:53.276 [E] AndroidRuntime: at androidx.compose.ui.node.UiApplier.insertBottomUp(UiApplier.android.kt:21)
+20:04:53.276 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation$PostInsertNodeFixup.execute(Operation.kt:777)
+20:04:53.276 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+20:04:53.276 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+20:04:53.276 [E] AndroidRuntime: at androidx.compose.runtime.changelist.FixupList.executeAndFlushAllPendingFixups(FixupList.kt:54)
+20:04:53.276 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation$InsertSlotsWithFixups.execute(Operation.kt:683)
+20:04:53.277 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operation.executeWithComposeStackTrace(Operation.kt:63)
+20:04:53.277 [E] AndroidRuntime: at androidx.compose.runtime.changelist.Operations.executeAndFlushAllPendingOperations(Operations.kt:350)
+20:04:53.277 [E] AndroidRuntime: at androidx.compose.runtime.changelist.ChangeList.executeAndFlushAllPendingChanges(ChangeList.kt:90)
+20:04:53.277 [E] AndroidRuntime: at androidx.compose.runtime.CompositionImpl.applyChangesInLocked(Composition.kt:1120)
+20:04:53.282 [E] AndroidRuntime: at androidx.compose.runtime.CompositionImpl.applyChanges(Composition.kt:1160)
+20:04:53.283 [E] AndroidRuntime: at androidx.compose.runtime.Recomposer.composeInitial$runtime(Recomposer.kt:1299)
+20:04:53.283 [E] AndroidRuntime: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)
+20:04:53.283 [E] AndroidRuntime: at androidx.compose.runtime.ComposerImpl$CompositionContextImpl.composeInitial$runtime(ComposerImpl.kt:2993)

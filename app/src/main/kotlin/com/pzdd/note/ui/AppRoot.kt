@@ -168,6 +168,7 @@ private fun AppContent(
             1 -> FavoritesPage(
                 vm = noteVm,
                 paddingValues = paddingValues,
+                floatingBottomBar = floatingBottomBar,
                 onScrollDirectionChanged = onScrollDirectionChanged,
                 backdrop = backdrop,
                 onHideBottomBar = onHideBottomBar,

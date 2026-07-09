@@ -117,3 +117,4 @@ private fun StandardBottomBar(
                         )
                     }
                 }
+        colors = CardDefaults.cardColors(containerColor = Color.White),

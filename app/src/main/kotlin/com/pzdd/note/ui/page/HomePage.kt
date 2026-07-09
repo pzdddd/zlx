@@ -412,7 +412,9 @@ fun HomePage(
                     columns = GridCells.Fixed(2),
                     state = gridState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    contentPadding = if (floatingBottomBar)
+                        PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 88.dp)
+                    else PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
@@ -445,7 +447,9 @@ fun HomePage(
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    contentPadding = if (floatingBottomBar)
+                        PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 88.dp)
+                    else PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(notes, key = { it.id }) { note ->
@@ -532,7 +536,9 @@ fun HomePage(
                 LazyColumn(
                     state = deepListState,
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    contentPadding = if (floatingBottomBar)
+                        PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 88.dp)
+                    else PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     itemsIndexed(notes, key = { _, parentNote -> parentNote.id }) { index, parentNote ->

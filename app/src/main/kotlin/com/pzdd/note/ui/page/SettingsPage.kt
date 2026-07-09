@@ -75,7 +75,11 @@ fun SettingsPage(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(paddingValues)
-            .padding(16.dp),
+            .padding(16.dp)
+            // 悬浮底栏不占 Scaffold 布局空间，需额外预留底部高度避免最后一栏被遮挡
+            .padding(
+                bottom = if (settings.floatingBottomBar) 120.dp else 0.dp
+            ),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // ===== 主题模式 =====
@@ -124,7 +128,10 @@ fun SettingsPage(
         BackupSection(noteVm = noteVm)
 
         // ===== 关于 =====
-        Card(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = "UI 框架：Jetpack Compose Material3",
@@ -147,7 +154,7 @@ private fun SettingsSectionCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(

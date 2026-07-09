@@ -378,7 +378,7 @@ fun HomePage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 2.dp)
-                    .heightIn(min = 20.dp)
+                    .heightIn(min = 10.dp)
         )
         }
 

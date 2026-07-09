@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -142,6 +143,9 @@ fun FavoritesPage(
     var favAddChildParent by remember { mutableStateOf<Note?>(null) }
     var favEditingChild by remember { mutableStateOf<Note?>(null) }
 
+    // 搜索栏展开/收起状态：向上滚动收起，向下滚动展开
+    var searchBarExpanded by remember { mutableStateOf(true) }
+
     // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
     LaunchedEffect(listState) {
@@ -156,6 +160,7 @@ fun FavoritesPage(
                 else -> offset > prevOffset
             }
             onScrollDirectionChanged(isScrollingUp)
+            searchBarExpanded = !isScrollingUp
             prevIndex = index
             prevOffset = offset
         }
@@ -175,6 +180,7 @@ fun FavoritesPage(
                 else -> offset > prevOffset
             }
             onScrollDirectionChanged(isScrollingUp)
+            searchBarExpanded = !isScrollingUp
             prevIndex = index
             prevOffset = offset
         }
@@ -206,42 +212,49 @@ fun FavoritesPage(
             onTabSelected = { selectedTab = it }
         )
 
-        // 搜索框
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = {
-                Text(
-                    if (selectedTab == 0) "搜索收藏笔记..." else "搜索收藏父笔记...",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Filled.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            trailingIcon = {
-                if (searchQuery.isNotEmpty()) {
-                    IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(20.dp)) {
-                        Icon(
-                            Icons.Filled.Close,
-                            contentDescription = "清除",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(18.dp)
-                        )
+        // 搜索框，向上滚动时收起
+        AnimatedVisibility(
+            visible = searchBarExpanded,
+            enter = expandVertically(animationSpec = tween(200)) + fadeIn(tween(200)),
+            exit = shrinkVertically(animationSpec = tween(200)) + fadeOut(tween(200))
+        ) {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = {
+                    Text(
+                        if (selectedTab == 0) "搜索收藏笔记..." else "搜索收藏父笔记...",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Filled.Search,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }, modifier = Modifier.size(20.dp)) {
+                            Icon(
+                                Icons.Filled.Close,
+                                contentDescription = "清除",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
-                }
-            },
-            singleLine = true,
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp)
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(24.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 2.dp)
+                    .heightIn(min = 44.dp)
         )
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
             AnimatedContent(

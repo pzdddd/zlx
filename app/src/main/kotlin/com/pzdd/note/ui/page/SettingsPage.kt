@@ -1,5 +1,8 @@
 package com.pzdd.note.ui.page
 
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -25,36 +28,48 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.pzdd.note.data.ThemeMode
+import com.pzdd.note.ui.NoteViewModel
 import com.pzdd.note.ui.SettingsViewModel
 import com.pzdd.note.ui.collectAsStateSafe
 import com.pzdd.note.ui.theme.ThemeColorOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun SettingsPage(
     vm: SettingsViewModel,
+    noteVm: NoteViewModel,
     paddingValues: PaddingValues
 ) {
     val settings by vm.settings.collectAsStateSafe()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -104,6 +119,9 @@ fun SettingsPage(
                 onCheckedChange = { vm.setLiquidGlassBottomBar(it) }
             )
         }
+
+        // ===== 备份与导入 =====
+        BackupSection(noteVm = noteVm)
 
         // ===== 关于 =====
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -317,4 +335,246 @@ private fun ThemeModePickerRow(
             }
         }
     }
+}
+
+// ==================== 备份与导入 ====================
+
+@Composable
+private fun BackupSection(noteVm: NoteViewModel) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var exportNormal by remember { mutableStateOf(true) }
+    var exportDeep by remember { mutableStateOf(true) }
+    var exportFavorites by remember { mutableStateOf(true) }
+    var exportExpanded by remember { mutableStateOf(false) }
+    var importExpanded by remember { mutableStateOf(false) }
+    var showImportStrategyDialog by remember { mutableStateOf(false) }
+    var pendingImportUri by remember { mutableStateOf<android.net.Uri?>(null) }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        if (uri != null) {
+            val scopes = mutableSetOf<NoteViewModel.BackupScope>()
+            if (exportNormal) scopes.add(NoteViewModel.BackupScope.NORMAL)
+            if (exportDeep) scopes.add(NoteViewModel.BackupScope.DEEP)
+            if (exportFavorites) scopes.add(NoteViewModel.BackupScope.FAVORITES)
+            scope.launch(Dispatchers.IO) {
+                val ok = noteVm.writeBackupToUri(uri, scopes)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, if (ok) "备份导出成功" else "备份导出失败", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            pendingImportUri = uri
+            showImportStrategyDialog = true
+        }
+    }
+
+    SettingsSectionCard(title = "备份与导入") {
+        // ---- 导出 ----
+        BackupExpandHeader(
+            icon = Icons.Filled.Upload,
+            title = "备份导出",
+            expanded = exportExpanded,
+            onClick = { exportExpanded = !exportExpanded }
+        )
+        AnimatedVisibility(visible = exportExpanded) {
+            Column(modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 4.dp)) {
+                Text("选择备份范围", style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 4.dp))
+                BackupCheckboxRow("普通模式笔记", exportNormal) { exportNormal = it }
+                BackupCheckboxRow("多列模式笔记", exportDeep) { exportDeep = it }
+                BackupCheckboxRow("收藏列表", exportFavorites) { exportFavorites = it }
+                Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.End) {
+                    val canExport = exportNormal || exportDeep || exportFavorites
+                    BackupActionButton(
+                        text = "导出",
+                        enabled = canExport,
+                        onClick = {
+                            exportLauncher.launch("pznote_backup_${System.currentTimeMillis()}.json")
+                        }
+                    )
+                }
+            }
+        }
+        // 分隔线
+        Box(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+            .height(0.5.dp)
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)))
+        // ---- 导入 ----
+        BackupExpandHeader(
+            icon = Icons.Filled.Download,
+            title = "备份导入",
+            expanded = importExpanded,
+            onClick = { importExpanded = !importExpanded }
+        )
+        AnimatedVisibility(visible = importExpanded) {
+            Column(modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 4.dp)) {
+                Text("选择 JSON 备份文件导入，导入时可选择冲突处理方式",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    BackupActionButton(text = "选择文件导入", enabled = true) {
+                        importLauncher.launch(arrayOf("application/json", "*/*"))
+                    }
+                }
+            }
+        }
+    }
+
+    // 导入策略选择弹窗
+    if (showImportStrategyDialog && pendingImportUri != null) {
+        ImportStrategyDialog(
+            onDismiss = { showImportStrategyDialog = false; pendingImportUri = null },
+            onStrategy = { strategy ->
+                val uri = pendingImportUri
+                showImportStrategyDialog = false
+                pendingImportUri = null
+                if (uri != null) {
+                    scope.launch(Dispatchers.IO) {
+                        val count = noteVm.importFromUri(uri, strategy)
+                        withContext(Dispatchers.Main) {
+                            val msg = when {
+                                count < 0 -> "导入失败：文件格式错误"
+                                strategy == NoteViewModel.ImportStrategy.SKIP -> "导入完成：新增 $count 条（跳过已存在）"
+                                strategy == NoteViewModel.ImportStrategy.DUPLICATE -> "导入完成：新增 $count 条（作为副本）"
+                                else -> "导入完成：处理 $count 条（覆盖同 ID）"
+                            }
+                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun BackupExpandHeader(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    expanded: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Text(title, style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(start = 8.dp))
+        }
+        Icon(
+            imageVector = if (expanded) Icons.Filled.KeyboardArrowUp
+            else Icons.Filled.KeyboardArrowDown,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
+private fun BackupCheckboxRow(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable { onCheckedChange(!checked) }
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(title, style = MaterialTheme.typography.bodyLarge)
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(
+                    if (checked) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                )
+                .clickable { onCheckedChange(!checked) },
+            contentAlignment = Alignment.Center
+        ) {
+            if (checked) {
+                Icon(Icons.Filled.Check, contentDescription = null,
+                    tint = Color.White, modifier = Modifier.size(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun BackupActionButton(
+    text: String,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(
+                if (enabled) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+            )
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 10.dp)
+    ) {
+        Text(text, fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold, color = Color.White)
+    }
+}
+
+@Composable
+private fun ImportStrategyDialog(
+    onDismiss: () -> Unit,
+    onStrategy: (NoteViewModel.ImportStrategy) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("导入冲突处理") },
+        text = {
+            Column {
+                Text("检测到已存在的笔记时，如何处理？",
+                    style = MaterialTheme.typography.bodyMedium)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onStrategy(NoteViewModel.ImportStrategy.SKIP) }) {
+                Text("跳过已存在")
+            }
+        },
+        dismissButton = {
+            Column {
+                TextButton(onClick = { onStrategy(NoteViewModel.ImportStrategy.DUPLICATE) }) {
+                    Text("全部导入（允许重复）")
+                }
+                TextButton(onClick = { onStrategy(NoteViewModel.ImportStrategy.OVERWRITE) }) {
+                    Text("覆盖同 ID")
+                }
+            }
+        }
+    )
 }

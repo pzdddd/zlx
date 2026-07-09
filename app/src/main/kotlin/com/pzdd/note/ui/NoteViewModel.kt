@@ -1,6 +1,7 @@
 package com.pzdd.note.ui
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pzdd.note.data.Note
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 
 class NoteViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -257,5 +260,151 @@ class NoteViewModel(app: Application) : AndroidViewModel(app) {
         lines[index] = lines[target]
         lines[target] = tmp
         updateNoteContent(note, lines.joinToString("\n"))
+    }
+
+    // ==================== 备份导出 / 导入 ====================
+
+    /** 备份范围选项 */
+    enum class BackupScope { NORMAL, DEEP, FAVORITES }
+
+    /** 导入冲突处理策略 */
+    enum class ImportStrategy { SKIP, DUPLICATE, OVERWRITE }
+
+    /**
+     * 导出选中范围的笔记为 JSON 字符串。
+     */
+    fun exportToJson(scopes: Set<BackupScope>): String {
+        val notes = _notes.value
+        val filtered = notes.filter { note ->
+            scopes.any { scope ->
+                when (scope) {
+                    BackupScope.NORMAL -> note.mode == NoteMode.NORMAL.value
+                    BackupScope.DEEP -> note.mode == NoteMode.DEEP.value
+                    BackupScope.FAVORITES -> note.isFavorite
+                }
+            }
+        }
+        val arr = JSONArray()
+        filtered.forEach { n ->
+            arr.put(JSONObject().apply {
+                put("id", n.id)
+                put("title", n.title)
+                put("content", n.content)
+                put("isFavorite", n.isFavorite)
+                put("isPinned", n.isPinned)
+                put("mode", n.mode)
+                put("parentId", n.parentId)
+                put("createdAt", n.createdAt)
+                put("updatedAt", n.updatedAt)
+            })
+        }
+        val meta = JSONObject().apply {
+            put("app", "pznote")
+            put("version", 1)
+            put("exportedAt", System.currentTimeMillis())
+            put("count", filtered.size)
+            put("notes", arr)
+        }
+        return meta.toString(2)
+    }
+
+    /**
+     * 将导出的 JSON 写入指定 Uri（SAF）。
+     * 返回 true 表示成功。
+     */
+    fun writeBackupToUri(uri: Uri, scopes: Set<BackupScope>): Boolean {
+        return runCatching {
+            val json = exportToJson(scopes)
+            getApplication<Application>().contentResolver.openOutputStream(uri)?.use { out ->
+                out.write(json.toByteArray(Charsets.UTF_8))
+                out.flush()
+            }
+            true
+        }.getOrDefault(false)
+    }
+
+    /**
+     * 从指定 Uri（SAF）读取备份 JSON 并导入。
+     * @param strategy 冲突处理策略
+     * @return 导入的笔记数量，-1 表示解析失败
+     */
+    fun importFromUri(uri: Uri, strategy: ImportStrategy): Int {
+        return runCatching {
+            val jsonStr = getApplication<Application>().contentResolver
+                .openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
+                ?: return@runCatching -1
+
+            val root = JSONObject(jsonStr)
+            val arr = root.optJSONArray("notes") ?: return@runCatching -1
+
+            val imported = mutableListOf<Note>()
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i)
+                imported.add(
+                    Note(
+                        id = o.getLong("id"),
+                        title = o.optString("title"),
+                        content = o.optString("content"),
+                        isFavorite = o.optBoolean("isFavorite"),
+                        isPinned = o.optBoolean("isPinned", false),
+                        mode = o.optInt("mode", 0),
+                        parentId = o.optLong("parentId", -1L),
+                        createdAt = o.optLong("createdAt"),
+                        updatedAt = o.optLong("updatedAt")
+                    )
+                )
+            }
+
+            if (imported.isEmpty()) return@runCatching 0
+
+            val current = _notes.value.toMutableList()
+            val currentIds = current.map { it.id }.toMutableSet()
+            var addedCount = 0
+
+            imported.forEach { note ->
+                when {
+                    note.id !in currentIds -> {
+                        // 新笔记，直接添加
+                        current.add(note)
+                        currentIds.add(note.id)
+                        addedCount++
+                    }
+                    strategy == ImportStrategy.SKIP -> {
+                        // 跳过已存在的
+                    }
+                    strategy == ImportStrategy.DUPLICATE -> {
+                        // 作为副本导入，分配新 ID
+                        val newId = System.currentTimeMillis() + addedCount
+                        val newParentId = if (note.parentId != -1L) {
+                            // 查找同批次导入的父笔记是否有映射
+                            val parentOldIdx = imported.indexOfFirst { it.id == note.parentId }
+                            if (parentOldIdx != -1) {
+                                // 父笔记也在导入批次中，用父笔记的新 ID
+                                // 先查找父笔记是否已处理
+                                val parentNew = current.firstOrNull {
+                                    it.id == note.parentId + addedCount.toLong() ||
+                                    it.id == note.parentId
+                                }
+                                parentNew?.id ?: newId
+                            } else note.parentId
+                        } else -1L
+                        current.add(note.copy(id = newId, parentId = newParentId))
+                        addedCount++
+                    }
+                    strategy == ImportStrategy.OVERWRITE -> {
+                        // 覆盖同 ID 的笔记
+                        val idx = current.indexOfFirst { it.id == note.id }
+                        if (idx != -1) {
+                            current[idx] = note
+                            addedCount++
+                        }
+                    }
+                }
+            }
+
+            _notes.value = current
+            persist()
+            addedCount
+        }.getOrDefault(-1)
     }
 }

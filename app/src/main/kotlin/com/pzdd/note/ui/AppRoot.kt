@@ -172,7 +172,7 @@ private fun AppContent(
                 backdrop = backdrop,
                 onHideBottomBar = onHideBottomBar,
             )
-            2 -> SettingsPage(vm = settingsVm, paddingValues = paddingValues)
+            2 -> SettingsPage(vm = settingsVm, noteVm = noteVm, paddingValues = paddingValues)
         }
     }
 }
@@ -203,7 +203,7 @@ private fun AppContent(
     ) { page ->
         when (page) {
             0 -> HomePage(vm = noteVm, settingsVm = settingsVm, paddingValues = paddingValues)
-            2 -> SettingsPage(vm = settingsVm, paddingValues = paddingValues)
+            2 -> SettingsPage(vm = settingsVm, noteVm = noteVm, paddingValues = paddingValues)
         }
     }
 }

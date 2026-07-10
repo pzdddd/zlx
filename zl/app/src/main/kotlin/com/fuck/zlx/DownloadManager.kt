@@ -276,12 +276,10 @@ object DownloadManager {
                         taskDir.deleteRecursively()
                         
                         _tasks.update { list -> list.map { t -> if (t.id == task.id) t.copy(status = DownloadStatus.SUCCESS, progress = "下载完成，已存入相册/目录", outputPath = finalUriString, completedAt = System.currentTimeMillis()) else t } }
-                        saveTasksToDisk(context) 
-                        _tasks.update { list -> list.map { t -> if (t.id == task.id) t.copy(status = DownloadStatus.CANCELED, progress = "已取消") else t } }
-                        saveTasksToDisk(context) 
+                        saveTasksToDisk(context)
                     } else {
                         _tasks.update { list -> list.map { t -> if (t.id == task.id) t.copy(status = DownloadStatus.FAILED, progress = "合并 MP4 失败") else t } }
-                        saveTasksToDisk(context) 
+                        saveTasksToDisk(context)
                     }
                 }, null, null)
 

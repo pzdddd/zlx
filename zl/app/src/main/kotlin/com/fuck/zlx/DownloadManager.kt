@@ -35,7 +35,8 @@ data class DownloadTask(
     val fileName: String,
     val progress: String = "准备中...",
     val status: DownloadStatus = DownloadStatus.DOWNLOADING,
-    val outputPath: String
+    val outputPath: String,
+    val completedAt: Long = 0L  // 下载完成时间戳（毫秒），0表示未完成
 )
 
 enum class DownloadStatus { DOWNLOADING, SUCCESS, FAILED, CANCELED }
@@ -63,7 +64,6 @@ object DownloadManager {
                 // 如果 App 被强制关闭时正在下载，那么重新打开时状态应该变为“失败”
                 val status = if (statusStr == DownloadStatus.DOWNLOADING.name) DownloadStatus.FAILED else DownloadStatus.valueOf(statusStr)
                 val progress = if (status == DownloadStatus.FAILED && statusStr == DownloadStatus.DOWNLOADING.name) "应用被关闭，下载中断" else obj.getString("progress")
-                
                 val task = DownloadTask(
                     id = obj.getString("id"),
                     url = obj.getString("url"),
@@ -71,7 +71,8 @@ object DownloadManager {
                     fileName = obj.getString("fileName"),
                     progress = progress,
                     status = status,
-                    outputPath = obj.getString("outputPath")
+                    outputPath = obj.getString("outputPath"),
+                    completedAt = obj.optLong("completedAt", 0L)
                 )
                 loadedTasks.add(task)
             }
@@ -115,6 +116,7 @@ object DownloadManager {
                     put("progress", task.progress)
                     put("status", task.status.name)
                     put("outputPath", task.outputPath)
+                    put("completedAt", task.completedAt)
                 }
                 array.put(obj)
             }
@@ -273,9 +275,8 @@ object DownloadManager {
                         outputFile.delete() 
                         taskDir.deleteRecursively()
                         
-                        _tasks.update { list -> list.map { t -> if (t.id == task.id) t.copy(status = DownloadStatus.SUCCESS, progress = "下载完成，已存入相册/目录", outputPath = finalUriString) else t } }
+                        _tasks.update { list -> list.map { t -> if (t.id == task.id) t.copy(status = DownloadStatus.SUCCESS, progress = "下载完成，已存入相册/目录", outputPath = finalUriString, completedAt = System.currentTimeMillis()) else t } }
                         saveTasksToDisk(context) 
-                    } else if (ReturnCode.isCancel(session.returnCode)) {
                         _tasks.update { list -> list.map { t -> if (t.id == task.id) t.copy(status = DownloadStatus.CANCELED, progress = "已取消") else t } }
                         saveTasksToDisk(context) 
                     } else {

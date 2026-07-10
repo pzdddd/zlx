@@ -36,7 +36,6 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -93,7 +92,6 @@ data class SniffedItem(
     val m3u8Url: String,
     val thumbUrl: String,
     val isComplete: Boolean,
-    val timestamp: Long = System.currentTimeMillis(),
     val videoSize: String = "",
     val videoDuration: String = ""
 )
@@ -201,17 +199,17 @@ private object NoRippleIndication : IndicationNodeFactory {
 
 @Composable
 fun MainScreen() {
-    var currentRoute by remember { mutableStateOf(NavRoute.Home) }
-
     var sniffedResources by remember { mutableStateOf(listOf<SniffedItem>()) }
     val sniffedIds = remember { mutableSetOf<String>() }
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
     var playingVideoUrl by remember { mutableStateOf<String?>(null) }
 
-    // 资源页视图状态提升到 MainScreen 层级，防止切换页面时丢失
-    var resIsDescending by rememberSaveable { mutableStateOf(false) }
-    var resIsGridView by rememberSaveable { mutableStateOf(true) }
+    // 当前页面路由
+    var currentRoute by remember { mutableStateOf(NavRoute.Home) }
 
+    // 资源列表的排序与视图状态
+    var isDescending by remember { mutableStateOf(false) }
+    var isGridView by remember { mutableStateOf(false) }
     val jsInterface = remember {
         SniffJsInterface(
             onAdd = { id, url, thumbUrl, isComplete ->
@@ -584,10 +582,10 @@ fun MainScreen() {
                             sniffedIds.clear()
                         },
                         onPlayVideo = { playingVideoUrl = it },
-                        isDescending = resIsDescending,
-                        isGridView = resIsGridView,
-                        onDescendingChange = { resIsDescending = it },
-                        onGridViewChange = { resIsGridView = it }
+                        isDescending = isDescending,
+                        isGridView = isGridView,
+                        onDescendingChange = { isDescending = it },
+                        onGridViewChange = { isGridView = it }
                     )
                 }
             }

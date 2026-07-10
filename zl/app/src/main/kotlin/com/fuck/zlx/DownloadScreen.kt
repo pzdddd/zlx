@@ -66,10 +66,23 @@ fun DownloadScreen(onBack: () -> Unit) {
     val downloadingTasks by remember(tasks) { derivedStateOf { tasks.filter { it.status != DownloadStatus.SUCCESS } } }
     val completedTasks by remember(tasks) { derivedStateOf { tasks.filter { it.status == DownloadStatus.SUCCESS } } }
 
+    // 已完成列表的排序方式
+    var completedSortMode by remember { mutableStateOf(CompletedSortMode.BY_TIME_DESC) }
+    val sortedCompletedTasks by remember(completedTasks, completedSortMode) {
+        derivedStateOf {
+            when (completedSortMode) {
+                CompletedSortMode.BY_TIME_DESC -> completedTasks.sortedByDescending { it.completedAt }
+                CompletedSortMode.BY_TIME_ASC -> completedTasks.sortedBy { it.completedAt }
+                CompletedSortMode.BY_NAME_ASC -> completedTasks.sortedBy { it.fileName }
+                CompletedSortMode.BY_NAME_DESC -> completedTasks.sortedByDescending { it.fileName }
+            }
+        }
+    }
+    var showSortMenu by remember { mutableStateOf(false) }
+
     var currentTab by remember { mutableStateOf(0) }
     val tabs = listOf("正在下载", "已完成")
     val tabIcons = listOf(Icons.Default.Refresh, Icons.Default.CheckCircle)
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -160,25 +173,86 @@ fun DownloadScreen(onBack: () -> Unit) {
                             if (completedTasks.isEmpty()) {
                                 EmptyScreenHint("暂无已完成的任务", Icons.Default.CheckCircle)
                             } else {
-                                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp)) {
-                                    items(completedTasks, key = { it.id }) { task ->
-                                        DownloadTaskCard(task, context,
-                                            onClick = {
-                                                var exists = false
-                                                try {
-                                                    exists = if (task.outputPath.startsWith("content://")) {
-                                                        DocumentFile.fromSingleUri(context, Uri.parse(task.outputPath))?.exists() == true
-                                                    } else File(task.outputPath).exists()
-                                                } catch (_: Exception) {}
-                                                if (exists) {
-                                                    playVideo(context, task.outputPath, false)
-                                                } else {
-                                                    Toast.makeText(context, "视频文件已在外部被删除", Toast.LENGTH_SHORT).show()
-                                                    DownloadManager.deleteTask(context, task.id)
-                                                }
-                                            },
-                                            onLongClick = { showMenuFor = task }
+                                Column(Modifier.fillMaxSize()) {
+                                    // ==================== 排序按钮栏 ====================
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                                        horizontalArrangement = Arrangement.End,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "共${completedTasks.size}个视频",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = MaterialTheme.colorScheme.outline
                                         )
+                                        Spacer(Modifier.weight(1f))
+                                        Box {
+                                            TextButton(
+                                                onClick = { showSortMenu = true },
+                                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Sort,
+                                                    contentDescription = "排序",
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(Modifier.width(4.dp))
+                                                Text(
+                                                    text = completedSortMode.label,
+                                                    style = MaterialTheme.typography.labelMedium
+                                                )
+                                            }
+                                            DropdownMenu(
+                                                expanded = showSortMenu,
+                                                onDismissRequest = { showSortMenu = false }
+                                            ) {
+                                                CompletedSortMode.values().forEach { mode ->
+                                                    DropdownMenuItem(
+                                                        text = {
+                                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                                Text(mode.label)
+                                                                if (mode == completedSortMode) {
+                                                                    Spacer(Modifier.width(8.dp))
+                                                                    Icon(
+                                                                        Icons.Default.Check,
+                                                                        contentDescription = null,
+                                                                        modifier = Modifier.size(16.dp),
+                                                                        tint = MaterialTheme.colorScheme.primary
+                                                                    )
+                                                                }
+                                                            }
+                                                        },
+                                                        onClick = {
+                                                            completedSortMode = mode
+                                                            showSortMenu = false
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(vertical = 8.dp)) {
+                                        items(sortedCompletedTasks, key = { it.id }) { task ->
+                                            DownloadTaskCard(task, context,
+                                                onClick = {
+                                                    var exists = false
+                                                    try {
+                                                        exists = if (task.outputPath.startsWith("content://")) {
+                                                            DocumentFile.fromSingleUri(context, Uri.parse(task.outputPath))?.exists() == true
+                                                        } else File(task.outputPath).exists()
+                                                    } catch (_: Exception) {}
+                                                    if (exists) {
+                                                        playVideo(context, task.outputPath, false)
+                                                    } else {
+                                                        Toast.makeText(context, "视频文件已在外部被删除", Toast.LENGTH_SHORT).show()
+                                                        DownloadManager.deleteTask(context, task.id)
+                                                    }
+                                                },
+                                                onLongClick = { showMenuFor = task }
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -312,6 +386,14 @@ fun DownloadScreen(onBack: () -> Unit) {
 
 // ======================= 辅助组件 =======================
 
+// 已完成列表的排序方式
+enum class CompletedSortMode(val label: String) {
+    BY_TIME_DESC("时间↓"),
+    BY_TIME_ASC("时间↑"),
+    BY_NAME_ASC("名称A-Z"),
+    BY_NAME_DESC("名称Z-A")
+}
+
 @Composable
 private fun EmptyScreenHint(text: String, icon: ImageVector) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -393,6 +475,24 @@ private fun DownloadTaskCard(
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                             maxLines = 1
                         )
+                    }
+                    // 显示下载完成时间
+                    if (task.completedAt > 0L) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.DownloadDone,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.outline
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = "完成于 ${formatCompletedTime(task.completedAt)}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.outline,
+                                maxLines = 1
+                            )
+                        }
                     }
                 } else {
                     val statusColor = when (task.status) {
@@ -496,6 +596,17 @@ private fun getFileDate(context: Context, path: String): String {
     }
 }
 
+// 格式化下载完成时间
+private fun formatCompletedTime(timestamp: Long): String {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        sdf.format(Date(timestamp))
+    } catch (e: Exception) {
+        "未知时间"
+    }
+}
+
+// 核心播放/外调逻辑
 // 核心播放/外调逻辑
 private fun playVideo(context: Context, path: String, useChooser: Boolean) {
     try {

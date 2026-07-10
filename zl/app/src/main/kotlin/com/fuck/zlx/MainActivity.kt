@@ -36,6 +36,7 @@ import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,7 +92,10 @@ data class SniffedItem(
     val id: String,
     val m3u8Url: String,
     val thumbUrl: String,
-    val isComplete: Boolean
+    val isComplete: Boolean,
+    val timestamp: Long = System.currentTimeMillis(),
+    val videoSize: String = "",
+    val videoDuration: String = ""
 )
 
 class SniffJsInterface(
@@ -203,6 +207,10 @@ fun MainScreen() {
     val sniffedIds = remember { mutableSetOf<String>() }
     var webViewInstance by remember { mutableStateOf<WebView?>(null) }
     var playingVideoUrl by remember { mutableStateOf<String?>(null) }
+
+    // 资源页视图状态提升到 MainScreen 层级，防止切换页面时丢失
+    var resIsDescending by rememberSaveable { mutableStateOf(false) }
+    var resIsGridView by rememberSaveable { mutableStateOf(true) }
 
     val jsInterface = remember {
         SniffJsInterface(
@@ -575,7 +583,11 @@ fun MainScreen() {
                             sniffedResources = emptyList()
                             sniffedIds.clear()
                         },
-                        onPlayVideo = { playingVideoUrl = it }
+                        onPlayVideo = { playingVideoUrl = it },
+                        isDescending = resIsDescending,
+                        isGridView = resIsGridView,
+                        onDescendingChange = { resIsDescending = it },
+                        onGridViewChange = { resIsGridView = it }
                     )
                 }
             }

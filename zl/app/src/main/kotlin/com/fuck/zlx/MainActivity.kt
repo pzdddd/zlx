@@ -8,7 +8,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
@@ -109,9 +111,51 @@ class SniffJsInterface(
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.auto(
+                android.graphics.Color.TRANSPARENT,
+                android.graphics.Color.TRANSPARENT
+            )
+        )
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            val isDarkTheme = isSystemInDarkTheme()
+            val blueColorScheme = if (isDarkTheme) {
+                darkColorScheme(
+                    primary = Color(0xFF90CAF9),
+                    onPrimary = Color(0xFF000000),
+                    primaryContainer = Color(0xFF1976D2),
+                    onPrimaryContainer = Color(0xFFFFFFFF),
+                    secondary = Color(0xFF64B5F6),
+                    onSecondary = Color(0xFF000000),
+                    secondaryContainer = Color(0xFF1565C0),
+                    onSecondaryContainer = Color(0xFFFFFFFF),
+                    tertiary = Color(0xFF42A5F5),
+                    background = Color(0xFF121212),
+                    surface = Color(0xFF1E1E1E)
+                )
+            } else {
+                lightColorScheme(
+                    primary = Color(0xFF2196F3),
+                    onPrimary = Color(0xFFFFFFFF),
+                    primaryContainer = Color(0xFFBBDEFB),
+                    onPrimaryContainer = Color(0xFF0D47A1),
+                    secondary = Color(0xFF42A5F5),
+                    onSecondary = Color(0xFFFFFFFF),
+                    secondaryContainer = Color(0xFFE3F2FD),
+                    onSecondaryContainer = Color(0xFF0D47A1),
+                    tertiary = Color(0xFF64B5F6),
+                    background = Color(0xFFFAFAFA),
+                    surface = Color(0xFFFFFFFF)
+                )
+            }
+            MaterialTheme(
+                colorScheme = blueColorScheme
+            ) {
                 // 【修复闪退根因】：覆盖 LocalIndication，提供一个空的 IndicationNodeFactory。
                 // 项目中 com.google.android.material:material 间接拉入了旧的
                 // androidx.compose.material.ripple.PlatformRipple，它不是 IndicationNodeFactory，
@@ -269,10 +313,13 @@ fun MainScreen() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             // 底栏容器
             Box(
-                modifier = bottomBarPadding
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .then(bottomBarPadding)
                     .fillMaxWidth()
                     .height(72.dp)
                     .offset(y = bottomBarOffset),
@@ -486,10 +533,12 @@ fun MainScreen() {
             }
         }
     ) { paddingValues ->
-        // ======================= 修复闪烁的架构 =======================
-
         // 外层套一个普通的 Box 作为容器
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+        ) {
 
             // [第 1 层] WebView 独立放在最底层，绝对不参与 layerBackdrop 的实时捕获
             val homeOffset = if (currentRoute == NavRoute.Home) 0.dp else 10000.dp

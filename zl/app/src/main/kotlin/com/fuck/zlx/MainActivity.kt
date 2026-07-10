@@ -555,7 +555,7 @@ fun MainScreen() {
                     .fillMaxSize()
                     .offset(x = homeOffset)
                     .navigationBarsPadding()
-                    .padding(bottom = 21.dp)
+                    .padding(bottom = 11.dp)
             ) {
                 HomeWebViewScreen(onWebViewCreated = onWebViewCreated, jsInterface = jsInterface)
             }
@@ -565,7 +565,8 @@ fun MainScreen() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .navigationBarsPadding()
+                        .padding(bottom = 31.dp)
                         .background(MaterialTheme.colorScheme.background)
                 ) {
                     ResourcesScreen(
@@ -583,7 +584,8 @@ fun MainScreen() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .navigationBarsPadding()
+                        .padding(bottom = 31.dp)
                         .background(MaterialTheme.colorScheme.background)
                 ) {
                     SettingsScreen()

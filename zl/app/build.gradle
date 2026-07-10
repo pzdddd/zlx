@@ -33,9 +33,30 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            minifyEnabled false
+            // ===== 体积优化：开启代码压缩 + 资源压缩 =====
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            // debug 保持不变，方便开发调试
+            minifyEnabled false
+        }
+    }
+
+    // ===== 体积优化：按 ABI 拆分 APK，每个包只含对应架构的 native 库 =====
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a'
+            universalApk true  // 同时生成一个通用包（含所有架构）
+        }
+    }
+
+    // ===== 体积优化：Android 7+ 的 PNG 无损压缩（release 自动生效） =====
+    androidResources {
+        noCompress ''  // 防止某些已压缩资源被二次处理
     }
     buildFeatures {
         viewBinding true

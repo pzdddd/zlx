@@ -390,14 +390,22 @@ fun MainScreen() {
                                     onDrawSurface = { drawRect(containerColor) }
                                 )
                         )
-                    } else {
+                    } else if (isFloating) {
+                        // 悬浮底栏：不透明白色背景 + 圆角 + 阴影
+                        val containerColor = if (isDarkTheme) Color(0xFF1E1E1E) else Color(0xFFFFFFFF)
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(bottomBarShape)
-                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-                                .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), bottomBarShape)
-                                .shadow(if (isFloating) 0.dp else 8.dp)
+                                .background(containerColor)
+                        )
+                    } else {
+                        // 普通底栏：不透明白色背景
+                        val containerColor = if (isDarkTheme) Color(0xFF1E1E1E) else Color(0xFFFFFFFF)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(containerColor)
                         )
                     }
 
@@ -542,7 +550,13 @@ fun MainScreen() {
 
             // [第 1 层] WebView 独立放在最底层，绝对不参与 layerBackdrop 的实时捕获
             val homeOffset = if (currentRoute == NavRoute.Home) 0.dp else 10000.dp
-            Box(modifier = Modifier.fillMaxSize().offset(x = homeOffset)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset(x = homeOffset)
+                    .navigationBarsPadding()
+                    .padding(bottom = 21.dp)
+            ) {
                 HomeWebViewScreen(onWebViewCreated = onWebViewCreated, jsInterface = jsInterface)
             }
 

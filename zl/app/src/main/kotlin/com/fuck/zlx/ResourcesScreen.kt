@@ -248,6 +248,18 @@ fun ResourcesScreen(
                                         .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                                 )
 
+                                // 标题
+                                if (item.title.isNotEmpty()) {
+                                    Text(
+                                        text = item.title,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+
                                 Box(
                                     modifier = Modifier.fillMaxWidth().padding(8.dp),
                                     contentAlignment = Alignment.Center
@@ -331,6 +343,19 @@ fun ResourcesScreen(
                                     modifier = Modifier.weight(1f).fillMaxHeight(),
                                     verticalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
+                                    // 标题
+                                    if (item.title.isNotEmpty()) {
+                                        Text(
+                                            text = item.title,
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                    }
+
                                     // 链接信息
                                     Text(
                                         text = item.m3u8Url,

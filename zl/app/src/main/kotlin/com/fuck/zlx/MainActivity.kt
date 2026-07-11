@@ -93,16 +93,16 @@ data class SniffedItem(
     val thumbUrl: String,
     val isComplete: Boolean,
     val videoSize: String = "",
-    val videoDuration: String = ""
+    val videoDuration: String = "",
+    val title: String = ""
 )
-
 class SniffJsInterface(
-    private val onAdd: (String, String, String, Boolean) -> Unit,
+    private val onAdd: (String, String, String, Boolean, String) -> Unit,
     private val onUpdate: (String, String) -> Unit
 ) {
     @JavascriptInterface
-    fun onAddItem(id: String, url: String, thumbUrl: String, isComplete: Boolean) {
-        Handler(Looper.getMainLooper()).post { onAdd(id, url, thumbUrl, isComplete) }
+    fun onAddItem(id: String, url: String, thumbUrl: String, isComplete: Boolean, title: String) {
+        Handler(Looper.getMainLooper()).post { onAdd(id, url, thumbUrl, isComplete, title) }
     }
 
     @JavascriptInterface
@@ -212,10 +212,10 @@ fun MainScreen() {
     var isGridView by remember { mutableStateOf(false) }
     val jsInterface = remember {
         SniffJsInterface(
-            onAdd = { id, url, thumbUrl, isComplete ->
+            onAdd = { id, url, thumbUrl, isComplete, title ->
                 if (!sniffedIds.contains(id)) {
                     sniffedIds.add(id)
-                    sniffedResources = sniffedResources + SniffedItem(id, url, thumbUrl, isComplete)
+                    sniffedResources = sniffedResources + SniffedItem(id, url, thumbUrl, isComplete, title = title)
                 }
             },
             onUpdate = { id, realUrl ->

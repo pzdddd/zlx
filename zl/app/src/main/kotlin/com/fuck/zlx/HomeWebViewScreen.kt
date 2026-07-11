@@ -96,6 +96,32 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                         let foundThumbs = new Set();
                                         let resolvingLinks = new Set();
                                         let hashToItemId = new Map();
+                                        let hashToTitle = new Map();
+
+                                        // 扫描页面上的 list_item，建立 hash→标题 映射
+                                        function scanTitles() {
+                                            document.querySelectorAll('.list_item').forEach(function(item) {
+                                                var img = item.querySelector('img');
+                                                var imgSrc = '';
+                                                if (img) {
+                                                    imgSrc = img.getAttribute('data-src') || img.getAttribute('src') || '';
+                                                }
+                                                var hashMatch = imgSrc.match(/([a-f0-9]{16,})/i);
+                                                var titleEl = item.querySelector('.list_title');
+                                                var title = titleEl ? titleEl.textContent.trim() : '';
+                                                if (hashMatch && title) {
+                                                    hashToTitle.set(hashMatch[1].toLowerCase(), title);
+                                                }
+                                            });
+                                        }
+                                        scanTitles();
+                                        // 定期重新扫描，处理懒加载内容
+                                        setInterval(scanTitles, 3000);
+
+                                        function getTitleByHash(hash) {
+                                            if (!hash) return '';
+                                            return hashToTitle.get(hash.toLowerCase()) || '';
+                                        }
                                         
                                         function cleanUrl(raw) {
                                             if (!raw) return '';
@@ -108,6 +134,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                         function addM3u8Item(m3u8Url, thumbUrl, isComplete, hash) {
                                             const clean = cleanUrl(m3u8Url);
                                             if (!clean || foundM3u8.has(clean)) return null;
+                                            const title = getTitleByHash(hash);
                                             if (isComplete && hash && hashToItemId.has(hash)) {
                                                 const itemId = hashToItemId.get(hash);
                                                 foundM3u8.add(clean);
@@ -119,7 +146,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                             const itemId = 'item-' + Math.random().toString(36).substr(2, 9);
                                             if (!isComplete && hash) hashToItemId.set(hash, itemId);
                                             if(window.AndroidSniffer) {
-                                                window.AndroidSniffer.onAddItem(itemId, clean, thumbUrl || "", isComplete);
+                                                window.AndroidSniffer.onAddItem(itemId, clean, thumbUrl || "", isComplete, title);
                                             }
                                             return itemId;
                                         }
@@ -376,7 +403,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                 ?.replace("\\u003E", ">")
                                 ?.replace("\\u0026", "&")
                                 .orEmpty()
-                            sourceHtml = text.lines().take(150).joinToString("\n")
+                            sourceHtml = text
                             showSourceDialog = true
                         }
                     },
@@ -417,7 +444,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
         if (showSourceDialog) {
             AlertDialog(
                 onDismissRequest = { showSourceDialog = false },
-                title = { Text("网页源码 (前150行)") },
+                title = { Text("网页源码") },
                 text = {
                     Text(
                         text = sourceHtml.ifEmpty { "（空）" },

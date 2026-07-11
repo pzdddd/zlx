@@ -268,8 +268,8 @@ fun ResourcesScreen(
                                         onClick = {
                                             val useLocal = sharedPreferences.getBoolean("use_local_download", false)
                                             if (useLocal) {
-                                                val defaultName = "视频_${System.currentTimeMillis()}"
-                                                DownloadManager.startDownload(context, item.m3u8Url, item.thumbUrl, defaultName)
+                                                val videoName = item.title.ifBlank { "视频_${System.currentTimeMillis()}" }
+                                                DownloadManager.startDownload(context, item.m3u8Url, item.thumbUrl, videoName)
                                                 Toast.makeText(context, "已加入内置下载队列", Toast.LENGTH_SHORT).show()
                                             } else {
                                                 try {
@@ -402,8 +402,8 @@ fun ResourcesScreen(
                                         onClick = {
                                             val useLocal = sharedPreferences.getBoolean("use_local_download", false)
                                             if (useLocal) {
-                                                val defaultName = "视频_${System.currentTimeMillis()}"
-                                                DownloadManager.startDownload(context, item.m3u8Url, item.thumbUrl, defaultName)
+                                                val videoName = item.title.ifBlank { "视频_${System.currentTimeMillis()}" }
+                                                DownloadManager.startDownload(context, item.m3u8Url, item.thumbUrl, videoName)
                                                 Toast.makeText(context, "已加入内置下载队列", Toast.LENGTH_SHORT).show()
                                             } else {
                                                 try {

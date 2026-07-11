@@ -91,7 +91,10 @@ fun ResourcesScreen(
     // 播放器已提升到 MainActivity 顶层全屏渲染（共享 Activity 窗口，亮度手势才能生效），
     // 这里只需把点击事件回调上去即可。
     if (showDownloadManager) {
-        DownloadScreen(onBack = { showDownloadManager = false })
+        DownloadScreen(
+            onBack = { showDownloadManager = false },
+            onPlayVideo = onPlayVideo
+        )
         return
     }
 

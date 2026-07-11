@@ -52,7 +52,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
-fun DownloadScreen(onBack: () -> Unit) {
+fun DownloadScreen(onBack: () -> Unit, onPlayVideo: (String) -> Unit = {}) {
     val context = LocalContext.current
     val tasks by DownloadManager.tasks.collectAsState()
 
@@ -244,7 +244,20 @@ fun DownloadScreen(onBack: () -> Unit) {
                                                         } else File(task.outputPath).exists()
                                                     } catch (_: Exception) {}
                                                     if (exists) {
-                                                        playVideo(context, task.outputPath, false)
+                                                        val playUri = if (task.outputPath.startsWith("content://")) {
+                                                            task.outputPath
+                                                        } else {
+                                                            try {
+                                                                androidx.core.content.FileProvider.getUriForFile(
+                                                                    context,
+                                                                    "${context.packageName}.fileprovider",
+                                                                    File(task.outputPath)
+                                                                ).toString()
+                                                            } catch (_: Exception) {
+                                                                "file://${task.outputPath}"
+                                                            }
+                                                        }
+                                                        onPlayVideo(playUri)
                                                     } else {
                                                         Toast.makeText(context, "视频文件已在外部被删除", Toast.LENGTH_SHORT).show()
                                                         DownloadManager.deleteTask(context, task.id)

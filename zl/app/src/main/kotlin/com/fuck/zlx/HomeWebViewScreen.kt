@@ -8,16 +8,20 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment // 修复：补全了对齐包
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp // 修复：补全了尺寸包
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -32,6 +36,11 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
     var showChangeUrlDialog by remember { mutableStateOf(false) }
     var inputUrlText by remember { mutableStateOf(currentUrl) }
     var showMenu by remember { mutableStateOf(false) }
+
+
+    // 网页源码相关状态
+    var showSourceDialog by remember { mutableStateOf(false) }
+    var sourceHtml by remember { mutableStateOf("") }
 
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val isLazyLoad = prefs.getBoolean("lazy_load_video", true)
@@ -321,6 +330,58 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                     },
                     leadingIcon = { Icon(Icons.Filled.MoreVert, contentDescription = null) }
                 )
+                // 获取网页源码
+                DropdownMenuItem(
+                    text = { Text("获取网页源码") },
+                    onClick = {
+                        showMenu = false
+                        webViewInstance?.evaluateJavascript(
+                            """
+                            (function(){
+                                var c=document.documentElement.cloneNode(true);
+                                c.querySelectorAll('head,style,script,noscript').forEach(function(e){e.remove()});
+                                var result=[];
+                                // 遍历每个 list_item（包含图片和标题的卡片）
+                                var items=c.querySelectorAll('.list_item');
+                                items.forEach(function(item){
+                                    // 提取 data-src 中的真实图片链接（排除 loading.png）
+                                    var img=item.querySelector('img');
+                                    var imgSrc='';
+                                    if(img){
+                                        imgSrc=img.getAttribute('data-src')||img.getAttribute('src')||'';
+                                        if(imgSrc.indexOf('loading.png')>=0) imgSrc=img.getAttribute('data-src')||'';
+                                    }
+                                    // 提取标题文本
+                                    var titleEl=item.querySelector('.list_title');
+                                    var title=titleEl?titleEl.textContent.trim():'';
+                                    // 提取链接
+                                    var href=item.getAttribute('href')||'';
+                                    if(href&&href.indexOf('http')!==0) href='https://www.zl-x.com'+href;
+                                    if(imgSrc&&imgSrc.indexOf('http')!==0) imgSrc='https://www.zl-x.com'+imgSrc;
+                                    result.push('[图片] '+imgSrc);
+                                    result.push('[标题] '+title);
+                                    result.push('[链接] '+href);
+                                    result.push('');
+                                });
+                                return result.join('\n');
+                            })();
+                            """.trimIndent()
+                        ) { rawResult ->
+                            val text = rawResult
+                                ?.removeSurrounding("\"")
+                                ?.replace("\\\"", "\"")
+                                ?.replace("\\/", "/")
+                                ?.replace("\\n", "\n")
+                                ?.replace("\\u003C", "<")
+                                ?.replace("\\u003E", ">")
+                                ?.replace("\\u0026", "&")
+                                .orEmpty()
+                            sourceHtml = text.lines().take(150).joinToString("\n")
+                            showSourceDialog = true
+                        }
+                    },
+                    leadingIcon = { Icon(Icons.Filled.Code, contentDescription = null) }
+                )
             }
         }
 
@@ -348,6 +409,26 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                 },
                 dismissButton = {
                     TextButton(onClick = { showChangeUrlDialog = false }) { Text("取消") }
+                }
+            )
+        }
+
+        // 网页源码弹窗
+        if (showSourceDialog) {
+            AlertDialog(
+                onDismissRequest = { showSourceDialog = false },
+                title = { Text("网页源码 (前150行)") },
+                text = {
+                    Text(
+                        text = sourceHtml.ifEmpty { "（空）" },
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { showSourceDialog = false }) { Text("关闭") }
                 }
             )
         }

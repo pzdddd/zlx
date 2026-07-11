@@ -1,0 +1,45 @@
+    val context = LocalContext.current
+    val notes by vm.notes.collectAsState()
+    var showAdd by remember { mutableStateOf(false) }
+    var editingNote by remember { mutableStateOf<Note?>(null) }
+    var actionNote by remember { mutableStateOf<Note?>(null) }
+
+    // 顶部 Tab：0 = 普通模式，1 = 深度模式
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val tabs = listOf("普通模式", "深度模式")
+
+    // 滚动状态：检测滚动方向以驱动悬浮底栏的显示/隐藏
+    val listState = rememberLazyListState()
+    LaunchedEffect(listState) {
+        var prevIndex = listState.firstVisibleItemIndex
+        var prevOffset = listState.firstVisibleItemScrollOffset
+        snapshotFlow {
+            listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
+        }.collect { (index, offset) ->
+            // 只在有笔记时才检测滚动方向
+            if (notes.isNotEmpty()) {
+                val isScrollingUp = when {
+                    index > prevIndex -> true
+                    index < prevIndex -> false
+                    else -> offset > prevOffset  // 同一 item 内，offset 增大 = 向上滚动
+                }
+                onScrollDirectionChanged(isScrollingUp)
+            }
+            prevIndex = index
+            prevOffset = offset
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        // 顶部双文字 Tab
+        ModeTabRow(
+            tabs = tabs,
+            selectedIndex = selectedTab,
+            onTabSelected = { selectedTab = it }
+        )
+
+        Box(modifier = Modifier.fillMaxSize()) {

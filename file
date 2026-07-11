@@ -1,0 +1,120 @@
+@Composable
+private fun StandardBottomBar(
+    selected: Int,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+                // 深度模式：可拖动排序的父笔记列表
+                var deepDragIndex by remember { mutableIntStateOf(-1) }
+                var deepDragOffset by remember { mutableStateOf(0f) }
+                // 每个卡片大致高度（含间距），用于计算交换阈值
+                val cardHeightPx = with(LocalDensity.current) { (90.dp).toPx() }
+                val swapThreshold = cardHeightPx * 0.5f
+                val edgeScrollThreshold = with(LocalDensity.current) { (60.dp).toPx() }
+                val listHeightPx = with(LocalDensity.current) {
+                    LocalConfiguration.current.screenHeightDp.dp.toPx()
+                }
+                var autoScrollJob by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
+                val coroutineScope = rememberCoroutineScope()
+
+                LazyColumn(
+                    state = deepListState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    itemsIndexed(notes, key = { _, n -> n.id }) { index, parentNote ->
+                        val isDragging = deepDragIndex == index
+                        DeepParentCard(
+                            parentNote = parentNote,
+                            children = modeNotes.filter { it.parentId == parentNote.id },
+                            isDragging = isDragging,
+                            dragOffset = if (isDragging) deepDragOffset else 0f,
+                            modifier = if (deepDragIndex == -1) {
+                                Modifier.animateItem()
+                            } else if (isDragging) {
+                                Modifier
+                            } else {
+                                Modifier.animateItem()
+                            },
+                            onDragStart = {
+                                deepDragIndex = index
+                                deepDragOffset = 0f
+                            },
+                            onDragMove = { dragAmount ->
+                                // 锁定横向：仅累加 Y 轴
+                                deepDragOffset += dragAmount
+                                // 边缘自动滚动检测
+                                val draggedItemTop = with(deepListState) {
+                                    layoutInfo.visibleItemsInfo.find { it.index == index }?.top ?: 0
+                                } + deepDragOffset
+                                val draggedItemBottom = draggedItemTop + cardHeightPx
+                                val viewportStart = deepListState.layoutInfo.viewportStartOffset
+                                val viewportEnd = deepListState.layoutInfo.viewportEndOffset
+                                when {
+                                    draggedItemTop < viewportStart + edgeScrollThreshold -> {
+                                        if (autoScrollJob == null) {
+                                            autoScrollJob = coroutineScope.launch {
+                                                while (true) {
+                                                    deepListState.scrollBy(-cardHeightPx * 0.15f)
+                                                    delay(16)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    draggedItemBottom > viewportEnd - edgeScrollThreshold -> {
+                                        if (autoScrollJob == null) {
+                                            autoScrollJob = coroutineScope.launch {
+                                                while (true) {
+                                                    deepListState.scrollBy(cardHeightPx * 0.15f)
+                                                    delay(16)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else -> {
+                                        autoScrollJob?.cancel()
+                                        autoScrollJob = null
+                                    }
+                                }
+                                // 向下拖拽：累计偏移超过半张卡片高度时与下一项交换
+                                if (deepDragOffset > swapThreshold && index < notes.lastIndex) {
+                                    vm.reorderDeepParents(parentNote.id, notes[index + 1].id)
+                                    deepDragIndex = index + 1
+                                    deepDragOffset -= swapThreshold
+                                } else if (deepDragOffset < -swapThreshold && index > 0) {
+                                    vm.reorderDeepParents(parentNote.id, notes[index - 1].id)
+                                    deepDragIndex = index - 1
+                                    deepDragOffset += swapThreshold
+                                }
+                            },
+                            onDragEnd = {
+                                autoScrollJob?.cancel()
+                                autoScrollJob = null
+                                deepDragIndex = -1
+                                deepDragOffset = 0f
+                            },
+                            onToggleFavorite = { vm.toggleFavorite(parentNote) },
+                            onDelete = {
+                                vm.deleteNote(parentNote)
+                                Toast.makeText(context, "已删除", Toast.LENGTH_SHORT).show()
+                            },
+                            onRename = { newTitle -> vm.updateNoteTitle(parentNote, newTitle) },
+                            onAddChild = { title, content ->
+                                vm.addNote(title, content, NoteMode.DEEP, parentId = parentNote.id)
+                            },
+                            onUpdateChild = { child, title, content ->
+                                vm.updateNote(child, title, content)
+                            },
+                            onDeleteChild = { child -> vm.deleteNote(child) },
+                            onCopyChild = { text ->
+                                copyToClipboard(context, "内容", text)
+                                Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
+                            },
+                            onReorderChild = { fromId, toId ->
+                                vm.reorderChildren(parentNote.id, fromId, toId)
+                            }
+                        )
+                    }
+                }
+        colors = CardDefaults.cardColors(containerColor = Color.White),

@@ -385,13 +385,37 @@ fun DownloadScreen(onBack: () -> Unit, onPlayVideo: (String) -> Unit = {}) {
             dismissButton = { TextButton(onClick = { showRenameDialog = null }) { Text("取消") } }
         )
     }
-
     // ==================== 详细信息对话框 ====================
     showDetailsFor?.let { task ->
+        var detailText by remember(task.id) { mutableStateOf("加载中...") }
+        LaunchedEffect(task) {
+            withContext(Dispatchers.IO) {
+                detailText = getFileDetails(context, task)
+            }
+        }
         AlertDialog(
             onDismissRequest = { showDetailsFor = null },
             title = { Text("详细信息") },
-            text = { Text(getFileDetails(context, task.outputPath), style = MaterialTheme.typography.bodyMedium) },
+            text = {
+                Column {
+                    val parts = detailText.split("\n\n")
+                    parts.forEachIndexed { index, part ->
+                        if (part.startsWith("文件路径：")) {
+                            Text(
+                                text = part,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.outline
+                            )
+                        } else {
+                            Text(
+                                text = part,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        if (index < parts.lastIndex) Spacer(Modifier.height(8.dp))
+                    }
+                }
+            },
             confirmButton = { TextButton(onClick = { showDetailsFor = null }) { Text("我知道了") } }
         )
     }
@@ -542,34 +566,30 @@ fun MenuItemRow(icon: ImageVector, text: String, color: Color = MaterialTheme.co
 }
 // ======================= 核心业务方法 =======================
 private fun getVideoDuration(context: Context, path: String): String {
-    try {
-        if (path.startsWith("content://")) {
-            val docFile = DocumentFile.fromSingleUri(context, Uri.parse(path))
-            if (docFile == null || !docFile.exists()) return "未知时长"
-        } else {
-            val file = File(path)
-            if (!file.exists() || file.length() == 0L) return "未知时长"
-        }
-    } catch (e: Exception) {
-        return "未知时长"
-    }
     return try {
         val retriever = MediaMetadataRetriever()
         if (path.startsWith("content://")) {
             retriever.setDataSource(context, Uri.parse(path))
         } else {
+            val file = File(path)
+            if (!file.exists() || file.length() == 0L) {
+                retriever.release()
+                return "未知时长"
+            }
             retriever.setDataSource(path)
         }
         val timeMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
         retriever.release()
-        
+
         if (timeMs == 0L) return "未知时长"
         val totalSeconds = timeMs / 1000
-        val minutes = totalSeconds / 60
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
         val seconds = totalSeconds % 60
-        String.format("%02d:%02d", minutes, seconds)
-    } catch (e: Exception) {
-        "00:00"
+        if (hours > 0) String.format("%d:%02d:%02d", hours, minutes, seconds)
+        else String.format("%02d:%02d", minutes, seconds)
+    } catch (_: Exception) {
+        "未知时长"
     }
 }
 
@@ -675,19 +695,79 @@ private fun shareOrMoveVideo(context: Context, path: String) {
 }
 
 // 获取文件大小与详情
-private fun getFileDetails(context: Context, path: String): String {
+private fun getFileDetails(context: Context, task: DownloadTask): String {
+    val path = task.outputPath
+    val sb = StringBuilder()
+
+    // 文件名称
+    val displayName = task.fileName.ifBlank { "未知名称" }
+    sb.append("文件名称：$displayName.mp4\n\n")
+
+    // 视频时长
+    sb.append("视频时长：${getVideoDuration(context, path)}\n\n")
+
+    // 文件大小
+    sb.append("文件大小：${getFileSizeStr(context, path)}\n\n")
+
+    // 下载完成时间
+    if (task.completedAt > 0L) {
+        sb.append("下载时间：${formatCompletedTime(task.completedAt)}\n\n")
+    } else {
+        sb.append("下载时间：未知\n\n")
+    }
+
+    // 文件路径：将 content:// SAF URI 转为人类可读路径
+    val displayPath = readablePath(context, path)
+    sb.append("文件路径：\n$displayPath")
+
+    return sb.toString()
+}
+
+/**
+ * 将 content:// SAF URI 或编码路径转为人类可读的存储路径。
+ */
+private fun readablePath(context: Context, path: String): String {
+    if (!path.startsWith("content://")) return path
     return try {
-        var size = 0L
-        if (path.startsWith("content://")) {
-            val uri = Uri.parse(path)
-            val doc = DocumentFile.fromSingleUri(context, uri)
-            size = doc?.length() ?: 0L
-        } else {
-            size = File(path).length()
+        val uri = Uri.parse(path)
+        val fullUri = uri.toString()
+
+        // 先尝试从 DocumentFile 获取真实文件名
+        var fileName: String? = null
+        try {
+            val docFile = DocumentFile.fromSingleUri(context, uri)
+            fileName = docFile?.name
+        } catch (_: Exception) {}
+
+        // 提取 /tree/ 后面的部分（目录）
+        val treePart = fullUri.substringAfter("/tree/", "").substringBefore("/document/")
+        val decodedTree = Uri.decode(treePart).removePrefix("primary:")
+
+        // 提取 /document/ 后面的部分
+        val docPart = fullUri.substringAfter("/document/", "")
+        val decodedDoc = Uri.decode(docPart)
+
+        // 去掉 "primary:" 前缀
+        val relativeDoc = decodedDoc.removePrefix("primary:")
+
+        when {
+            // 如果 document 部分有完整相对路径（最常见）
+            relativeDoc.isNotEmpty() && relativeDoc != decodedDoc -> {
+                "/storage/emulated/0/$relativeDoc"
+            }
+            // document 部分只有文件名，拼接 tree 目录
+            decodedTree.isNotEmpty() -> {
+                val name = fileName ?: decodedDoc.substringAfterLast(":")
+                "/storage/emulated/0/$decodedTree/$name"
+            }
+            // 有文件名但无目录信息
+            !fileName.isNullOrEmpty() -> {
+                "/storage/emulated/0/$fileName"
+            }
+            // 兜底：返回完整解码 URI
+            else -> Uri.decode(fullUri)
         }
-        val sizeStr = Formatter.formatFileSize(context, size)
-        "文件路径：\n$path\n\n文件大小：$sizeStr"
-    } catch (e: Exception) {
-        "无法获取文件信息"
+    } catch (_: Exception) {
+        Uri.decode(path)
     }
 }

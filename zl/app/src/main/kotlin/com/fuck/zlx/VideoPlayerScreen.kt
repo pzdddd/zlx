@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.pm.ActivityInfo
 import android.media.AudioManager
+import android.os.Build
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
@@ -76,6 +77,11 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
 
 private enum class DragMode { SEEK, BRIGHTNESS, VOLUME }
 
@@ -123,10 +129,23 @@ fun VideoPlayerScreen(url: String, onClose: () -> Unit) {
 
     val accent = MaterialTheme.colorScheme.primary
 
-    // ============ 屏幕常亮 ============
+    // ============ 屏幕常亮 + 沉浸式模式（隐藏状态栏和导航栏）============
     DisposableEffect(player) {
         view.keepScreenOn = true
-        onDispose { view.keepScreenOn = false }
+        // 进入播放器时隐藏系统状态栏和导航栏
+        activity?.window?.let { window ->
+            WindowInsetsControllerCompat(window, view).let { controller ->
+                controller.hide(WindowInsetsCompat.Type.systemBars())
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        }
+        onDispose {
+            view.keepScreenOn = false
+            // 退出播放器时恢复系统状态栏和导航栏
+            activity?.window?.let { window ->
+                WindowInsetsControllerCompat(window, view).show(WindowInsetsCompat.Type.systemBars())
+            }
+        }
     }
 
     // ============ 监听播放器 ============
@@ -183,6 +202,18 @@ fun VideoPlayerScreen(url: String, onClose: () -> Unit) {
             delay(700)
             fastHint = null
         }
+    }
+
+    // ============ 后台自动暂停 ============
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                player.pause()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     // ============ 释放资源 ============

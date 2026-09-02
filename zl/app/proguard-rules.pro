@@ -59,3 +59,7 @@
 # ===== 移除注解（减少体积） =====
 # 注意：保留 Compose 和 Kotlin 需要的注解
 -keepattributes RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations,RuntimeVisibleTypeAnnotations
+# ===== WebView JS 桥：必须保留 @JavascriptInterface 方法（嗅探核心），否则 release 下网页嗅探失效 =====
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}

@@ -185,8 +185,15 @@ class MainActivity : ComponentActivity() {
                         }
                         LaunchedEffect(activated) {
                             ActivationManager.refreshNetworkTime(this@MainActivity)
+                            ActivationManager.refreshCloudAuth(this@MainActivity)
+                            var tick = 0
                             while (activated) {
                                 kotlinx.coroutines.delay(30_000)
+                                tick++
+                                if (tick % 10 == 0) {
+                                    // 每5分钟刷新一次云端授权（吊销/到期即时生效）
+                                    ActivationManager.refreshCloudAuth(this@MainActivity)
+                                }
                                 if (!ActivationManager.checkValid(this@MainActivity)) {
                                     activated = false
                                 }

@@ -58,7 +58,6 @@ object ActivationManager {
     private const val HOUR_MS = 3600_000L
     private const val MAX_HOURS = 46655          // "ZZZ" 36进制上限 ≈ 5.3 年
     private const val CLOUD_FRESH_MS = 3L * 24 * 3600 * 1000 // 3天内取到过云端即视为有效来源
-    private const val ROLLBACK_MS = 15L * 60 * 1000           // 回拨超过15分钟视为作弊
 
     /** 期望的 APK 签名证书 SHA-256（防二次打包：破解者改代码后必须重签名，指纹改变即拒绝运行） */
     private const val EXPECTED_SIG = "53FE53289AE267EB0E8150602BAC687B687B2A0F9CCAC170E3613E04DEBB61DD"
@@ -282,7 +281,6 @@ object ActivationManager {
 
         val nowAdj = calibratedNow(context)
         val lastSeen = prefs.getLong(KEY_LAST_SEEN, 0L)
-        if (lastSeen > 0 && nowAdj < lastSeen - ROLLBACK_MS) return false // 时间回拨作弊
         val effective = maxOf(nowAdj, lastSeen)
         if (nowAdj - lastSeen > 60L * 60 * 1000) {
             prefs.edit().putLong(KEY_LAST_SEEN, nowAdj).apply()
@@ -349,9 +347,6 @@ object ActivationManager {
                 }
             }
         }
-        if (lastSeen > 0 && calibratedNow(context) < lastSeen - ROLLBACK_MS) {
-            return "检测到系统时间被回拨，请校准时间后重试"
-        }
         val effective = effectiveNow(context, lastSeen)
         if (hours > 0 && effective - activatedAt > hours * HOUR_MS) return "激活已到期，请重新获取激活码"
 
@@ -386,11 +381,14 @@ object ActivationManager {
 fun ActivationScreen(onActivated: () -> Unit) {
     val context = LocalContext.current
     val deviceCode = remember { ActivationManager.deviceCode(context) }
-    val failReason = remember { ActivationManager.invalidReason(context) }
     var input by remember { mutableStateOf("") }
     var error by remember { mutableStateOf(false) }
-    // 进入激活界面时也拉一次云端（可能已获云端授权）
-    LaunchedEffect(Unit) { ActivationManager.refreshCloudAuth(context) }
+    // 进入激活界面时拉取网络时间与云端授权；若发放者已远程授权则直接进入应用
+    LaunchedEffect(Unit) {
+        ActivationManager.refreshNetworkTime(context)
+        ActivationManager.refreshCloudAuth(context)
+        if (ActivationManager.checkValid(context)) onActivated()
+    }
 
     Box(
         modifier = Modifier
@@ -400,18 +398,7 @@ fun ActivationScreen(onActivated: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("zlx", fontSize = 42.sp, fontWeight = FontWeight.Black,
-                color = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.height(6.dp))
-            Text("视频嗅探浏览器", fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(28.dp))
 
-            if (failReason != null) {
-                Text(failReason, fontSize = 13.sp, fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.error)
-                Spacer(modifier = Modifier.height(16.dp))
-            }
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
@@ -433,8 +420,6 @@ fun ActivationScreen(onActivated: () -> Unit) {
                                 modifier = Modifier.size(18.dp))
                         }
                     }
-                    Text("把设备码发给发放者获取激活码", fontSize = 12.sp, textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
 
@@ -446,7 +431,7 @@ fun ActivationScreen(onActivated: () -> Unit) {
                     input = it.take(13)
                     error = false
                 },
-                label = { Text("激活码（如 A1B2-C3D4-0A9）") },
+                label = { Text("激活码") },
                 isError = error,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(autoCorrect = false,
@@ -477,12 +462,6 @@ fun ActivationScreen(onActivated: () -> Unit) {
                 Text("激活", fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                "激活码与设备绑定，一码一机，时长由激活码决定。\n到期或更换设备需重新获取。",
-                fontSize = 12.sp, textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }

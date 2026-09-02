@@ -289,6 +289,24 @@ fun MainScreen() {
         }
     }
 
+    // ======================= 网页生命周期优化 =======================
+    // 网页不在眼前（切到资源/设置页、或正在播放视频）时彻底停下它：
+    // INVISIBLE 跳过绘制 + onPause/pauseTimers 停渲染和 JS 动画定时器。
+    // 否则网页里的动画广告会带着整个应用满帧率持续重绘（实测约120fps），又卡又耗电。
+    val isPlayingVideo = playingVideoUrl != null
+    LaunchedEffect(webViewInstance, currentRoute, isPlayingVideo) {
+        val webView = webViewInstance ?: return@LaunchedEffect
+        if (currentRoute == NavRoute.Home && !isPlayingVideo) {
+            webView.visibility = android.view.View.VISIBLE
+            webView.onResume()
+            webView.resumeTimers()
+        } else {
+            webView.visibility = android.view.View.INVISIBLE
+            webView.onPause()
+            webView.pauseTimers()
+        }
+    }
+
     LaunchedEffect(webViewInstance) {
         webViewInstance?.let { webView ->
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -366,9 +384,7 @@ fun MainScreen() {
                 HomeWebViewScreen(onWebViewCreated = onWebViewCreated, jsInterface = jsInterface)
             }
 
-            // [第 2 层] Resources 和 Settings 页面：整体挂 layerBackdrop 登记为底栏毛玻璃的捕获源
-            // （参考 MyDia 的写法：内容层做 backdrop 源，底栏在内容层外用 drawBackdrop 读取，不嵌套不崩）
-            // WebView 仍放在该层之外，不参与捕获（避免网页滚动时反复重绘捕获层）
+            // [第 2 层] 资源/设置页面：整体挂 layerBackdrop 登记为底栏毛玻璃的捕获源
             Box(
                 modifier = Modifier
                     .fillMaxSize()

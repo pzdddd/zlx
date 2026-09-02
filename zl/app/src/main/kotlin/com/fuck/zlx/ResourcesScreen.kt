@@ -8,7 +8,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -43,7 +42,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -98,6 +96,8 @@ object ThumbAspectCache {
  * 自适应封面图：图片加载完成后按真实宽高比调整占位框，
  * 保证整张图完整显示且撑满给定宽度/高度，既不裁切也不留大空白。
  * 已知比例直接从 [ThumbAspectCache] 读取，避免回滚时高度跳变。
+ * 注意：使用 model 型 AsyncImage（同观看历史页）。此前 rememberAsyncImagePainter +
+ * Image(painter) 的写法配合 layerBackdrop 会引发每帧重绘死循环（120fps 持续渲染）。
  */
 @Composable
 fun AutoFitAsyncImage(
@@ -106,31 +106,24 @@ fun AutoFitAsyncImage(
     modifier: Modifier = Modifier,
     defaultAspect: Float = 3f / 4f
 ) {
-    // 空地址直接给固定占位，不创建 painter（避免无效请求反复触发状态变化）
+    // 空地址直接给固定占位，不创建图片请求
     if (url.isBlank()) {
         Box(modifier = modifier.aspectRatio(defaultAspect))
         return
     }
     var aspect by remember(url) { mutableStateOf(ThumbAspectCache.get(url) ?: defaultAspect) }
-    val painter = rememberAsyncImagePainter(url)
-    // 注意：不能用 LaunchedEffect(painter.state) —— 在组合期读取 painter.state 会订阅重组，
-    // 状态变化→重组→painter 重启→状态再变化，形成每帧重绘循环，直接打断列表惯性滚动。
-    // snapshotFlow 在协程里观察状态，不参与重组订阅。
-    LaunchedEffect(painter) {
-        snapshotFlow { painter.state }.collect {
-            val s = painter.intrinsicSize
-            if (s.width > 0f && s.height > 0f) {
-                val real = (s.width / s.height).coerceIn(0.5f, 2.5f)
+    AsyncImage(
+        model = url,
+        contentDescription = contentDescription,
+        contentScale = ContentScale.Fit,
+        onSuccess = { state ->
+            val d = state.result.drawable
+            if (d.intrinsicWidth > 0 && d.intrinsicHeight > 0) {
+                val real = (d.intrinsicWidth.toFloat() / d.intrinsicHeight).coerceIn(0.5f, 2.5f)
                 ThumbAspectCache.put(url, real)
                 if (real != aspect) aspect = real
             }
-        }
-    }
-    // 该项目依赖的 coil 版本没有 AsyncImage(painter=...) 重载，直接用原生 Image 渲染
-    Image(
-        painter = painter,
-        contentDescription = contentDescription,
-        contentScale = ContentScale.Fit,
+        },
         modifier = modifier.aspectRatio(aspect)
     )
 }

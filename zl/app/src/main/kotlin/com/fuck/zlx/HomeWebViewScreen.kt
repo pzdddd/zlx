@@ -297,7 +297,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                             return origFetch.apply(this, args).then(resp => {
                                                 const clone = resp.clone();
                                                 clone.text().then(text => {
-                                                    if (!text) return;
+                                                    if (!text || text.length > 1048576) return;
                                                     (text.match(/https?:\/\/[^\s"'>]+(thumbnails|poster2)\.jpg/gi) || []).forEach(handlePosterUrl);
                                                     (text.match(/https?:\/\/[^\s"'>]+index\d*\.png/gi) || []).forEach(handlePngUrl);
                                                     (text.match(/https?:\/\/video\.zl-x\.xyz\/try\/[a-f0-9]{16,}\.m3u8\?[^\s"'>]*/gi) || []).forEach(u => {
@@ -319,7 +319,7 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                             const url = args[1] || '';
                                             checkUrlForLinks(url);
                                             this.addEventListener('load', () => {
-                                                if (this.responseText) {
+                                                if (this.responseText && this.responseText.length <= 1048576) {
                                                     const text = this.responseText;
                                                     (text.match(/https?:\/\/[^\s"'>]+(thumbnails|poster2)\.jpg/gi) || []).forEach(handlePosterUrl);
                                                     (text.match(/https?:\/\/[^\s"'>]+index\d*\.png/gi) || []).forEach(handlePngUrl);
@@ -348,20 +348,28 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                                         var lazyLoadEnabled = $isLazyLoad;
                                         var lazyLoadEnabled = $isLazyLoad;
                                         if (!lazyLoadEnabled) {
+                                            var lazyForceDone = false;
                                             setInterval(function() {
+                                                if (lazyForceDone) return;
+                                                var changed = false;
                                                 document.querySelectorAll('[loading="lazy"]').forEach(function(el) {
-                                                    el.setAttribute('loading', 'eager');
+                                                    el.setAttribute('loading', 'eager'); changed = true;
                                                 });
                                                 var mediaElements = document.querySelectorAll('img, video, source');
                                                 mediaElements.forEach(function(el) {
                                                     for (var key in el.dataset) {
                                                         var val = el.dataset[key];
                                                         if (val && typeof val === 'string' && (val.indexOf('http') === 0 || val.indexOf('//') === 0)) {
-                                                            if (el.src !== val) el.src = val; 
+                                                            if (el.src !== val) { el.src = val; changed = true; }
                                                         }
                                                     }
                                                 });
-                                                window.dispatchEvent(new Event('scroll'));
+                                                if (changed) {
+                                                    window.dispatchEvent(new Event('scroll'));
+                                                } else {
+                                                    // 本页已无待强制加载的内容，停手，避免持续骚扰页面造成滑动卡顿
+                                                    lazyForceDone = true;
+                                                }
                                             }, 2000);
                                         }
                                     })();

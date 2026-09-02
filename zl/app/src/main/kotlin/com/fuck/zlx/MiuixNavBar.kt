@@ -1,0 +1,364 @@
+package com.fuck.zlx
+
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kyant.backdrop.backdrops.LayerBackdrop
+import com.kyant.backdrop.drawBackdrop
+import com.kyant.backdrop.effects.blur
+import com.kyant.backdrop.effects.lens
+import com.kyant.backdrop.highlight.Highlight
+import com.kyant.backdrop.shadow.InnerShadow
+import com.kyant.backdrop.shadow.Shadow
+import com.kyant.shapes.Capsule
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.roundToInt
+
+/**
+ * 液态玻璃底部导航栏（复刻自 MyDia 的 MiuixNavBar）。
+ *
+ * 四层结构：
+ *  - [图层1] 底栏整体：drawBackdrop 真液态玻璃（blur + lens + 高光 + 阴影）。无 backdrop 时降级半透明。
+ *  - [图层2] 选中滑块：跟随选中位置丝滑滑动（Animatable），按压时果冻膨胀 + 拖拽拉伸形变。
+ *  - [图层3] 图标与文字：最上层，清晰不被模糊。
+ *  - [图层4] 隐形拖拽层：跟手指实时移动滑块，松手弹性吸附到最近 tab。
+ *
+ * @param items Tab 项（标题 + 图标）
+ * @param selected 当前选中
+ * @param onSelect 切换回调
+ * @param backdrop layerBackdrop 登记的内容捕获源，底栏透过它模糊背后内容；传 null 则降级为纯色底栏
+ * @param barShape 底栏整体形状（悬浮传 Capsule，贴底通栏传圆角顶矩形）
+ */
+@Composable
+fun MiuixNavBar(
+    items: List<Pair<String, ImageVector>>,
+    selected: Int,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    backdrop: LayerBackdrop? = null,
+    barShape: Shape = Capsule(),
+) {
+    val cs = MaterialTheme.colorScheme
+    val isLight = cs.background.luminance() > 0.5f
+    val tabCount = items.size
+    val useBackdrop = backdrop != null
+
+    BoxWithConstraints(modifier = modifier.fillMaxWidth().height(72.dp)) {
+        val density = LocalDensity.current
+        val tabWidthPx = with(density) { maxWidth.toPx() } / tabCount
+        val tabWidth = maxWidth / tabCount
+        val scope = rememberCoroutineScope()
+
+        // 滑块位置动画（丝滑滑动）
+        val position = remember { Animatable(selected.toFloat()) }
+        var isPressed by remember { mutableStateOf(false) }
+        var dragVelocity by remember { mutableFloatStateOf(0f) }
+
+        // 果冻缩放：按压/拖拽当前选中 tab 时滑块变大（状态驱动 + 弹簧回弹）
+        var pressScale by remember { mutableStateOf(1f) }
+        val jellyScale by animateFloatAsState(
+            targetValue = pressScale,
+            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+            label = "jellyScale",
+        )
+        // 外部选中变化 → 滑块平滑滑过去（切 tab 不弹大，只滑动）
+        LaunchedEffect(selected) {
+            if (!isPressed) {
+                position.animateTo(
+                    selected.toFloat(),
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow,
+                    ),
+                )
+            }
+        }
+        // 拖拽拉伸形变（拖得快时滑块沿拖动方向拉伸）
+        val stretchAmount by animateFloatAsState(
+            targetValue = if (isPressed) (abs(dragVelocity) * 0.0015f).coerceIn(0f, 0.25f) else 0f,
+            animationSpec = spring(stiffness = Spring.StiffnessHigh),
+            label = "stretchAmount",
+        )
+        val stretchDirection = if (dragVelocity >= 0f) 1f else -1f
+
+        val sliderOffsetPx = position.value * tabWidthPx
+
+        // ==================== [图层1] 底栏整体液态玻璃背景 ====================
+        val containerColor = if (isLight) Color(0xFFFAFAFA).copy(alpha = 0.72f)
+        else Color(0xFF121212).copy(alpha = 0.72f)
+        val bgMod = if (useBackdrop && backdrop != null) {
+            Modifier.fillMaxSize().drawBackdrop(
+                backdrop = backdrop,
+                shape = { barShape },
+                effects = { blur(100.dp.toPx()) },
+                highlight = { Highlight.Default },
+                shadow = { Shadow() },
+                onDrawSurface = { drawRect(containerColor) },
+            )
+        } else {
+            // 降级（无 backdrop 源）：画半实色背景，保证底栏不透明、不透出背后文字
+            Modifier
+                .fillMaxSize()
+                .clip(barShape)
+                .background(containerColor)
+                .border(0.5.dp, cs.onSurface.copy(alpha = 0.15f), barShape)
+        }
+        Box(modifier = bgMod)
+
+        // ==================== [图层2] 选中滑块 ====================
+        val sliderMod = if (useBackdrop && backdrop != null) {
+            Modifier
+                .align(Alignment.CenterStart)
+                .offset { IntOffset(sliderOffsetPx.roundToInt(), 0) }
+                .width(tabWidth)
+                .fillMaxHeight()
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+                .graphicsLayer {
+                    scaleX = jellyScale * (1f + stretchAmount * stretchDirection * 0.3f)
+                    scaleY = jellyScale * (1f - stretchAmount * 0.15f)
+                }
+                .drawBackdrop(
+                    backdrop = backdrop,
+                    shape = { Capsule() },
+                    effects = {
+                        val pressProgress = if (isPressed) 1f else 0f
+                        lens(
+                            10.dp.toPx() + 6.dp.toPx() * pressProgress,
+                            14.dp.toPx() + 8.dp.toPx() * pressProgress,
+                            chromaticAberration = true,
+                        )
+                    },
+                    highlight = { Highlight.Default },
+                    shadow = { Shadow() },
+                    innerShadow = { InnerShadow(radius = 8.dp) },
+                    onDrawSurface = {
+                        drawRect(
+                            if (isLight) Color.Black.copy(alpha = 0.06f) else Color.White.copy(alpha = 0.10f)
+                        )
+                    },
+                )
+        } else {
+            // 降级：液态透明水滴滑块（白色高光边 + 极透填充 + 按压膨胀）
+            Modifier
+                .align(Alignment.CenterStart)
+                .offset { IntOffset(sliderOffsetPx.roundToInt(), 0) }
+                .width(tabWidth)
+                .fillMaxHeight()
+                .padding(horizontal = 14.dp, vertical = 8.dp)
+                .graphicsLayer {
+                    scaleX = jellyScale * (1f + stretchAmount * stretchDirection * 0.3f)
+                    scaleY = jellyScale * (1f - stretchAmount * 0.15f)
+                }
+                .clip(Capsule())
+                .border(1.dp, Color.White.copy(alpha = 0.6f), Capsule())
+                .background(Color.White.copy(alpha = 0.18f))
+        }
+        Box(modifier = sliderMod)
+
+        // ==================== [图层3] 图标与文字 ====================
+        // 点击由 [图层4] 拖拽层统一接管（它铺满底栏且在上层），这里不做 pointerInput。
+        Row(modifier = Modifier.fillMaxSize()) {
+            items.forEachIndexed { index, (label, icon) ->
+                val isSelected = selected == index
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    val contentColor by animateColorAsState(
+                        targetValue = if (isSelected) cs.primary else cs.onSurfaceVariant,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium,
+                        ),
+                        label = "tabContentColor",
+                    )
+                    val iconScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.15f else 1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium,
+                        ),
+                        label = "tabIconScale",
+                    )
+                    val labelAlpha by animateFloatAsState(
+                        targetValue = if (isSelected) 1f else 0.7f,
+                        animationSpec = spring(stiffness = Spring.StiffnessMedium),
+                        label = "tabLabelAlpha",
+                    )
+                    val labelScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.05f else 1f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium,
+                        ),
+                        label = "tabLabelScale",
+                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = label,
+                            tint = contentColor,
+                            modifier = Modifier.size(24.dp).graphicsLayer {
+                                scaleX = iconScale; scaleY = iconScale
+                            },
+                        )
+                        Spacer(Modifier.height(2.dp))
+                        Text(
+                            text = label,
+                            fontSize = 12.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = contentColor.copy(alpha = labelAlpha),
+                            modifier = Modifier.graphicsLayer {
+                                scaleX = labelScale; scaleY = labelScale
+                            },
+                        )
+                    }
+                }
+            }
+        }
+
+        // ==================== [图层4] 隐形拖拽层 ====================
+        // 铺满整个底栏（参考系固定不动）：按下 → 滑块变大；未拖动 → 点击切换；
+        // 拖动 → 滑块跟手 snapTo，松手弹性吸附到最近 tab。
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxSize()
+                .pointerInput(tabCount, tabWidthPx, selected) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        // 按下：滑块变大（按压效果）
+                        isPressed = true
+                        pressScale = 1.3f
+                        val startIndex = position.value
+                        var totalDx = 0f
+                        var isDrag = false
+                        var lastX = down.position.x
+                        // 位移超过阈值才视为拖动（区分点击 vs 拖动）
+                        val touchSlop = with(density) { 8.dp.toPx() }
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            val change = event.changes.firstOrNull() ?: break
+                            if (!change.pressed) {
+                                // 松手：弹回 + 吸附到最近 tab
+                                isPressed = false
+                                pressScale = 1f
+                                dragVelocity = 0f
+                                if (!isDrag) {
+                                    // 未达拖动阈值 = 点击：直接切换点击处的 tab
+                                    val tapped = (change.position.x / tabWidthPx).toInt().coerceIn(0, tabCount - 1)
+                                    if (tapped != selected) {
+                                        scope.launch {
+                                            position.animateTo(
+                                                tapped.toFloat(),
+                                                animationSpec = spring(
+                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                    stiffness = Spring.StiffnessLow,
+                                                ),
+                                            )
+                                        }
+                                        onSelect(tapped)
+                                    } else {
+                                        scope.launch {
+                                            position.animateTo(
+                                                selected.toFloat(),
+                                                animationSpec = spring(
+                                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                    stiffness = Spring.StiffnessLow,
+                                                ),
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    val target = position.value.roundToInt().coerceIn(0, tabCount - 1)
+                                    scope.launch {
+                                        position.animateTo(
+                                            target.toFloat(),
+                                            animationSpec = spring(
+                                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                                stiffness = Spring.StiffnessLow,
+                                            ),
+                                        )
+                                    }
+                                    onSelect(target)
+                                }
+                                break
+                            }
+                            // 拖动跟手：拖拽层铺满底栏（参考系固定不动），
+                            // 手指上一帧坐标增量 = 真实位移，滑块 snapTo 精确跟随
+                            val dx = change.position.x - lastX
+                            lastX = change.position.x
+                            if (dx != 0f) {
+                                change.consume()
+                                totalDx += dx
+                                if (abs(totalDx) > touchSlop) isDrag = true
+                                if (isDrag) {
+                                    dragVelocity = dx
+                                    // snapTo 是 suspend：包进 scope.launch（awaitEachGesture 的
+                                    // restricted scope 不能直接调 suspend，只包一拍即完成，无竞态）
+                                    val targetX = (startIndex + totalDx / tabWidthPx)
+                                        .coerceIn(0f, (tabCount - 1).toFloat())
+                                    scope.launch { position.snapTo(targetX) }
+                                }
+                            }
+                        }
+                        // 手势结束兜底：确保弹回
+                        if (pressScale != 1f) pressScale = 1f
+                        if (isPressed) isPressed = false
+                    }
+                },
+        )
+    }
+}

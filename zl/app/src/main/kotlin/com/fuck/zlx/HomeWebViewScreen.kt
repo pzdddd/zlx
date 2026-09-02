@@ -7,22 +7,88 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import org.json.JSONArray
+import org.json.JSONObject
+
+data class UrlFavorite(
+    val url: String,
+    val title: String,
+    val time: Long
+)
+
+object UrlFavoritesStore {
+    private const val PREFS_NAME = "AppConfig"
+    private const val KEY_ITEMS = "url_favorites"
+
+    /** 内置收藏：始终存在于收藏列表第一位，不可删除 */
+    const val BUILT_IN_URL = "https://www.zl-x.com"
+    val builtIn = UrlFavorite(BUILT_IN_URL, "默认主页", 0L)
+
+    fun load(context: Context): MutableList<UrlFavorite> {
+        val list = mutableListOf<UrlFavorite>()
+        val json = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .getString(KEY_ITEMS, null)
+        if (json != null) {
+            try {
+                val arr = JSONArray(json)
+                for (i in 0 until arr.length()) {
+                    val o = arr.getJSONObject(i)
+                    val fav = UrlFavorite(o.getString("url"), o.optString("title"), o.optLong("time"))
+                    if (fav.url != BUILT_IN_URL) list.add(fav)
+                }
+            } catch (_: Exception) {
+            }
+        }
+        // 内置条目始终排第一，不落盘
+        list.add(0, builtIn)
+        return list
+    }
+
+    fun save(context: Context, list: List<UrlFavorite>) {
+        val arr = JSONArray()
+        list.filter { it.url != BUILT_IN_URL }.forEach {
+            arr.put(JSONObject().put("url", it.url).put("title", it.title).put("time", it.time))
+        }
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit().putString(KEY_ITEMS, arr.toString()).apply()
+    }
+
+    fun add(context: Context, url: String, title: String): Boolean {
+        val list = load(context)
+        if (list.any { it.url == url }) return false
+        list.add(1, UrlFavorite(url, title, System.currentTimeMillis()))
+        save(context, list)
+        return true
+    }
+
+    fun remove(context: Context, url: String) {
+        if (url == BUILT_IN_URL) return // 内置条目不可删除
+        val list = load(context)
+        list.removeAll { it.url == url }
+        save(context, list)
+    }
+}
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -37,10 +103,9 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
     var inputUrlText by remember { mutableStateOf(currentUrl) }
     var showMenu by remember { mutableStateOf(false) }
 
-
-    // 网页源码相关状态
-    var showSourceDialog by remember { mutableStateOf(false) }
-    var sourceHtml by remember { mutableStateOf("") }
+    // 收藏相关状态
+    var showFavoritesDialog by remember { mutableStateOf(false) }
+    var favorites by remember { mutableStateOf(listOf<UrlFavorite>()) }
 
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     val isLazyLoad = prefs.getBoolean("lazy_load_video", true)
@@ -357,57 +422,44 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
                     },
                     leadingIcon = { Icon(Icons.Filled.MoreVert, contentDescription = null) }
                 )
-                // 获取网页源码
+                // 收藏当前网址
                 DropdownMenuItem(
-                    text = { Text("获取网页源码") },
+                    text = { Text("收藏此网址") },
                     onClick = {
                         showMenu = false
+                        val curUrl = webViewInstance?.url ?: currentUrl
+                        if (curUrl.isBlank() || !curUrl.startsWith("http")) {
+                            Toast.makeText(context, "当前页面无效，无法收藏", Toast.LENGTH_SHORT).show()
+                            return@DropdownMenuItem
+                        }
                         webViewInstance?.evaluateJavascript(
-                            """
-                            (function(){
-                                var c=document.documentElement.cloneNode(true);
-                                c.querySelectorAll('head,style,script,noscript').forEach(function(e){e.remove()});
-                                var result=[];
-                                // 遍历每个 list_item（包含图片和标题的卡片）
-                                var items=c.querySelectorAll('.list_item');
-                                items.forEach(function(item){
-                                    // 提取 data-src 中的真实图片链接（排除 loading.png）
-                                    var img=item.querySelector('img');
-                                    var imgSrc='';
-                                    if(img){
-                                        imgSrc=img.getAttribute('data-src')||img.getAttribute('src')||'';
-                                        if(imgSrc.indexOf('loading.png')>=0) imgSrc=img.getAttribute('data-src')||'';
-                                    }
-                                    // 提取标题文本
-                                    var titleEl=item.querySelector('.list_title');
-                                    var title=titleEl?titleEl.textContent.trim():'';
-                                    // 提取链接
-                                    var href=item.getAttribute('href')||'';
-                                    if(href&&href.indexOf('http')!==0) href='https://www.zl-x.com'+href;
-                                    if(imgSrc&&imgSrc.indexOf('http')!==0) imgSrc='https://www.zl-x.com'+imgSrc;
-                                    result.push('[图片] '+imgSrc);
-                                    result.push('[标题] '+title);
-                                    result.push('[链接] '+href);
-                                    result.push('');
-                                });
-                                return result.join('\n');
-                            })();
-                            """.trimIndent()
-                        ) { rawResult ->
-                            val text = rawResult
+                            "(function(){try{return document.title}catch(e){return ''}})()"
+                        ) { rawTitle ->
+                            val title = rawTitle
                                 ?.removeSurrounding("\"")
-                                ?.replace("\\\"", "\"")
-                                ?.replace("\\/", "/")
-                                ?.replace("\\n", "\n")
-                                ?.replace("\\u003C", "<")
-                                ?.replace("\\u003E", ">")
-                                ?.replace("\\u0026", "&")
+                                ?.replace("\\n", " ")
+                                ?.orEmpty()
                                 .orEmpty()
-                            sourceHtml = text
-                            showSourceDialog = true
+                            val added = UrlFavoritesStore.add(context, curUrl, title)
+                            favorites = UrlFavoritesStore.load(context)
+                            Toast.makeText(
+                                context,
+                                if (added) "已收藏：${title.ifBlank { curUrl }}" else "该网址已在收藏中",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
-                    leadingIcon = { Icon(Icons.Filled.Code, contentDescription = null) }
+                    leadingIcon = { Icon(Icons.Filled.Star, contentDescription = null) }
+                )
+                // 查看收藏列表
+                DropdownMenuItem(
+                    text = { Text("查看收藏") },
+                    onClick = {
+                        showMenu = false
+                        favorites = UrlFavoritesStore.load(context)
+                        showFavoritesDialog = true
+                    },
+                    leadingIcon = { Icon(Icons.Filled.List, contentDescription = null) }
                 )
             }
         }
@@ -440,22 +492,74 @@ fun HomeWebViewScreen(onWebViewCreated: (WebView) -> Unit, jsInterface: SniffJsI
             )
         }
 
-        // 网页源码弹窗
-        if (showSourceDialog) {
+        // 收藏列表弹窗
+        if (showFavoritesDialog) {
             AlertDialog(
-                onDismissRequest = { showSourceDialog = false },
-                title = { Text("网页源码") },
+                onDismissRequest = { showFavoritesDialog = false },
+                title = { Text("我的收藏 (${favorites.size})") },
                 text = {
-                    Text(
-                        text = sourceHtml.ifEmpty { "（空）" },
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .verticalScroll(rememberScrollState())
-                    )
+                    if (favorites.isEmpty()) {
+                        Text(
+                            text = "暂无收藏\n点击首页菜单中的「收藏此网址」即可收藏当前页面",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 360.dp)
+                        ) {
+                            items(favorites) { fav ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clickable {
+                                                showFavoritesDialog = false
+                                                currentUrl = fav.url
+                                                webViewInstance?.loadUrl(fav.url)
+                                            }
+                                    ) {
+                                        Text(
+                                            text = fav.title.ifBlank { fav.url },
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = fav.url,
+                                            fontSize = 11.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                    // 内置的默认主页不可删除，不显示删除按钮
+                                    if (fav.url != UrlFavoritesStore.BUILT_IN_URL) {
+                                        IconButton(onClick = {
+                                            UrlFavoritesStore.remove(context, fav.url)
+                                            favorites = UrlFavoritesStore.load(context)
+                                        }) {
+                                            Icon(
+                                                Icons.Filled.Close,
+                                                contentDescription = "删除",
+                                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
                 confirmButton = {
-                    TextButton(onClick = { showSourceDialog = false }) { Text("关闭") }
+                    TextButton(onClick = { showFavoritesDialog = false }) { Text("关闭") }
                 }
             )
         }

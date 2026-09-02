@@ -20,10 +20,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -523,7 +524,7 @@ fun VideoPlayerScreen(url: String, onClose: () -> Unit) {
                         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                     } else onClose()
                 },
-                modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp)
+                modifier = Modifier.align(Alignment.TopStart).statusBarsPadding().padding(top = 8.dp)
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回", tint = Color.White, modifier = Modifier.size(28.dp))
             }
@@ -538,6 +539,7 @@ fun VideoPlayerScreen(url: String, onClose: () -> Unit) {
                             listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
                         )
                     )
+                    .navigationBarsPadding()
                     .padding(horizontal = 12.dp)
                     .padding(top = 28.dp, bottom = 8.dp)
             ) {

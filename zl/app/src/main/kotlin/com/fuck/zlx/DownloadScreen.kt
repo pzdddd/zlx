@@ -378,7 +378,7 @@ fun DownloadScreen(onBack: () -> Unit) {
         AlertDialog(
             onDismissRequest = { showDetailsFor = null },
             title = { Text("详细信息") },
-            text = { Text(getFileDetails(context, task.outputPath), style = MaterialTheme.typography.bodyMedium) },
+            text = { Text(getFileDetails(context, task), style = MaterialTheme.typography.bodyMedium) },
             confirmButton = { TextButton(onClick = { showDetailsFor = null }) { Text("我知道了") } }
         )
     }
@@ -662,19 +662,51 @@ private fun shareOrMoveVideo(context: Context, path: String) {
 }
 
 // 获取文件大小与详情
-private fun getFileDetails(context: Context, path: String): String {
+private fun getFileDetails(context: Context, task: DownloadTask): String {
     return try {
         var size = 0L
-        if (path.startsWith("content://")) {
-            val uri = Uri.parse(path)
+        if (task.outputPath.startsWith("content://")) {
+            val uri = Uri.parse(task.outputPath)
             val doc = DocumentFile.fromSingleUri(context, uri)
             size = doc?.length() ?: 0L
         } else {
-            size = File(path).length()
+            size = File(task.outputPath).length()
         }
         val sizeStr = Formatter.formatFileSize(context, size)
-        "文件路径：\n$path\n\n文件大小：$sizeStr"
+        val dateStr = if (task.completedAt > 0)
+            SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(task.completedAt))
+        else "未知"
+        buildString {
+            append("文件名：\n${task.fileName}\n\n")
+            append("下载日期：$dateStr\n\n")
+            append("文件路径：\n${humanReadablePath(task.outputPath)}\n\n")
+            append("文件大小：$sizeStr")
+        }
     } catch (e: Exception) {
         "无法获取文件信息"
+    }
+}
+
+/**
+ * 把 SAF 的 content:// URI（百分号编码，形如乱码）解码成人类可读的存储路径。
+ * 例如 content://...document/primary%3ADownload%2Fzl-x%2Fa.mp4
+ * 解码为 /storage/emulated/0/Download/zl-x/a.mp4
+ */
+private fun humanReadablePath(path: String): String {
+    if (!path.startsWith("content://")) return path
+    return try {
+        val idxDoc = path.lastIndexOf("/document/")
+        val idxTree = path.lastIndexOf("/tree/")
+        val markerLen = when {
+            idxDoc >= idxTree && idxDoc >= 0 -> 10 // "/document/"
+            idxTree >= 0 -> 6                       // "/tree/"
+            else -> return path
+        }
+        val start = maxOf(idxDoc, idxTree)
+        val decoded = java.net.URLDecoder.decode(path.substring(start + markerLen), "UTF-8")
+        if (decoded.startsWith("primary:")) "/storage/emulated/0/" + decoded.removePrefix("primary:")
+        else decoded
+    } catch (e: Exception) {
+        path
     }
 }

@@ -3,6 +3,7 @@ package com.fuck.zlx
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
@@ -14,6 +15,8 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -34,6 +37,18 @@ fun SettingsScreen() {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
+    var showHelp by remember { mutableStateOf(false) }
+    // 帮助页打开时隐藏底部导航栏
+    DisposableEffect(showHelp) {
+        SubPageState.covering = showHelp
+        onDispose { SubPageState.covering = false }
+    }
+    BackHandler(enabled = showHelp) { showHelp = false }
+    if (showHelp) {
+        HelpScreen(onBack = { showHelp = false })
+        return
+    }
+
     var useLocalDownload by remember { mutableStateOf(prefs.getBoolean("use_local_download", false)) }
     var downloadThreads by remember { mutableFloatStateOf(prefs.getInt("download_threads", 8).toFloat()) }
     
@@ -41,10 +56,9 @@ fun SettingsScreen() {
     var downloadDirName by remember { mutableStateOf("默认 (系统下载文件夹)") }
 
     var lazyLoadVideo by remember { mutableStateOf(prefs.getBoolean("lazy_load_video", true)) }
+    var floatingBottomBar by remember { mutableStateOf(prefs.getBoolean("floating_bottom_bar", true)) }
+    var liquidGlass by remember { mutableStateOf(prefs.getBoolean("liquid_glass", true)) }
 
-    var floatingBottomBar by remember { mutableStateOf(prefs.getBoolean("floating_bottom_bar", false)) }
-    var liquidGlass by remember { mutableStateOf(prefs.getBoolean("liquid_glass", false)) }
-    var smoothCorners by remember { mutableStateOf(prefs.getBoolean("smooth_corners", false)) }
 
     LaunchedEffect(downloadDirUri) {
         if (downloadDirUri != null) {
@@ -90,6 +104,35 @@ fun SettingsScreen() {
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
+
+                // --- 帮助 ---
+                Column {
+                    LiquidGlassSectionTitle("帮助")
+                    LiquidGlassListCard(backdrop = backdrop) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showHelp = true }
+                                .padding(horizontal = 20.dp, vertical = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.HelpOutline,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("使用帮助", style = MaterialTheme.typography.bodyLarge)
+                                Text(
+                                    "各页面功能与操作说明",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
 
                 // --- 下载引擎与网络 ---
                 Column {
@@ -180,11 +223,11 @@ fun SettingsScreen() {
 
                 // --- 外观与视觉 ---
                 Column {
-                    LiquidGlassSectionTitle("外观与视觉 (动态生效)")
+                    LiquidGlassSectionTitle("外观与视觉")
                     LiquidGlassListCard(backdrop = backdrop) {
                         LiquidGlassSettingSwitchItem(
                             title = "悬浮底栏",
-                            subtitle = "使用类 Apple 风格的悬浮底栏",
+                            subtitle = "开启: 悬浮胶囊造型 关闭: 贴底通栏\n切换标签页后生效",
                             checked = floatingBottomBar,
                             onCheckedChange = {
                                 floatingBottomBar = it
@@ -196,23 +239,11 @@ fun SettingsScreen() {
 
                         LiquidGlassSettingSwitchItem(
                             title = "液态玻璃",
-                            subtitle = "启用悬浮底栏的液态玻璃效果",
+                            subtitle = "底栏毛玻璃效果，关闭则纯色底栏更省电\n切换标签页后生效",
                             checked = liquidGlass,
                             onCheckedChange = {
                                 liquidGlass = it
                                 prefs.edit().putBoolean("liquid_glass", it).apply()
-                            },
-                            backdrop = backdrop,
-                            showDivider = true
-                        )
-
-                        LiquidGlassSettingSwitchItem(
-                            title = "平滑圆角",
-                            subtitle = "让悬浮底栏拥有更平滑的圆角弧度",
-                            checked = smoothCorners,
-                            onCheckedChange = {
-                                smoothCorners = it
-                                prefs.edit().putBoolean("smooth_corners", it).apply()
                             },
                             backdrop = backdrop,
                             showDivider = false

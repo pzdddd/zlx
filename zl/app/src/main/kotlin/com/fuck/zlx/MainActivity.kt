@@ -179,7 +179,15 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        MainScreen()
+                        // 激活门槛：未激活先进入激活界面，激活后进入主界面
+                        var activated by remember {
+                            mutableStateOf(ActivationManager.isActivated(this@MainActivity))
+                        }
+                        if (activated) {
+                            MainScreen()
+                        } else {
+                            ActivationScreen(onActivated = { activated = true })
+                        }
                     }
                 }
             }

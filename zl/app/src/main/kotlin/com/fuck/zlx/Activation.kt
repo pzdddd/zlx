@@ -21,19 +21,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.net.HttpURLConnection
+import java.net.URL
 import java.security.MessageDigest
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * 一机一码离线激活：
+ * 一机一码离线激活（支持时长）：
  *  设备码 = SHA-256(ANDROID_ID + 盐) 前 16 位十六进制（XXXX-XXXX-XXXX-XXXX），每台设备唯一；
- *  激活码 = HMAC-SHA256(仅持有者知道的密钥, 设备码) 前 8 位（XXXX-XXXX）。
- * 激活码只有拿到密钥的发放者才能计算，且只对对应设备有效，应用本地校验、无需服务器。
+ *  激活码 = 8 位签名 + 1 位时长码（XXXX-XXXX-D），签名 = HMAC-SHA256(私有密钥, 设备码|时长码)。
+ *  时长码：0=永久 1=1小时 2=1天 3=3天 4=7天 5=30天。
+ *
+ * 防时间作弊：
+ *  - 高水位：记录见过的最大时间戳，系统时间回拨超过15分钟即判定失效；
+ *  - 网络校时：定期取 HTTP Date 头算出本地时钟偏移，计算到期时用校准后的时间。
  */
 object ActivationManager {
     private const val PREFS_NAME = "activation"
     private const val KEY_CODE = "code"
+    private const val KEY_AT = "activatedAt"
+    private const val KEY_LAST_SEEN = "lastSeen"
+    private const val KEY_NET_OFFSET = "netOffset"
+    private const val KEY_INVALID_REASON = "invalidReason"
+
+    /** 时长码 -> 分钟（0 表示永久） */
+    private val DURATIONS = mapOf(
+        '0' to 0L, '1' to 60L, '2' to 1440L, '3' to 4320L, '4' to 10080L, '5' to 43200L
+    )
 
     // 密钥打散混淆存放（运行时还原），防止被一键字符串搜索
     private val secret: String by lazy {
@@ -51,31 +69,122 @@ object ActivationManager {
         return hex.chunked(4).joinToString("-")
     }
 
-    /** 由设备码计算对应激活码（与发放者生成器算法一致） */
-    fun expectedCode(context: Context): String {
+    /** 指定时长码对应的 8 位签名（与发放者生成器算法一致） */
+    private fun signatureFor(context: Context, durationChar: Char): String {
         val dev = deviceCode(context).replace("-", "")
         val mac = Mac.getInstance("HmacSHA256")
         mac.init(SecretKeySpec(secret.toByteArray(), "HmacSHA256"))
-        val hash = mac.doFinal(dev.toByteArray())
-        val hex = hash.take(4).joinToString("") { "%02X".format(it) }
-        return hex.chunked(4).joinToString("-")
+        val hash = mac.doFinal((dev + "|" + durationChar).toByteArray())
+        return hash.take(4).joinToString("") { "%02X".format(it) }
     }
 
-    fun isActivated(context: Context): Boolean {
-        val saved = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_CODE, null) ?: return false
-        return saved.replace("-", "").equals(expectedCode(context).replace("-", ""), ignoreCase = true)
+    private fun prefs(context: Context) =
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    /** 校准后的当前时间（本地时钟 + 网络偏移，偏移超一年视为无效不采用） */
+    private fun now(context: Context): Long {
+        val offset = prefs(context).getLong(KEY_NET_OFFSET, 0L)
+        val safe = if (kotlin.math.abs(offset) > 365L * 24 * 3600 * 1000) 0L else offset
+        return System.currentTimeMillis() + safe
     }
 
-    /** 校验并保存。返回是否激活成功 */
-    fun activate(context: Context, input: String): Boolean {
-        val ok = input.replace("-", "").trim()
-            .equals(expectedCode(context).replace("-", ""), ignoreCase = true)
-        if (ok) {
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit().putString(KEY_CODE, input.trim()).apply()
+    /** 后台取网络时间（HTTP Date 头）修正本地时钟偏移，结果存 prefs */
+    fun refreshNetworkTime(context: Context) {
+        Thread {
+            try {
+                val conn = URL("https://www.baidu.com").openConnection() as HttpURLConnection
+                conn.requestMethod = "HEAD"
+                conn.connectTimeout = 3000
+                conn.readTimeout = 3000
+                val dateStr = conn.getHeaderField("Date") ?: return@Thread
+                conn.disconnect()
+                val net = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US).parse(dateStr)?.time
+                    ?: return@Thread
+                val offset = net - System.currentTimeMillis()
+                if (kotlin.math.abs(offset) <= 365L * 24 * 3600 * 1000) {
+                    prefs(context).edit().putLong(KEY_NET_OFFSET, offset).apply()
+                }
+            } catch (_: Exception) {
+            }
+        }.start()
+    }
+
+    private fun invalidate(context: Context, reason: String) {
+        prefs(context).edit()
+            .remove(KEY_CODE)
+            .putString(KEY_INVALID_REASON, reason)
+            .apply()
+    }
+
+    /** 上次失效原因（供激活界面提示，如"激活已到期"），无则 null */
+    fun invalidReason(context: Context): String? =
+        prefs(context).getString(KEY_INVALID_REASON, null)?.also {
+            // 读一次即清除，避免激活成功后残留
         }
-        return ok
+
+    /** 校验并保存激活码（格式 XXXX-XXXX-D，9 位）。返回是否成功 */
+    fun activate(context: Context, input: String): Boolean {
+        val code = input.replace("-", "").replace(" ", "").trim().uppercase()
+        if (code.length != 9) return false
+        val durationChar = code.last()
+        val signature = code.dropLast(1)
+        if (durationChar !in DURATIONS) return false
+        if (!signature.equals(signatureFor(context, durationChar), ignoreCase = true)) return false
+        val t = now(context)
+        prefs(context).edit()
+            .putString(KEY_CODE, code)
+            .putLong(KEY_AT, t)
+            .putLong(KEY_LAST_SEEN, t)
+            .remove(KEY_INVALID_REASON)
+            .apply()
+        return true
+    }
+
+    /** 是否已激活且仍在有效期内（含时间作弊检测）。会更新高水位。 */
+    fun checkValid(context: Context): Boolean {
+        val code = prefs(context).getString(KEY_CODE, null) ?: return false
+        if (code.length != 9) {
+            invalidate(context, "激活数据无效，请重新激活")
+            return false
+        }
+        val durationChar = code.last()
+        if (durationChar !in DURATIONS ||
+            !code.dropLast(1).equals(signatureFor(context, durationChar), ignoreCase = true)
+        ) {
+            invalidate(context, "激活数据无效，请重新激活")
+            return false
+        }
+        val minutes = DURATIONS[durationChar]!!
+        val t = now(context)
+        val p = prefs(context)
+        val lastSeen = p.getLong(KEY_LAST_SEEN, t)
+        if (t + 15 * 60 * 1000 < lastSeen) {
+            invalidate(context, "检测到系统时间被回拨，请重新激活")
+            return false
+        }
+        p.edit().putLong(KEY_LAST_SEEN, maxOf(t, lastSeen)).apply()
+        if (minutes > 0L) {
+            val activatedAt = p.getLong(KEY_AT, t)
+            if (t - activatedAt > minutes * 60 * 1000) {
+                invalidate(context, "激活已到期，请重新获取激活码")
+                return false
+            }
+        }
+        return true
+    }
+
+    /** 激活成功后的有效期描述 */
+    fun durationText(context: Context): String {
+        val code = prefs(context).getString(KEY_CODE, null) ?: return ""
+        return when (code.getOrNull(8)) {
+            '0' -> "永久有效"
+            '1' -> "1 小时"
+            '2' -> "1 天"
+            '3' -> "3 天"
+            '4' -> "7 天"
+            '5' -> "30 天"
+            else -> ""
+        }
     }
 }
 
@@ -86,6 +195,7 @@ object ActivationManager {
 fun ActivationScreen(onActivated: () -> Unit) {
     val context = LocalContext.current
     val deviceCode = remember { ActivationManager.deviceCode(context) }
+    val failReason = remember { ActivationManager.invalidReason(context) }
     var input by remember { mutableStateOf("") }
     var error by remember { mutableStateOf(false) }
 
@@ -102,7 +212,13 @@ fun ActivationScreen(onActivated: () -> Unit) {
             Spacer(modifier = Modifier.height(6.dp))
             Text("视频嗅探浏览器", fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(28.dp))
+
+            if (failReason != null) {
+                Text(failReason, fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
@@ -134,13 +250,14 @@ fun ActivationScreen(onActivated: () -> Unit) {
             OutlinedTextField(
                 value = input,
                 onValueChange = {
-                    input = it.take(9)
+                    input = it.take(11)
                     error = false
                 },
-                label = { Text("激活码（如 A1B2-C3D4）") },
+                label = { Text("激活码（如 A1B2-C3D4-3）") },
                 isError = error,
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(autoCorrect = false, keyboardType = androidx.compose.ui.text.input.KeyboardType.Ascii),
+                keyboardOptions = KeyboardOptions(autoCorrect = false,
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Ascii),
                 modifier = Modifier.fillMaxWidth()
             )
             if (error) {
@@ -154,7 +271,8 @@ fun ActivationScreen(onActivated: () -> Unit) {
             Button(
                 onClick = {
                     if (ActivationManager.activate(context, input)) {
-                        Toast.makeText(context, "激活成功！", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "激活成功（${ActivationManager.durationText(context)}）",
+                            Toast.LENGTH_SHORT).show()
                         onActivated()
                     } else {
                         error = true
@@ -168,7 +286,7 @@ fun ActivationScreen(onActivated: () -> Unit) {
 
             Spacer(modifier = Modifier.height(32.dp))
             Text(
-                "激活码与设备绑定，一码一机。\n更换设备需重新获取。",
+                "激活码与设备绑定，一码一机，有效期由激活码决定。\n到期或更换设备需重新获取。",
                 fontSize = 12.sp, textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

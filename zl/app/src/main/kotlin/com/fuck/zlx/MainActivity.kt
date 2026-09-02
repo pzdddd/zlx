@@ -179,9 +179,18 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        // 激活门槛：未激活先进入激活界面，激活后进入主界面
+                        // 激活门槛：未激活/已到期先进入激活界面；运行中每30秒复查一次
                         var activated by remember {
-                            mutableStateOf(ActivationManager.isActivated(this@MainActivity))
+                            mutableStateOf(ActivationManager.checkValid(this@MainActivity))
+                        }
+                        LaunchedEffect(activated) {
+                            ActivationManager.refreshNetworkTime(this@MainActivity)
+                            while (activated) {
+                                kotlinx.coroutines.delay(30_000)
+                                if (!ActivationManager.checkValid(this@MainActivity)) {
+                                    activated = false
+                                }
+                            }
                         }
                         if (activated) {
                             MainScreen()
@@ -232,10 +241,11 @@ fun MainScreen() {
     // 滚动状态也提升到 MainScreen：切走再切回资源页时保留列表位置
     val resourcesListState = rememberLazyListState()
     val resourcesGridState = rememberLazyGridState()
+    val context = LocalContext.current
     val jsInterface = remember {
         SniffJsInterface(
             onAdd = { id, url, thumbUrl, isComplete, title ->
-                if (!sniffedIds.contains(id)) {
+                if (ActivationManager.checkValid(context) && !sniffedIds.contains(id)) {
                     sniffedIds.add(id)
                     sniffedResources = sniffedResources + SniffedItem(id, url, thumbUrl, isComplete, title = title)
                 }
@@ -252,7 +262,6 @@ fun MainScreen() {
         webViewInstance = webView
     }
 
-    val context = LocalContext.current
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     // 底栏样式开关（设置页可改，切回标签页时生效）
     val isFloating = prefs.getBoolean("floating_bottom_bar", true)
